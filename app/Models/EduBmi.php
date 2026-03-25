@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\BmiForAge;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -37,17 +38,15 @@ class EduBmi extends Model
     protected function category(): Attribute
     {
         return Attribute::get(function (): string {
-            if ($this->bmi < 18.5) {
-                return 'underweight';
-            }
-            if ($this->bmi < 25) {
-                return 'normal';
-            }
-            if ($this->bmi < 30) {
-                return 'overweight';
+            $birthdate = null;
+            $gender = null;
+
+            if ($this->relationLoaded('user') && $this->user) {
+                $birthdate = $this->user->birthdate;
+                $gender = $this->user->gender;
             }
 
-            return 'obese';
+            return BmiForAge::categorize($this->bmi, $birthdate, $gender, $this->date);
         });
     }
 

@@ -71,11 +71,11 @@ class DatabaseSeeder extends Seeder
 
         // Students
         $students = [
-            ['login' => 'student_chan', 'name' => 'Chan Tai Man',   'fee' => 800.00],
-            ['login' => 'student_li',  'name' => 'Li Ka Yan',      'fee' => 800.00],
-            ['login' => 'student_wong','name' => 'Wong Siu Ming',   'fee' => 900.00],
-            ['login' => 'student_lam', 'name' => 'Lam Hoi Yin',    'fee' => 800.00],
-            ['login' => 'student_ng',  'name' => 'Ng Chi Wai',     'fee' => 900.00],
+            ['login' => 'student_chan', 'name' => 'Chan Tai Man',  'fee' => 800.00, 'birthdate' => '2010-05-12', 'gender' => 'male'],
+            ['login' => 'student_li',  'name' => 'Li Ka Yan',     'fee' => 800.00, 'birthdate' => '2011-08-23', 'gender' => 'female'],
+            ['login' => 'student_wong','name' => 'Wong Siu Ming',  'fee' => 900.00, 'birthdate' => '2009-11-03', 'gender' => 'male'],
+            ['login' => 'student_lam', 'name' => 'Lam Hoi Yin',   'fee' => 800.00, 'birthdate' => '2012-02-17', 'gender' => 'female'],
+            ['login' => 'student_ng',  'name' => 'Ng Chi Wai',    'fee' => 900.00, 'birthdate' => '2008-07-30', 'gender' => 'male'],
         ];
 
         foreach ($students as $s) {
@@ -88,6 +88,10 @@ class DatabaseSeeder extends Seeder
             ]);
             DB::table('wp_3x_edu_user')->insert([
                 'user_id' => $id, 'note' => '', 'hourly_wage' => 0, 'class_fee' => $s['fee'],
+            ]);
+            DB::table('wp_3x_usermeta')->insert([
+                ['user_id' => $id, 'meta_key' => 'billing_birthdate', 'meta_value' => $s['birthdate']],
+                ['user_id' => $id, 'meta_key' => 'billing_gender',    'meta_value' => $s['gender']],
             ]);
             $this->studentIds[$s['login']] = $id;
         }

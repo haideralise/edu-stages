@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -37,10 +38,26 @@ class WpUser extends Authenticatable
         return $this->hasOne(EduUser::class, 'user_id', 'ID');
     }
 
+    // ── Accessors ─────────────────────────────────────────────────
+
+    protected function birthdate(): Attribute
+    {
+        return Attribute::get(fn () => $this->getMetaValue('billing_birthdate'));
+    }
+
+    protected function gender(): Attribute
+    {
+        return Attribute::get(fn () => $this->getMetaValue('billing_gender'));
+    }
+
     // ── Helpers ──────────────────────────────────────────────────
 
     public function getMetaValue(string $key): ?string
     {
+        if ($this->relationLoaded('meta')) {
+            return $this->meta->firstWhere('meta_key', $key)?->meta_value;
+        }
+
         return $this->meta()->where('meta_key', $key)->value('meta_value');
     }
 

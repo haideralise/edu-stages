@@ -24,7 +24,7 @@ class StudentBmiController extends Controller
         $isAdmin = $user->resolveRole() === 'admin';
 
         if ($isAdmin) {
-            $records = EduBmi::with('user')
+            $records = EduBmi::with('user.meta')
                 ->orderByDesc('date')
                 ->get()
                 ->each(fn ($bmi) => $bmi->student_name = $bmi->user?->display_name ?? "Student #{$bmi->user_id}");
@@ -43,7 +43,8 @@ class StudentBmiController extends Controller
 
             $students->prepend($user);
         } else {
-            $records = EduBmi::forUser($user->ID)
+            $records = EduBmi::with('user.meta')
+                ->forUser($user->ID)
                 ->orderByDesc('date')
                 ->get();
 
