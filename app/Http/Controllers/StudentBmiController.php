@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreBmiRequest;
 use App\Http\Requests\UpdateBmiRequest;
 use App\Models\EduBmi;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -26,56 +27,79 @@ class StudentBmiController extends Controller
         return view('account.mybmi', compact('records'));
     }
 
-    public function create(): View
+    public function show(EduBmi $bmi): JsonResponse
     {
-        $this->authorize('create', EduBmi::class);
+        $this->authorize('update', $bmi);
 
-        return view('account.bmi_form', ['bmi' => null]);
+        return response()->json([
+            'id'             => $bmi->id,
+            'height'         => $bmi->height,
+            'weight'         => $bmi->weight,
+            'hc'             => $bmi->hc,
+            'date'           => $bmi->date,
+            'date_formatted' => date('Y-m-d', $bmi->date),
+            'bmi'            => $bmi->bmi,
+        ]);
     }
 
-    public function store(StoreBmiRequest $request): RedirectResponse
+    public function store(StoreBmiRequest $request): JsonResponse|RedirectResponse
     {
         $this->authorize('create', EduBmi::class);
+
+        $date = $request->input('date');
+        if (! is_numeric($date)) {
+            $date = strtotime($date);
+        }
 
         $bmi = EduBmi::create([
             'user_id' => $request->user()->ID,
-            'date'    => $request->input('date'),
+            'date'    => $date,
             'height'  => $request->input('height'),
             'weight'  => $request->input('weight'),
             'hc'      => $request->input('hc', 0),
             'bmi'     => EduBmi::calculateBmi($request->input('height'), $request->input('weight')),
         ]);
 
+        if ($request->expectsJson()) {
+            return response()->json(['data' => $bmi], 201);
+        }
+
         return redirect()->route('account.mybmi')->with('success', 'BMI record added.');
     }
 
-    public function edit(EduBmi $bmi): View
+    public function update(UpdateBmiRequest $request, EduBmi $bmi): JsonResponse|RedirectResponse
     {
         $this->authorize('update', $bmi);
 
-        return view('account.bmi_form', compact('bmi'));
-    }
-
-    public function update(UpdateBmiRequest $request, EduBmi $bmi): RedirectResponse
-    {
-        $this->authorize('update', $bmi);
+        $date = $request->input('date');
+        if (! is_numeric($date)) {
+            $date = strtotime($date);
+        }
 
         $bmi->update([
-            'date'   => $request->input('date'),
+            'date'   => $date,
             'height' => $request->input('height'),
             'weight' => $request->input('weight'),
             'hc'     => $request->input('hc', 0),
             'bmi'    => EduBmi::calculateBmi($request->input('height'), $request->input('weight')),
         ]);
 
+        if ($request->expectsJson()) {
+            return response()->json(['data' => $bmi]);
+        }
+
         return redirect()->route('account.mybmi')->with('success', 'BMI record updated.');
     }
 
-    public function destroy(EduBmi $bmi): RedirectResponse
+    public function destroy(Request $request, EduBmi $bmi): JsonResponse|RedirectResponse
     {
         $this->authorize('delete', $bmi);
 
         $bmi->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Deleted']);
+        }
 
         return redirect()->route('account.mybmi')->with('success', 'BMI record deleted.');
     }

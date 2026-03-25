@@ -19,9 +19,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Student BMI
     Route::get('/account/mybmi', [StudentBmiController::class, 'index'])->name('account.mybmi');
-    Route::get('/account/bmi/create', [StudentBmiController::class, 'create'])->name('account.bmi.create');
     Route::post('/account/bmi', [StudentBmiController::class, 'store'])->name('account.bmi.store');
-    Route::get('/account/bmi/{bmi}/edit', [StudentBmiController::class, 'edit'])->name('account.bmi.edit');
+    Route::get('/account/bmi/{bmi}', [StudentBmiController::class, 'show'])->name('account.bmi.show');
     Route::put('/account/bmi/{bmi}', [StudentBmiController::class, 'update'])->name('account.bmi.update');
     Route::delete('/account/bmi/{bmi}', [StudentBmiController::class, 'destroy'])->name('account.bmi.delete');
 

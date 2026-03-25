@@ -16,7 +16,7 @@ class StoreBmiRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'date'   => ['required', 'integer'],
+            'date'   => ['required'],
             'height' => ['required', 'numeric', 'min:30', 'max:250'],
             'weight' => ['required', 'numeric', 'min:1', 'max:300'],
             'hc'     => ['nullable', 'numeric', 'min:20', 'max:100'],

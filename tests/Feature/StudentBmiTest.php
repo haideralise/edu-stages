@@ -82,7 +82,7 @@ class StudentBmiTest extends TestCase
 
         $response = $this->actingAs($student, 'web')
             ->post('/account/bmi', [
-                'date'   => strtotime('2025-06-01'),
+                'date'   => '2025-06-01',
                 'height' => 145.5,
                 'weight' => 38.0,
                 'hc'     => 53.0,
@@ -96,13 +96,29 @@ class StudentBmiTest extends TestCase
         ]);
     }
 
+    public function test_student_can_create_bmi_via_json(): void
+    {
+        $student = $this->createStudent();
+
+        $response = $this->actingAs($student, 'web')
+            ->postJson('/account/bmi', [
+                'date'   => '2025-06-01',
+                'height' => 145.5,
+                'weight' => 38.0,
+                'hc'     => 53.0,
+            ]);
+
+        $response->assertStatus(201);
+        $response->assertJsonStructure(['data' => ['id', 'height', 'weight']]);
+    }
+
     public function test_bmi_auto_calculated_on_store(): void
     {
         $student = $this->createStudent();
 
         $this->actingAs($student, 'web')
             ->post('/account/bmi', [
-                'date'   => strtotime('2025-06-01'),
+                'date'   => '2025-06-01',
                 'height' => 170.0,
                 'weight' => 70.0,
             ]);
@@ -129,12 +145,27 @@ class StudentBmiTest extends TestCase
 
         $response = $this->actingAs($student, 'web')
             ->postJson('/account/bmi', [
-                'date'   => strtotime('2025-01-01'),
+                'date'   => '2025-01-01',
                 'height' => 5,    // below 30 min
                 'weight' => 500,  // above 300 max
             ]);
 
         $response->assertStatus(422);
+    }
+
+    // ── Show (JSON for edit modal) ───────────────────────────────
+
+    public function test_student_can_view_own_bmi_json(): void
+    {
+        $student = $this->createStudent();
+        $bmi = $this->createBmi($student->ID);
+
+        $response = $this->actingAs($student, 'web')
+            ->getJson("/account/bmi/{$bmi->id}");
+
+        $response->assertOk();
+        $response->assertJsonFragment(['id' => $bmi->id]);
+        $response->assertJsonStructure(['id', 'height', 'weight', 'hc', 'date', 'date_formatted', 'bmi']);
     }
 
     // ── Edit / Update ────────────────────────────────────────────
@@ -146,7 +177,7 @@ class StudentBmiTest extends TestCase
 
         $response = $this->actingAs($student, 'web')
             ->put("/account/bmi/{$bmi->id}", [
-                'date'   => $bmi->date,
+                'date'   => '2025-01-15',
                 'height' => 142.0,
                 'weight' => 36.0,
             ]);
@@ -159,6 +190,22 @@ class StudentBmiTest extends TestCase
         ]);
     }
 
+    public function test_student_can_update_own_bmi_via_json(): void
+    {
+        $student = $this->createStudent();
+        $bmi = $this->createBmi($student->ID);
+
+        $response = $this->actingAs($student, 'web')
+            ->putJson("/account/bmi/{$bmi->id}", [
+                'date'   => '2025-01-15',
+                'height' => 142.0,
+                'weight' => 36.0,
+            ]);
+
+        $response->assertOk();
+        $response->assertJsonStructure(['data']);
+    }
+
     public function test_student_cannot_update_other_bmi(): void
     {
         $student = $this->createStudent();
@@ -167,7 +214,7 @@ class StudentBmiTest extends TestCase
 
         $response = $this->actingAs($student, 'web')
             ->put("/account/bmi/{$bmi->id}", [
-                'date'   => $bmi->date,
+                'date'   => '2025-01-15',
                 'height' => 142.0,
                 'weight' => 36.0,
             ]);
@@ -186,6 +233,19 @@ class StudentBmiTest extends TestCase
             ->delete("/account/bmi/{$bmi->id}");
 
         $response->assertRedirect(route('account.mybmi'));
+        $this->assertDatabaseMissing('wp_3x_edu_bmi', ['id' => $bmi->id]);
+    }
+
+    public function test_student_can_delete_own_bmi_via_json(): void
+    {
+        $student = $this->createStudent();
+        $bmi = $this->createBmi($student->ID);
+
+        $response = $this->actingAs($student, 'web')
+            ->deleteJson("/account/bmi/{$bmi->id}");
+
+        $response->assertOk();
+        $response->assertJson(['message' => 'Deleted']);
         $this->assertDatabaseMissing('wp_3x_edu_bmi', ['id' => $bmi->id]);
     }
 
@@ -211,7 +271,7 @@ class StudentBmiTest extends TestCase
 
         $response = $this->actingAs($admin, 'web')
             ->put("/account/bmi/{$bmi->id}", [
-                'date'   => $bmi->date,
+                'date'   => '2025-01-15',
                 'height' => 150.0,
                 'weight' => 40.0,
             ]);
@@ -240,9 +300,9 @@ class StudentBmiTest extends TestCase
 
         // Without CSRF middleware bypass (direct HTTP call)
         $response = $this->actingAs($student, 'web')
-            ->from('/account/bmi/create')
+            ->from('/account/mybmi')
             ->post('/account/bmi', [
-                'date'   => strtotime('2025-01-01'),
+                'date'   => '2025-01-01',
                 'height' => 140,
                 'weight' => 35,
             ]);
