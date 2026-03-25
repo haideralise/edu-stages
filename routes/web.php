@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CoachResultController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\StudentBmiController;
@@ -16,6 +17,10 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    // Account info
+    Route::get('/account/info', [AccountController::class, 'show'])->name('account.info');
+    Route::post('/account/info', [AccountController::class, 'update'])->name('account.info.update');
 
     // Student BMI
     Route::get('/account/mybmi', [StudentBmiController::class, 'index'])->name('account.mybmi');

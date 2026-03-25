@@ -64,8 +64,8 @@
                        class="sidebar-link">
                         Student Manual
                     </a>
-                    <a href="#"
-                       class="sidebar-link">
+                    <a href="{{ route('account.info') }}"
+                       class="sidebar-link {{ request()->routeIs('account.info') ? 'active' : '' }}">
                         Account Info
                     </a>
                     <a href="{{ route('account.test-result') }}"
