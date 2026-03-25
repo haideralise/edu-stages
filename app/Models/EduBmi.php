@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class EduBmi extends Model
@@ -31,6 +32,25 @@ class EduBmi extends Model
         ];
     }
 
+    // ── Accessors ──────────────────────────────────────────────
+
+    protected function category(): Attribute
+    {
+        return Attribute::get(function (): string {
+            if ($this->bmi < 18.5) {
+                return 'underweight';
+            }
+            if ($this->bmi < 25) {
+                return 'normal';
+            }
+            if ($this->bmi < 30) {
+                return 'overweight';
+            }
+
+            return 'obese';
+        });
+    }
+
     // ── Relationships ────────────────────────────────────────────
 
     public function user()
@@ -46,6 +66,14 @@ class EduBmi extends Model
     }
 
     // ── Helpers ──────────────────────────────────────────────────
+
+    /**
+     * Convert a YYYY-MM-DD string or timestamp to a unix integer.
+     */
+    public static function normalizeDate(mixed $date): int
+    {
+        return is_numeric($date) ? (int) $date : (int) strtotime($date);
+    }
 
     /**
      * Calculate BMI from height (cm) and weight (kg).

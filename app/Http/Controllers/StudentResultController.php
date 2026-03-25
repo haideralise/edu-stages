@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EduResult;
 use App\Services\AssesService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -14,6 +15,8 @@ class StudentResultController extends Controller
 
     public function index(Request $request): View
     {
+        $this->authorize('viewAny', EduResult::class);
+
         $user = $request->user();
 
         $tree = $this->assesService->getAllLevels();

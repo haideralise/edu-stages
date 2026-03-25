@@ -96,4 +96,32 @@ class StudentResultTest extends TestCase
     {
         $this->get('/account/test-result')->assertRedirect('/login');
     }
+
+    public function test_coach_cannot_access_student_results(): void
+    {
+        $coach = WpUser::create([
+            'user_login'   => 'coach_test',
+            'user_pass'    => bcrypt('password'),
+            'user_email'   => 'coach@edu.test',
+            'display_name' => 'Coach Test',
+        ]);
+
+        $classId = DB::table('wp_3x_edu_class')->insertGetId([
+            'class_name' => 'Test Class', 'district_id' => 101, 'class_year' => '2025',
+        ]);
+
+        DB::table('wp_3x_edu_class_user')->insert([
+            'class_id'   => $classId,
+            'month'      => '1月-2月',
+            'student'    => json_encode([]),
+            'teacher'    => json_encode([(string) $coach->ID]),
+            'class_year' => '2025',
+            'sort'       => 202501,
+        ]);
+
+        $response = $this->actingAs($coach, 'web')
+            ->get('/account/test-result');
+
+        $response->assertForbidden();
+    }
 }

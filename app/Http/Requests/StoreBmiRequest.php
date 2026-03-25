@@ -2,12 +2,13 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\Validator;
+use App\Http\Requests\Concerns\SchemeD422;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreBmiRequest extends FormRequest
 {
+    use SchemeD422;
+
     public function authorize(): bool
     {
         return true;
@@ -22,13 +23,5 @@ class StoreBmiRequest extends FormRequest
             'weight'  => ['required', 'numeric', 'min:1', 'max:300'],
             'hc'      => ['nullable', 'numeric', 'min:20', 'max:100'],
         ];
-    }
-
-    protected function failedValidation(Validator $validator): void
-    {
-        throw new HttpResponseException(response()->json([
-            'message' => 'Validation failed',
-            'errors'  => $validator->errors()->toArray(),
-        ], 422));
     }
 }

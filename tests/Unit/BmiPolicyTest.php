@@ -118,4 +118,52 @@ class BmiPolicyTest extends TestCase
 
         $this->assertFalse($this->policy->delete($student, $bmi));
     }
+
+    public function test_coach_cannot_view_bmi_list(): void
+    {
+        $coach = WpUser::create([
+            'user_login' => 'coach', 'user_pass' => bcrypt('pass'),
+            'user_email' => 'coach@edu.test', 'display_name' => 'Coach',
+        ]);
+
+        \Illuminate\Support\Facades\DB::table('wp_3x_edu_class')->insert([
+            'class_name' => 'Test Class', 'district_id' => 101, 'class_year' => '2025',
+        ]);
+        $classId = \Illuminate\Support\Facades\DB::table('wp_3x_edu_class')->max('class_id');
+
+        \Illuminate\Support\Facades\DB::table('wp_3x_edu_class_user')->insert([
+            'class_id'   => $classId,
+            'month'      => '1月-2月',
+            'student'    => json_encode([]),
+            'teacher'    => json_encode([(string) $coach->ID]),
+            'class_year' => '2025',
+            'sort'       => 202501,
+        ]);
+
+        $this->assertFalse($this->policy->viewAny($coach));
+    }
+
+    public function test_coach_cannot_create_bmi(): void
+    {
+        $coach = WpUser::create([
+            'user_login' => 'coach', 'user_pass' => bcrypt('pass'),
+            'user_email' => 'coach@edu.test', 'display_name' => 'Coach',
+        ]);
+
+        \Illuminate\Support\Facades\DB::table('wp_3x_edu_class')->insert([
+            'class_name' => 'Test Class', 'district_id' => 101, 'class_year' => '2025',
+        ]);
+        $classId = \Illuminate\Support\Facades\DB::table('wp_3x_edu_class')->max('class_id');
+
+        \Illuminate\Support\Facades\DB::table('wp_3x_edu_class_user')->insert([
+            'class_id'   => $classId,
+            'month'      => '1月-2月',
+            'student'    => json_encode([]),
+            'teacher'    => json_encode([(string) $coach->ID]),
+            'class_year' => '2025',
+            'sort'       => 202501,
+        ]);
+
+        $this->assertFalse($this->policy->create($coach));
+    }
 }

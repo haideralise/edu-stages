@@ -2,12 +2,13 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\Validator;
+use App\Http\Requests\Concerns\SchemeD422;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
 class LoginRequest extends FormRequest
 {
+    use SchemeD422;
+
     public function authorize(): bool
     {
         return true;
@@ -19,14 +20,5 @@ class LoginRequest extends FormRequest
             'user_login' => ['required', 'string'],
             'password'   => ['required', 'string'],
         ];
-    }
-
-    // Scheme D 422 format
-    protected function failedValidation(Validator $validator): void
-    {
-        throw new HttpResponseException(response()->json([
-            'message' => 'Validation failed',
-            'errors'  => $validator->errors()->toArray(),
-        ], 422));
     }
 }

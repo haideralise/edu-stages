@@ -50,6 +50,30 @@ class EduBmiTest extends TestCase
         $this->assertEquals($user1->ID, $results->first()->user_id);
     }
 
+    public function test_category_underweight(): void
+    {
+        $bmi = new EduBmi(['bmi' => 16.0]);
+        $this->assertEquals('underweight', $bmi->category);
+    }
+
+    public function test_category_normal(): void
+    {
+        $bmi = new EduBmi(['bmi' => 22.0]);
+        $this->assertEquals('normal', $bmi->category);
+    }
+
+    public function test_category_overweight(): void
+    {
+        $bmi = new EduBmi(['bmi' => 27.0]);
+        $this->assertEquals('overweight', $bmi->category);
+    }
+
+    public function test_category_obese(): void
+    {
+        $bmi = new EduBmi(['bmi' => 35.0]);
+        $this->assertEquals('obese', $bmi->category);
+    }
+
     public function test_user_relationship(): void
     {
         $user = WpUser::create([

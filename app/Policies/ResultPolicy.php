@@ -8,9 +8,25 @@ use App\Models\WpUser;
 
 class ResultPolicy
 {
+    /**
+     * Student and Admin can view the test results list page.
+     * Coaches access results via their own /coach/results route.
+     */
     public function viewAny(WpUser $user): bool
     {
-        return true;
+        $role = $user->resolveRole();
+
+        return $role === 'student' || $role === 'admin';
+    }
+
+    /**
+     * Coach can view results of students in their own classes.
+     */
+    public function viewAsCoach(WpUser $user): bool
+    {
+        $role = $user->resolveRole();
+
+        return $role === 'coach' || $role === 'admin';
     }
 
     public function view(WpUser $user, EduResult $result): bool
@@ -25,7 +41,6 @@ class ResultPolicy
             return $user->ID === $result->user_id;
         }
 
-        // Coach: check teacher JSON contains coach ID AND student JSON contains student ID
         if ($role === 'coach') {
             return $this->coachOwnsStudentResult($user, $result);
         }
@@ -35,16 +50,11 @@ class ResultPolicy
 
     private function coachOwnsStudentResult(WpUser $coach, EduResult $result): bool
     {
-        $coachId   = (string) $coach->ID;
         $studentId = (string) $result->user_id;
 
         return EduClassUser::where('class_id', $result->class_id)
+            ->whereTeacher($coach->ID)
             ->get()
-            ->contains(function ($cu) use ($coachId, $studentId) {
-                $teachers = $cu->teacher ?? [];
-                $students = $cu->student ?? [];
-
-                return in_array($coachId, $teachers) && in_array($studentId, $students);
-            });
+            ->contains(fn ($cu) => in_array($studentId, $cu->student ?? []));
     }
 }

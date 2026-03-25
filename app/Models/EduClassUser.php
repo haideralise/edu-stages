@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class EduClassUser extends Model
 {
@@ -24,8 +26,43 @@ class EduClassUser extends Model
         ];
     }
 
+    // ── Relationships ────────────────────────────────────────────
+
     public function eduClass()
     {
         return $this->belongsTo(EduClass::class, 'class_id', 'class_id');
+    }
+
+    // ── Scopes ───────────────────────────────────────────────────
+
+    public function scopeWhereTeacher(Builder $query, int $userId): Builder
+    {
+        $driver = $query->getConnection()->getDriverName();
+
+        if ($driver === 'sqlite') {
+            return $query->where('teacher', 'LIKE', '%"'.$userId.'"%');
+        }
+
+        return $query->whereRaw('JSON_CONTAINS(teacher, ?)', [json_encode((string) $userId)]);
+    }
+
+    // ── Query helpers ────────────────────────────────────────────
+
+    public static function studentIdsForTeacher(int $teacherId): Collection
+    {
+        return static::whereTeacher($teacherId)
+            ->pluck('student')
+            ->flatMap(fn ($s) => $s ?? [])
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+    }
+
+    public static function allTeacherIds(): Collection
+    {
+        return static::pluck('teacher')
+            ->flatMap(fn ($t) => $t ?? [])
+            ->map(fn ($id) => (int) $id)
+            ->unique();
     }
 }

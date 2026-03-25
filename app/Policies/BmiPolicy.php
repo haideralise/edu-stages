@@ -9,7 +9,9 @@ class BmiPolicy
 {
     public function viewAny(WpUser $user): bool
     {
-        return true; // all authenticated users can view own BMI list
+        $role = $user->resolveRole();
+
+        return $role === 'student' || $role === 'admin';
     }
 
     public function view(WpUser $user, EduBmi $bmi): bool
@@ -23,7 +25,9 @@ class BmiPolicy
 
     public function create(WpUser $user): bool
     {
-        return true; // any authenticated user can create own record
+        $role = $user->resolveRole();
+
+        return $role === 'student' || $role === 'admin';
     }
 
     public function update(WpUser $user, EduBmi $bmi): bool
