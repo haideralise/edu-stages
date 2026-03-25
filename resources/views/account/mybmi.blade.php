@@ -11,6 +11,9 @@
         <table class="min-w-full divide-y divide-gray-200" id="bmi-table">
             <thead class="bg-gray-50">
                 <tr>
+                    @if ($isAdmin)
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Student</th>
+                    @endif
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Height (cm)</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Weight (kg)</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">HC (cm)</th>
@@ -23,6 +26,9 @@
             <tbody class="divide-y divide-gray-200" id="bmi-tbody">
                 @forelse ($records as $record)
                 <tr data-id="{{ $record->id }}">
+                    @if ($isAdmin)
+                        <td class="px-4 py-3 text-sm font-medium">{{ $record->student_name }}</td>
+                    @endif
                     <td class="px-4 py-3 text-sm">{{ number_format($record->height, 2) }}</td>
                     <td class="px-4 py-3 text-sm">{{ number_format($record->weight, 2) }}</td>
                     <td class="px-4 py-3 text-sm">{{ $record->hc ? number_format($record->hc, 2) : '-' }}</td>
@@ -51,7 +57,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="px-4 py-6 text-center text-gray-400">No records found.</td>
+                    <td colspan="{{ $isAdmin ? 8 : 7 }}" class="px-4 py-6 text-center text-gray-400">No records found.</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -89,6 +95,17 @@
             <div class="px-6 py-4 space-y-4">
                 <div id="modal-errors" class="hidden bg-red-50 text-red-600 text-sm p-3 rounded"></div>
                 <input type="hidden" id="form-id" value="">
+                @if ($isAdmin)
+                <div id="student-field">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Student</label>
+                    <select id="form-user-id" class="w-full border rounded px-3 py-2">
+                        <option value="">-- Select Student --</option>
+                        @foreach ($students as $student)
+                            <option value="{{ $student->ID }}">{{ $student->display_name }} ({{ $student->user_login }})</option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Height</label>
                     <input type="number" id="form-height" step="0.1" min="30" max="250"
@@ -145,6 +162,7 @@
 
 <script>
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+const isAdmin = {{ $isAdmin ? 'true' : 'false' }};
 let deleteId = null;
 
 function openAddModal() {
@@ -155,6 +173,10 @@ function openAddModal() {
     document.getElementById('form-hc').value = '';
     document.getElementById('form-date').value = '';
     document.getElementById('modal-errors').classList.add('hidden');
+    if (isAdmin) {
+        document.getElementById('form-user-id').value = '';
+        document.getElementById('student-field').style.display = '';
+    }
     const modal = document.getElementById('bmi-modal');
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
@@ -177,6 +199,10 @@ function openEditModal(id) {
         document.getElementById('form-weight').value = data.weight;
         document.getElementById('form-hc').value = data.hc || '';
         document.getElementById('form-date').value = data.date_formatted;
+        if (isAdmin) {
+            document.getElementById('form-user-id').value = data.user_id;
+            document.getElementById('student-field').style.display = 'none';
+        }
         const modal = document.getElementById('bmi-modal');
         modal.classList.remove('hidden');
         modal.style.display = 'flex';
@@ -202,6 +228,11 @@ function submitForm(e) {
         hc: document.getElementById('form-hc').value ? parseFloat(document.getElementById('form-hc').value) : null,
         date: document.getElementById('form-date').value,
     };
+
+    if (isAdmin && !id) {
+        const userIdEl = document.getElementById('form-user-id');
+        if (userIdEl) body.user_id = parseInt(userIdEl.value);
+    }
 
     fetch(url, {
         method: method,

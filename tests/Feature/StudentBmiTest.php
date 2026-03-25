@@ -263,6 +263,68 @@ class StudentBmiTest extends TestCase
 
     // ── Admin ────────────────────────────────────────────────────
 
+    public function test_admin_sees_all_bmi_records(): void
+    {
+        $admin = $this->createAdmin();
+        $studentA = $this->createStudent();
+        $studentB = $this->createStudent('student_b');
+
+        $this->createBmi($studentA->ID);
+        $this->createBmi($studentB->ID);
+
+        $response = $this->actingAs($admin, 'web')
+            ->get('/account/mybmi');
+
+        $response->assertOk();
+        $response->assertSee($studentA->display_name);
+        $response->assertSee($studentB->display_name);
+    }
+
+    public function test_admin_can_create_bmi_for_student(): void
+    {
+        $admin = $this->createAdmin();
+        $student = $this->createStudent();
+
+        $response = $this->actingAs($admin, 'web')
+            ->postJson('/account/bmi', [
+                'user_id' => $student->ID,
+                'date'    => '2025-06-01',
+                'height'  => 145.5,
+                'weight'  => 38.0,
+                'hc'      => 53.0,
+            ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('wp_3x_edu_bmi', [
+            'user_id' => $student->ID,
+            'height'  => 145.5,
+        ]);
+    }
+
+    public function test_student_cannot_set_user_id(): void
+    {
+        $student = $this->createStudent();
+        $other = $this->createStudent('student_b');
+
+        $response = $this->actingAs($student, 'web')
+            ->postJson('/account/bmi', [
+                'user_id' => $other->ID,
+                'date'    => '2025-06-01',
+                'height'  => 145.5,
+                'weight'  => 38.0,
+            ]);
+
+        $response->assertStatus(201);
+        // Student's user_id should be used, not the other student's
+        $this->assertDatabaseHas('wp_3x_edu_bmi', [
+            'user_id' => $student->ID,
+            'height'  => 145.5,
+        ]);
+        $this->assertDatabaseMissing('wp_3x_edu_bmi', [
+            'user_id' => $other->ID,
+        ]);
+    }
+
     public function test_admin_can_update_any_bmi(): void
     {
         $admin = $this->createAdmin();

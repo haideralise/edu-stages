@@ -5,7 +5,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -30,6 +32,16 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
+        // Doc 09 Scheme D — 419 CSRF Token Mismatch
+        $exceptions->render(function (TokenMismatchException $e, Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'message' => 'CSRF token mismatch',
+                    'code'    => 'TOKEN_MISMATCH',
+                ], 419);
+            }
+        });
+
         // Doc 09 Scheme D — 403 Forbidden
         $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
@@ -47,6 +59,17 @@ return Application::configure(basePath: dirname(__DIR__))
                     'message' => 'Not found',
                     'code'    => 'NOT_FOUND',
                 ], 404);
+            }
+        });
+
+        // Doc 09 Scheme D — 419 CSRF (HttpException fallback)
+        // Laravel converts TokenMismatchException → HttpException(419) in prepareException
+        $exceptions->render(function (HttpException $e, Request $request) {
+            if ($e->getStatusCode() === 419 && ($request->expectsJson() || $request->is('api/*'))) {
+                return response()->json([
+                    'message' => 'CSRF token mismatch',
+                    'code'    => 'TOKEN_MISMATCH',
+                ], 419);
             }
         });
 
