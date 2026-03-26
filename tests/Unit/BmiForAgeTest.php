@@ -39,19 +39,21 @@ class BmiForAgeTest extends TestCase
 
     public function test_get_thresholds_valid_male(): void
     {
-        $thresholds = BmiForAge::getThresholds(180, 'male');
+        // HK-2020: male 183 months → p5=15.4
+        $thresholds = BmiForAge::getThresholds(183, 'male');
         $this->assertNotNull($thresholds);
         $this->assertArrayHasKey('p5', $thresholds);
         $this->assertArrayHasKey('p85', $thresholds);
         $this->assertArrayHasKey('p95', $thresholds);
-        $this->assertEquals(16.7, $thresholds['p5']);
+        $this->assertEquals(15.4, $thresholds['p5']);
     }
 
     public function test_get_thresholds_valid_female(): void
     {
-        $thresholds = BmiForAge::getThresholds(144, 'female');
+        // HK-2020: female 146 months → p5=14.3
+        $thresholds = BmiForAge::getThresholds(146, 'female');
         $this->assertNotNull($thresholds);
-        $this->assertEquals(15.0, $thresholds['p5']);
+        $this->assertEquals(14.3, $thresholds['p5']);
     }
 
     public function test_get_thresholds_under_24_months(): void
@@ -59,9 +61,9 @@ class BmiForAgeTest extends TestCase
         $this->assertNull(BmiForAge::getThresholds(12, 'male'));
     }
 
-    public function test_get_thresholds_over_240_months(): void
+    public function test_get_thresholds_over_219_months(): void
     {
-        $this->assertNull(BmiForAge::getThresholds(252, 'male'));
+        $this->assertNull(BmiForAge::getThresholds(220, 'male'));
     }
 
     public function test_get_thresholds_invalid_gender(): void
@@ -69,17 +71,25 @@ class BmiForAgeTest extends TestCase
         $this->assertNull(BmiForAge::getThresholds(120, 'unknown'));
     }
 
-    public function test_get_thresholds_rounds_to_nearest_6_months(): void
+    public function test_get_thresholds_finds_nearest_key(): void
     {
-        // 182 months should round to 180
-        $t182 = BmiForAge::getThresholds(182, 'male');
-        $t180 = BmiForAge::getThresholds(180, 'male');
-        $this->assertEquals($t180, $t182);
+        // 63 months is between 61 and 67; nearest is 61
+        $t63 = BmiForAge::getThresholds(63, 'male');
+        $t61 = BmiForAge::getThresholds(61, 'male');
+        $this->assertEquals($t61, $t63);
 
-        // 183 months should round to 186
-        $t183 = BmiForAge::getThresholds(183, 'male');
-        $t186 = BmiForAge::getThresholds(186, 'male');
-        $this->assertEquals($t186, $t183);
+        // 65 months is between 61 and 67; nearest is 67
+        $t65 = BmiForAge::getThresholds(65, 'male');
+        $t67 = BmiForAge::getThresholds(67, 'male');
+        $this->assertEquals($t67, $t65);
+    }
+
+    public function test_get_thresholds_exact_key(): void
+    {
+        // Exact monthly key should return directly
+        $thresholds = BmiForAge::getThresholds(48, 'male');
+        $this->assertNotNull($thresholds);
+        $this->assertEquals(13.7, $thresholds['p5']);
     }
 
     public function test_get_thresholds_boundary_24_months(): void
@@ -87,9 +97,9 @@ class BmiForAgeTest extends TestCase
         $this->assertNotNull(BmiForAge::getThresholds(24, 'male'));
     }
 
-    public function test_get_thresholds_boundary_240_months(): void
+    public function test_get_thresholds_boundary_219_months(): void
     {
-        $this->assertNotNull(BmiForAge::getThresholds(240, 'female'));
+        $this->assertNotNull(BmiForAge::getThresholds(219, 'female'));
     }
 
     // ── categorize ────────────────────────────────────────────────
@@ -104,45 +114,47 @@ class BmiForAgeTest extends TestCase
         $this->assertEquals('normal', BmiForAge::categorize(22.0, '2010-01-01', null, time()));
     }
 
-    public function test_categorize_adult_fallback_over_20(): void
+    public function test_categorize_adult_fallback_over_18(): void
     {
-        // Person over 20 years old → outside CDC range → adult thresholds
+        // Person over 18.25 years old → outside HK-2020 range → adult thresholds
         $recordDate = strtotime('2035-01-01');
         $this->assertEquals('normal', BmiForAge::categorize(22.0, '2010-01-01', 'male', $recordDate));
     }
 
     public function test_categorize_child_underweight(): void
     {
-        // 14yo boy: p5 ≈ 15.1 at 168 months. BMI 14.5 < p5 → underweight
+        // 10yo boy (born 2015-01-15, record 2025-01-15 → 120 months)
+        // Nearest key ~122: p5=13.6. BMI 13.0 < 13.6 → underweight
         $recordDate = strtotime('2025-01-15');
-        $this->assertEquals('underweight', BmiForAge::categorize(14.5, '2011-01-15', 'male', $recordDate));
+        $this->assertEquals('underweight', BmiForAge::categorize(13.0, '2015-01-15', 'male', $recordDate));
     }
 
     public function test_categorize_child_normal(): void
     {
-        // 14yo boy: p5 ≈ 15.1, p85 ≈ 21.4 at ~168mo. BMI 17.8 → normal
+        // 10yo boy at ~122 months: p5=13.6, p85=19.2. BMI 16.0 → normal
         $recordDate = strtotime('2025-01-15');
-        $this->assertEquals('normal', BmiForAge::categorize(17.8, '2011-01-15', 'male', $recordDate));
+        $this->assertEquals('normal', BmiForAge::categorize(16.0, '2015-01-15', 'male', $recordDate));
     }
 
     public function test_categorize_child_overweight(): void
     {
-        // 14yo boy at 168mo: p85=23.1, p95=25.9. BMI 24.0 → overweight
+        // 10yo boy at ~122 months: p85=19.2, p95=22.0. BMI 20.0 → overweight
         $recordDate = strtotime('2025-01-15');
-        $this->assertEquals('overweight', BmiForAge::categorize(24.0, '2011-01-15', 'male', $recordDate));
+        $this->assertEquals('overweight', BmiForAge::categorize(20.0, '2015-01-15', 'male', $recordDate));
     }
 
     public function test_categorize_child_obese(): void
     {
-        // 14yo boy at 168mo: p95=25.9. BMI 26.5 → obese
+        // 10yo boy at ~122 months: p95=22.0. BMI 23.0 → obese
         $recordDate = strtotime('2025-01-15');
-        $this->assertEquals('obese', BmiForAge::categorize(26.5, '2011-01-15', 'male', $recordDate));
+        $this->assertEquals('obese', BmiForAge::categorize(23.0, '2015-01-15', 'male', $recordDate));
     }
 
     public function test_categorize_female_child(): void
     {
-        // 13yo girl: ~156 months. p5=15.5, p85=22.9, p95=25.4. BMI 20.0 → normal
+        // 10yo girl (born 2015-01-15, record 2025-01-15 → 120 months)
+        // Nearest key ~122: p5=13.4, p85=18.7. BMI 16.0 → normal
         $recordDate = strtotime('2025-01-15');
-        $this->assertEquals('normal', BmiForAge::categorize(20.0, '2012-01-15', 'female', $recordDate));
+        $this->assertEquals('normal', BmiForAge::categorize(16.0, '2015-01-15', 'female', $recordDate));
     }
 }

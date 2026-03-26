@@ -24,14 +24,14 @@ class BmiForAge
     }
 
     /**
-     * Look up CDC percentile thresholds for a given age (months) and gender.
+     * Look up HK-2020 percentile thresholds for a given age (months) and gender.
      *
-     * Rounds to the nearest 6-month interval. Returns null if age is outside
-     * the 24–240 month range or gender is not recognised.
+     * Finds the nearest available age key. Returns null if age is outside
+     * the 24–219 month range or gender is not recognised.
      */
     public static function getThresholds(int $ageMonths, string $gender): ?array
     {
-        if ($ageMonths < 24 || $ageMonths > 240) {
+        if ($ageMonths < 24 || $ageMonths > 219) {
             return null;
         }
 
@@ -42,11 +42,25 @@ class BmiForAge
             return null;
         }
 
-        // Round to nearest 6-month interval
-        $key = (int) round($ageMonths / 6) * 6;
-        $key = max(24, min(240, $key));
+        // Exact match
+        if (isset($table[$ageMonths])) {
+            return $table[$ageMonths];
+        }
 
-        return $table[$key] ?? null;
+        // Find nearest available key
+        $keys = array_keys($table);
+        $closest = $keys[0];
+        $minDiff = abs($ageMonths - $closest);
+
+        foreach ($keys as $key) {
+            $diff = abs($ageMonths - $key);
+            if ($diff < $minDiff) {
+                $minDiff = $diff;
+                $closest = $key;
+            }
+        }
+
+        return $table[$closest];
     }
 
     /**
