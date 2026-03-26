@@ -40,8 +40,6 @@ class StudentBmiController extends Controller
             $students = WpUser::whereNotIn('ID', $excludeIds)
                 ->orderBy('display_name')
                 ->get();
-
-            $students->prepend($user);
         } else {
             $records = EduBmi::with('user.meta')
                 ->forUser($user->ID)

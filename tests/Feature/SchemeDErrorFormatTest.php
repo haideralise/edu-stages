@@ -25,7 +25,7 @@ class SchemeDErrorFormatTest extends TestCase
 
     public function test_401_returns_scheme_d_json(): void
     {
-        $response = $this->getJson('/account/mybmi');
+        $response = $this->getJson('/edu/account/mybmi');
 
         $response->assertStatus(401);
         $response->assertExactJson([
@@ -56,7 +56,7 @@ class SchemeDErrorFormatTest extends TestCase
         ]);
 
         $response = $this->actingAs($student, 'web')
-            ->putJson("/account/bmi/{$bmi->id}", [
+            ->putJson("/edu/account/bmi/{$bmi->id}", [
                 'date'   => '2025-01-15',
                 'height' => 142.0,
                 'weight' => 36.0,
@@ -76,7 +76,7 @@ class SchemeDErrorFormatTest extends TestCase
         $student = $this->createStudent();
 
         $response = $this->actingAs($student, 'web')
-            ->getJson('/account/bmi/99999');
+            ->getJson('/edu/account/bmi/99999');
 
         $response->assertStatus(404);
         $response->assertExactJson([
@@ -110,7 +110,7 @@ class SchemeDErrorFormatTest extends TestCase
         $student = $this->createStudent();
 
         $response = $this->actingAs($student, 'web')
-            ->postJson('/account/bmi', []);
+            ->postJson('/edu/account/bmi', []);
 
         $response->assertStatus(422);
         $response->assertJsonStructure([

@@ -32,7 +32,7 @@ class LoginController extends Controller
         Auth::guard('web')->login($user);
         $request->session()->regenerate();
 
-        return redirect()->intended('/account/mybmi');
+        return redirect()->intended(route('account.mybmi'));
     }
 
     public function logout(Request $request)
