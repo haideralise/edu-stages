@@ -186,7 +186,7 @@ function openEditModal(id) {
     document.getElementById('modal-title').textContent = 'Edit';
     document.getElementById('modal-errors').classList.add('hidden');
 
-    fetch(`/account/bmi/${id}`, {
+    fetch(`/edu/account/bmi/${id}`, {
         headers: {
             'Accept': 'application/json',
             'X-CSRF-TOKEN': csrfToken,
@@ -219,7 +219,7 @@ function submitForm(e) {
     e.preventDefault();
 
     const id = document.getElementById('form-id').value;
-    const url = id ? `/account/bmi/${id}` : '/account/bmi';
+    const url = id ? `/edu/account/bmi/${id}` : '/edu/account/bmi';
     const method = id ? 'PUT' : 'POST';
 
     const body = {
@@ -279,7 +279,7 @@ function closeDeleteModal() {
 function confirmDelete() {
     if (!deleteId) return;
 
-    fetch(`/account/bmi/${deleteId}`, {
+    fetch(`/edu/account/bmi/${deleteId}`, {
         method: 'DELETE',
         headers: {
             'Accept': 'application/json',

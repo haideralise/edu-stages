@@ -25,7 +25,7 @@ class AccountInfoTest extends TestCase
 
     public function test_guest_cannot_see_account_info(): void
     {
-        $this->get('/account/info')->assertRedirect('/login');
+        $this->get('/edu/account/info')->assertRedirect('/login');
     }
 
     public function test_student_can_see_account_info(): void
@@ -33,7 +33,7 @@ class AccountInfoTest extends TestCase
         $student = $this->createStudent();
 
         $response = $this->actingAs($student, 'web')
-            ->get('/account/info');
+            ->get('/edu/account/info');
 
         $response->assertOk();
         $response->assertSee('Account Info');
@@ -48,7 +48,7 @@ class AccountInfoTest extends TestCase
         $student = $this->createStudent();
 
         $response = $this->actingAs($student, 'web')
-            ->post('/account/info', [
+            ->post('/edu/account/info', [
                 'birthdate' => '2010-05-15',
                 'gender'    => 'female',
             ]);
@@ -75,7 +75,7 @@ class AccountInfoTest extends TestCase
         $student = $this->createStudent();
 
         $response = $this->actingAs($student, 'web')
-            ->post('/account/info', []);
+            ->post('/edu/account/info', []);
 
         $response->assertSessionHasErrors(['birthdate', 'gender']);
     }
@@ -85,7 +85,7 @@ class AccountInfoTest extends TestCase
         $student = $this->createStudent();
 
         $response = $this->actingAs($student, 'web')
-            ->post('/account/info', [
+            ->post('/edu/account/info', [
                 'birthdate' => '2099-01-01',
                 'gender'    => 'male',
             ]);
@@ -98,7 +98,7 @@ class AccountInfoTest extends TestCase
         $student = $this->createStudent();
 
         $response = $this->actingAs($student, 'web')
-            ->post('/account/info', [
+            ->post('/edu/account/info', [
                 'birthdate' => '2010-05-15',
                 'gender'    => 'other',
             ]);
@@ -114,14 +114,14 @@ class AccountInfoTest extends TestCase
 
         // First save
         $this->actingAs($student, 'web')
-            ->post('/account/info', [
+            ->post('/edu/account/info', [
                 'birthdate' => '2010-05-15',
                 'gender'    => 'female',
             ]);
 
         // Second save with different values
         $this->actingAs($student, 'web')
-            ->post('/account/info', [
+            ->post('/edu/account/info', [
                 'birthdate' => '2011-08-20',
                 'gender'    => 'male',
             ]);
@@ -157,7 +157,7 @@ class AccountInfoTest extends TestCase
         ]);
 
         $response = $this->actingAs($student, 'web')
-            ->get('/account/info');
+            ->get('/edu/account/info');
 
         $response->assertOk();
         $response->assertSee('2010-05-15');

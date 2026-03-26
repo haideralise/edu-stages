@@ -71,7 +71,7 @@ class CoachResultTest extends TestCase
         [$coach, $studentA, $studentB] = $this->createCoachWithStudents();
 
         $response = $this->actingAs($coach, 'web')
-            ->get('/coach/results');
+            ->get('/edu/coach/results');
 
         $response->assertOk();
         $response->assertSee('Student A');
@@ -83,7 +83,7 @@ class CoachResultTest extends TestCase
         [$coach] = $this->createCoachWithStudents();
 
         $response = $this->actingAs($coach, 'web')
-            ->get('/coach/results');
+            ->get('/edu/coach/results');
 
         $response->assertOk();
         $response->assertSee('Freestyle');
@@ -98,13 +98,13 @@ class CoachResultTest extends TestCase
         ]);
 
         $response = $this->actingAs($student, 'web')
-            ->get('/coach/results');
+            ->get('/edu/coach/results');
 
         $response->assertForbidden();
     }
 
     public function test_requires_auth(): void
     {
-        $this->get('/coach/results')->assertRedirect('/login');
+        $this->get('/edu/coach/results')->assertRedirect('/login');
     }
 }

@@ -58,7 +58,7 @@ class StudentResultTest extends TestCase
         $this->seedLevelsAndResults($student->ID);
 
         $response = $this->actingAs($student, 'web')
-            ->get('/account/test-result');
+            ->get('/edu/account/test-result');
 
         $response->assertOk();
         $response->assertSee('Freestyle 25m');
@@ -72,7 +72,7 @@ class StudentResultTest extends TestCase
         $this->seedLevelsAndResults($other->ID);
 
         $response = $this->actingAs($student, 'web')
-            ->get('/account/test-result');
+            ->get('/edu/account/test-result');
 
         $response->assertOk();
         $response->assertDontSee('>8<'); // other student's score not in table cell
@@ -84,7 +84,7 @@ class StudentResultTest extends TestCase
         $this->seedLevelsAndResults($student->ID);
 
         $response = $this->actingAs($student, 'web')
-            ->get('/account/test-result');
+            ->get('/edu/account/test-result');
 
         $response->assertOk();
         $response->assertSee('Swimming');
@@ -94,7 +94,7 @@ class StudentResultTest extends TestCase
 
     public function test_requires_auth(): void
     {
-        $this->get('/account/test-result')->assertRedirect('/login');
+        $this->get('/edu/account/test-result')->assertRedirect('/login');
     }
 
     public function test_coach_cannot_access_student_results(): void
@@ -120,7 +120,7 @@ class StudentResultTest extends TestCase
         ]);
 
         $response = $this->actingAs($coach, 'web')
-            ->get('/account/test-result');
+            ->get('/edu/account/test-result');
 
         $response->assertForbidden();
     }
