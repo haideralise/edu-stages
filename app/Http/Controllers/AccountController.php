@@ -20,7 +20,7 @@ class AccountController extends Controller
     {
         $request->validate([
             'birthdate' => ['required', 'date', 'before:today'],
-            'gender'    => ['required', 'in:male,female'],
+            'gender' => ['required', 'in:male,female'],
         ]);
 
         $userId = $request->user()->ID;

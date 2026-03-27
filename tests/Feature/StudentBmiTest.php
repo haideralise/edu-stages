@@ -6,6 +6,7 @@ use App\Models\EduBmi;
 use App\Models\WpUser;
 use App\Models\WpUserMeta;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class StudentBmiTest extends TestCase
@@ -15,9 +16,9 @@ class StudentBmiTest extends TestCase
     private function createStudent(string $login = 'student_a'): WpUser
     {
         return WpUser::create([
-            'user_login'   => $login,
-            'user_pass'    => bcrypt('password'),
-            'user_email'   => "{$login}@edu.test",
+            'user_login' => $login,
+            'user_pass' => bcrypt('password'),
+            'user_email' => "{$login}@edu.test",
             'display_name' => ucfirst($login),
         ]);
     }
@@ -25,15 +26,15 @@ class StudentBmiTest extends TestCase
     private function createAdmin(): WpUser
     {
         $user = WpUser::create([
-            'user_login'   => 'admin',
-            'user_pass'    => bcrypt('password'),
-            'user_email'   => 'admin@edu.test',
+            'user_login' => 'admin',
+            'user_pass' => bcrypt('password'),
+            'user_email' => 'admin@edu.test',
             'display_name' => 'Admin',
         ]);
 
         WpUserMeta::create([
-            'user_id'    => $user->ID,
-            'meta_key'   => 'wp_3x_capabilities',
+            'user_id' => $user->ID,
+            'meta_key' => 'wp_3x_capabilities',
             'meta_value' => serialize(['administrator' => true]),
         ]);
 
@@ -44,11 +45,11 @@ class StudentBmiTest extends TestCase
     {
         return EduBmi::create(array_merge([
             'user_id' => $userId,
-            'height'  => 140.0,
-            'weight'  => 35.0,
-            'hc'      => 52.0,
-            'bmi'     => EduBmi::calculateBmi(140.0, 35.0),
-            'date'    => strtotime('2025-01-15'),
+            'height' => 140.0,
+            'weight' => 35.0,
+            'hc' => 52.0,
+            'bmi' => EduBmi::calculateBmi(140.0, 35.0),
+            'date' => strtotime('2025-01-15'),
         ], $attrs));
     }
 
@@ -82,17 +83,17 @@ class StudentBmiTest extends TestCase
 
         $response = $this->actingAs($student, 'web')
             ->post('/edu/account/bmi', [
-                'date'   => '2025-06-01',
+                'date' => '2025-06-01',
                 'height' => 145.5,
                 'weight' => 38.0,
-                'hc'     => 53.0,
+                'hc' => 53.0,
             ]);
 
         $response->assertRedirect(route('account.mybmi'));
         $this->assertDatabaseHas('edu_bmi', [
             'user_id' => $student->ID,
-            'height'  => 145.5,
-            'weight'  => 38.0,
+            'height' => 145.5,
+            'weight' => 38.0,
         ]);
     }
 
@@ -102,10 +103,10 @@ class StudentBmiTest extends TestCase
 
         $response = $this->actingAs($student, 'web')
             ->postJson('/edu/account/bmi', [
-                'date'   => '2025-06-01',
+                'date' => '2025-06-01',
                 'height' => 145.5,
                 'weight' => 38.0,
-                'hc'     => 53.0,
+                'hc' => 53.0,
             ]);
 
         $response->assertStatus(201);
@@ -118,7 +119,7 @@ class StudentBmiTest extends TestCase
 
         $this->actingAs($student, 'web')
             ->post('/edu/account/bmi', [
-                'date'   => '2025-06-01',
+                'date' => '2025-06-01',
                 'height' => 170.0,
                 'weight' => 70.0,
             ]);
@@ -145,7 +146,7 @@ class StudentBmiTest extends TestCase
 
         $response = $this->actingAs($student, 'web')
             ->postJson('/edu/account/bmi', [
-                'date'   => '2025-01-01',
+                'date' => '2025-01-01',
                 'height' => 5,    // below 30 min
                 'weight' => 500,  // above 300 max
             ]);
@@ -177,14 +178,14 @@ class StudentBmiTest extends TestCase
 
         $response = $this->actingAs($student, 'web')
             ->put("/edu/account/bmi/{$bmi->id}", [
-                'date'   => '2025-01-15',
+                'date' => '2025-01-15',
                 'height' => 142.0,
                 'weight' => 36.0,
             ]);
 
         $response->assertRedirect(route('account.mybmi'));
         $this->assertDatabaseHas('edu_bmi', [
-            'id'     => $bmi->id,
+            'id' => $bmi->id,
             'height' => 142.0,
             'weight' => 36.0,
         ]);
@@ -197,7 +198,7 @@ class StudentBmiTest extends TestCase
 
         $response = $this->actingAs($student, 'web')
             ->putJson("/edu/account/bmi/{$bmi->id}", [
-                'date'   => '2025-01-15',
+                'date' => '2025-01-15',
                 'height' => 142.0,
                 'weight' => 36.0,
             ]);
@@ -214,7 +215,7 @@ class StudentBmiTest extends TestCase
 
         $response = $this->actingAs($student, 'web')
             ->put("/edu/account/bmi/{$bmi->id}", [
-                'date'   => '2025-01-15',
+                'date' => '2025-01-15',
                 'height' => 142.0,
                 'weight' => 36.0,
             ]);
@@ -288,16 +289,16 @@ class StudentBmiTest extends TestCase
         $response = $this->actingAs($admin, 'web')
             ->postJson('/edu/account/bmi', [
                 'user_id' => $student->ID,
-                'date'    => '2025-06-01',
-                'height'  => 145.5,
-                'weight'  => 38.0,
-                'hc'      => 53.0,
+                'date' => '2025-06-01',
+                'height' => 145.5,
+                'weight' => 38.0,
+                'hc' => 53.0,
             ]);
 
         $response->assertStatus(201);
         $this->assertDatabaseHas('edu_bmi', [
             'user_id' => $student->ID,
-            'height'  => 145.5,
+            'height' => 145.5,
         ]);
     }
 
@@ -309,16 +310,16 @@ class StudentBmiTest extends TestCase
         $response = $this->actingAs($student, 'web')
             ->postJson('/edu/account/bmi', [
                 'user_id' => $other->ID,
-                'date'    => '2025-06-01',
-                'height'  => 145.5,
-                'weight'  => 38.0,
+                'date' => '2025-06-01',
+                'height' => 145.5,
+                'weight' => 38.0,
             ]);
 
         $response->assertStatus(201);
         // Student's user_id should be used, not the other student's
         $this->assertDatabaseHas('edu_bmi', [
             'user_id' => $student->ID,
-            'height'  => 145.5,
+            'height' => 145.5,
         ]);
         $this->assertDatabaseMissing('edu_bmi', [
             'user_id' => $other->ID,
@@ -333,7 +334,7 @@ class StudentBmiTest extends TestCase
 
         $response = $this->actingAs($admin, 'web')
             ->put("/edu/account/bmi/{$bmi->id}", [
-                'date'   => '2025-01-15',
+                'date' => '2025-01-15',
                 'height' => 150.0,
                 'weight' => 40.0,
             ]);
@@ -359,25 +360,25 @@ class StudentBmiTest extends TestCase
     public function test_coach_cannot_access_bmi_page(): void
     {
         $coach = WpUser::create([
-            'user_login'   => 'coach_test',
-            'user_pass'    => bcrypt('password'),
-            'user_email'   => 'coach@edu.test',
+            'user_login' => 'coach_test',
+            'user_pass' => bcrypt('password'),
+            'user_email' => 'coach@edu.test',
             'display_name' => 'Coach Test',
         ]);
 
         // Make them a coach by adding to a class as teacher
-        \Illuminate\Support\Facades\DB::table('edu_class')->insert([
+        DB::table('edu_class')->insert([
             'class_name' => 'Test Class', 'district_id' => 101, 'class_year' => '2025',
         ]);
-        $classId = \Illuminate\Support\Facades\DB::table('edu_class')->max('class_id');
+        $classId = DB::table('edu_class')->max('class_id');
 
-        \Illuminate\Support\Facades\DB::table('edu_class_user')->insert([
-            'class_id'   => $classId,
-            'month'      => '1月-2月',
-            'student'    => json_encode([]),
-            'teacher'    => json_encode([(string) $coach->ID]),
+        DB::table('edu_class_user')->insert([
+            'class_id' => $classId,
+            'month' => '1月-2月',
+            'student' => json_encode([]),
+            'teacher' => json_encode([(string) $coach->ID]),
             'class_year' => '2025',
-            'sort'       => 202501,
+            'sort' => 202501,
         ]);
 
         $response = $this->actingAs($coach, 'web')->get('/edu/account/mybmi');
@@ -387,29 +388,29 @@ class StudentBmiTest extends TestCase
     public function test_coach_cannot_create_bmi(): void
     {
         $coach = WpUser::create([
-            'user_login'   => 'coach_test',
-            'user_pass'    => bcrypt('password'),
-            'user_email'   => 'coach@edu.test',
+            'user_login' => 'coach_test',
+            'user_pass' => bcrypt('password'),
+            'user_email' => 'coach@edu.test',
             'display_name' => 'Coach Test',
         ]);
 
-        \Illuminate\Support\Facades\DB::table('edu_class')->insert([
+        DB::table('edu_class')->insert([
             'class_name' => 'Test Class', 'district_id' => 101, 'class_year' => '2025',
         ]);
-        $classId = \Illuminate\Support\Facades\DB::table('edu_class')->max('class_id');
+        $classId = DB::table('edu_class')->max('class_id');
 
-        \Illuminate\Support\Facades\DB::table('edu_class_user')->insert([
-            'class_id'   => $classId,
-            'month'      => '1月-2月',
-            'student'    => json_encode([]),
-            'teacher'    => json_encode([(string) $coach->ID]),
+        DB::table('edu_class_user')->insert([
+            'class_id' => $classId,
+            'month' => '1月-2月',
+            'student' => json_encode([]),
+            'teacher' => json_encode([(string) $coach->ID]),
             'class_year' => '2025',
-            'sort'       => 202501,
+            'sort' => 202501,
         ]);
 
         $response = $this->actingAs($coach, 'web')
             ->postJson('/edu/account/bmi', [
-                'date'   => '2025-06-01',
+                'date' => '2025-06-01',
                 'height' => 145.5,
                 'weight' => 38.0,
             ]);
@@ -427,7 +428,7 @@ class StudentBmiTest extends TestCase
         $response = $this->actingAs($student, 'web')
             ->from('/edu/account/mybmi')
             ->post('/edu/account/bmi', [
-                'date'   => '2025-01-01',
+                'date' => '2025-01-01',
                 'height' => 140,
                 'weight' => 35,
             ]);

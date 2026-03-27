@@ -18,10 +18,10 @@ class StoreBmiRequest extends FormRequest
     {
         return [
             'user_id' => ['nullable', 'integer', 'exists:users,ID'],
-            'date'    => ['required'],
-            'height'  => ['required', 'numeric', 'min:30', 'max:250'],
-            'weight'  => ['required', 'numeric', 'min:1', 'max:300'],
-            'hc'      => ['nullable', 'numeric', 'min:20', 'max:100'],
+            'date' => ['required'],
+            'height' => ['required', 'numeric', 'min:30', 'max:250'],
+            'weight' => ['required', 'numeric', 'min:1', 'max:300'],
+            'hc' => ['nullable', 'numeric', 'min:20', 'max:100'],
         ];
     }
 }

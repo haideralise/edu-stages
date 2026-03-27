@@ -14,9 +14,9 @@ class AccountInfoTest extends TestCase
     private function createStudent(string $login = 'student_a'): WpUser
     {
         return WpUser::create([
-            'user_login'   => $login,
-            'user_pass'    => bcrypt('password'),
-            'user_email'   => "{$login}@edu.test",
+            'user_login' => $login,
+            'user_pass' => bcrypt('password'),
+            'user_email' => "{$login}@edu.test",
             'display_name' => ucfirst($login),
         ]);
     }
@@ -50,20 +50,20 @@ class AccountInfoTest extends TestCase
         $response = $this->actingAs($student, 'web')
             ->post('/edu/account/info', [
                 'birthdate' => '2010-05-15',
-                'gender'    => 'female',
+                'gender' => 'female',
             ]);
 
         $response->assertRedirect(route('account.info'));
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('usermeta', [
-            'user_id'    => $student->ID,
-            'meta_key'   => 'billing_birthdate',
+            'user_id' => $student->ID,
+            'meta_key' => 'billing_birthdate',
             'meta_value' => '2010-05-15',
         ]);
         $this->assertDatabaseHas('usermeta', [
-            'user_id'    => $student->ID,
-            'meta_key'   => 'billing_gender',
+            'user_id' => $student->ID,
+            'meta_key' => 'billing_gender',
             'meta_value' => 'female',
         ]);
     }
@@ -87,7 +87,7 @@ class AccountInfoTest extends TestCase
         $response = $this->actingAs($student, 'web')
             ->post('/edu/account/info', [
                 'birthdate' => '2099-01-01',
-                'gender'    => 'male',
+                'gender' => 'male',
             ]);
 
         $response->assertSessionHasErrors('birthdate');
@@ -100,7 +100,7 @@ class AccountInfoTest extends TestCase
         $response = $this->actingAs($student, 'web')
             ->post('/edu/account/info', [
                 'birthdate' => '2010-05-15',
-                'gender'    => 'other',
+                'gender' => 'other',
             ]);
 
         $response->assertSessionHasErrors('gender');
@@ -116,24 +116,24 @@ class AccountInfoTest extends TestCase
         $this->actingAs($student, 'web')
             ->post('/edu/account/info', [
                 'birthdate' => '2010-05-15',
-                'gender'    => 'female',
+                'gender' => 'female',
             ]);
 
         // Second save with different values
         $this->actingAs($student, 'web')
             ->post('/edu/account/info', [
                 'birthdate' => '2011-08-20',
-                'gender'    => 'male',
+                'gender' => 'male',
             ]);
 
         $this->assertDatabaseHas('usermeta', [
-            'user_id'    => $student->ID,
-            'meta_key'   => 'billing_birthdate',
+            'user_id' => $student->ID,
+            'meta_key' => 'billing_birthdate',
             'meta_value' => '2011-08-20',
         ]);
         $this->assertDatabaseHas('usermeta', [
-            'user_id'    => $student->ID,
-            'meta_key'   => 'billing_gender',
+            'user_id' => $student->ID,
+            'meta_key' => 'billing_gender',
             'meta_value' => 'male',
         ]);
 
@@ -146,13 +146,13 @@ class AccountInfoTest extends TestCase
         $student = $this->createStudent();
 
         WpUserMeta::create([
-            'user_id'    => $student->ID,
-            'meta_key'   => 'billing_birthdate',
+            'user_id' => $student->ID,
+            'meta_key' => 'billing_birthdate',
             'meta_value' => '2010-05-15',
         ]);
         WpUserMeta::create([
-            'user_id'    => $student->ID,
-            'meta_key'   => 'billing_gender',
+            'user_id' => $student->ID,
+            'meta_key' => 'billing_gender',
             'meta_value' => 'male',
         ]);
 

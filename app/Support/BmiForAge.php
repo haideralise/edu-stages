@@ -36,7 +36,7 @@ class BmiForAge
         }
 
         $gender = strtolower($gender);
-        $table = config('bmi.percentiles.' . $gender);
+        $table = config('bmi.percentiles.'.$gender);
 
         if (! $table) {
             return null;

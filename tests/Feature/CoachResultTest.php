@@ -37,12 +37,12 @@ class CoachResultTest extends TestCase
 
         // Assign coach + student A to class
         DB::table('edu_class_user')->insert([
-            'class_id'   => $classId,
-            'month'      => '1月-2月',
-            'student'    => json_encode([(string)$studentA->ID]),
-            'teacher'    => json_encode([(string)$coach->ID]),
+            'class_id' => $classId,
+            'month' => '1月-2月',
+            'student' => json_encode([(string) $studentA->ID]),
+            'teacher' => json_encode([(string) $coach->ID]),
             'class_year' => '2025',
-            'sort'       => 202501,
+            'sort' => 202501,
         ]);
 
         // Result for student A (in coach's class)

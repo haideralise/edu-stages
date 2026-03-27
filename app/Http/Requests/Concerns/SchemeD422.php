@@ -11,7 +11,7 @@ trait SchemeD422
     {
         throw new HttpResponseException(response()->json([
             'message' => 'Validation failed',
-            'errors'  => $validator->errors()->toArray(),
+            'errors' => $validator->errors()->toArray(),
         ], 422));
     }
 }

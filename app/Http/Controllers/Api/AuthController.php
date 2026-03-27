@@ -29,7 +29,7 @@ class AuthController extends Controller
         $token = $user->createToken('api')->plainTextToken;
 
         return $this->success([
-            'user'  => $this->formatUser($user),
+            'user' => $this->formatUser($user),
             'token' => $token,
         ]);
     }
@@ -51,11 +51,11 @@ class AuthController extends Controller
     private function formatUser(WpUser $user): array
     {
         return [
-            'id'           => $user->ID,
-            'user_login'   => $user->user_login,
-            'user_email'   => $user->user_email,
+            'id' => $user->ID,
+            'user_login' => $user->user_login,
+            'user_email' => $user->user_email,
             'display_name' => $user->display_name,
-            'role'         => $user->resolveRole(),
+            'role' => $user->resolveRole(),
         ];
     }
 
@@ -85,11 +85,11 @@ class AuthController extends Controller
 
         $countLog2 = strpos($itoa64, $stored[3]);
         $count = 1 << $countLog2;
-        $salt  = substr($stored, 4, 8);
+        $salt = substr($stored, 4, 8);
 
-        $hash = md5($salt . $password, true);
+        $hash = md5($salt.$password, true);
         do {
-            $hash = md5($hash . $password, true);
+            $hash = md5($hash.$password, true);
         } while (--$count);
 
         $encoded = substr($stored, 0, 12);
@@ -98,18 +98,22 @@ class AuthController extends Controller
 
         do {
             $value = ord($hash[$i++]);
-            $encoded .= $itoa64[$value & 0x3f];
+            $encoded .= $itoa64[$value & 0x3F];
             if ($i < $len) {
                 $value |= ord($hash[$i]) << 8;
             }
-            $encoded .= $itoa64[($value >> 6) & 0x3f];
-            if ($i++ >= $len) break;
+            $encoded .= $itoa64[($value >> 6) & 0x3F];
+            if ($i++ >= $len) {
+                break;
+            }
             if ($i < $len) {
                 $value |= ord($hash[$i]) << 16;
             }
-            $encoded .= $itoa64[($value >> 12) & 0x3f];
-            if ($i++ >= $len) break;
-            $encoded .= $itoa64[($value >> 18) & 0x3f];
+            $encoded .= $itoa64[($value >> 12) & 0x3F];
+            if ($i++ >= $len) {
+                break;
+            }
+            $encoded .= $itoa64[($value >> 18) & 0x3F];
         } while ($i < $len);
 
         return hash_equals($stored, $encoded);

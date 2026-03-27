@@ -27,8 +27,8 @@ class StudentChartController extends Controller
         }
 
         return view('account.chart2', [
-            'user'     => $user,
-            'isAdmin'  => $role === 'admin',
+            'user' => $user,
+            'isAdmin' => $role === 'admin',
             'students' => $students,
         ]);
     }
