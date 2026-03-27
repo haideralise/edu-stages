@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Chart2BmiRequest;
 use App\Models\EduBmi;
 use App\Models\EduResult;
 use App\Models\WpUser;
@@ -16,18 +17,9 @@ class Chart2Controller extends Controller
 {
     use ApiResponse;
 
-    private const VALID_TYPES = ['height', 'weight', 'bmi', 'hc'];
-
-    public function bmi(Request $request, int $userId): JsonResponse
+    public function bmi(Chart2BmiRequest $request, int $userId): JsonResponse
     {
         $type = $request->input('type', 'bmi');
-
-        if (! in_array($type, self::VALID_TYPES, true)) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => ['type' => ['The selected type is invalid.']],
-            ], 422);
-        }
 
         $user = $request->user();
         $this->authorizeChart($user, $userId);
