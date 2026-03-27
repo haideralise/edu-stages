@@ -31,12 +31,12 @@ class CoachResultTest extends TestCase
         ]);
 
         // Create class
-        $classId = DB::table('wp_3x_edu_class')->insertGetId([
+        $classId = DB::table('edu_class')->insertGetId([
             'class_name' => 'Coach Class', 'district_id' => 101, 'class_year' => '2025',
         ]);
 
         // Assign coach + student A to class
-        DB::table('wp_3x_edu_class_user')->insert([
+        DB::table('edu_class_user')->insert([
             'class_id'   => $classId,
             'month'      => '1月-2月',
             'student'    => json_encode([(string)$studentA->ID]),
@@ -46,7 +46,7 @@ class CoachResultTest extends TestCase
         ]);
 
         // Result for student A (in coach's class)
-        DB::table('wp_3x_edu_result')->insert([
+        DB::table('edu_result')->insert([
             'class_id' => $classId, 'class_month' => '1月-2月', 'exam_id' => 1,
             'user_id' => $studentA->ID, 'first_name' => 'Student', 'last_name' => 'A',
             'exam_type' => 'score', 'exam_name' => 'Freestyle', 'exam_data' => '9',
@@ -55,7 +55,7 @@ class CoachResultTest extends TestCase
         ]);
 
         // Result for student B (NOT in coach's class)
-        DB::table('wp_3x_edu_result')->insert([
+        DB::table('edu_result')->insert([
             'class_id' => $classId + 999, 'class_month' => '1月-2月', 'exam_id' => 1,
             'user_id' => $studentB->ID, 'first_name' => 'Student', 'last_name' => 'B',
             'exam_type' => 'score', 'exam_name' => 'Backstroke', 'exam_data' => '7',

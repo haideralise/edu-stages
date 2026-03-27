@@ -10,7 +10,7 @@ class WpUser extends Authenticatable
 {
     use HasApiTokens;
 
-    protected $table = 'wp_3x_users';
+    protected $table = 'users';
     protected $primaryKey = 'ID';
     public $timestamps = false;
 

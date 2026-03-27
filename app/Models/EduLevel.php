@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 
 class EduLevel extends Model
 {
-    protected $table = 'wp_3x_edu_level';
+    protected $table = 'edu_level';
     public $timestamps = false;
 
     protected $guarded = ['*'];

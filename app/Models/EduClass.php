@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class EduClass extends Model
 {
-    protected $table = 'wp_3x_edu_class';
+    protected $table = 'edu_class';
     protected $primaryKey = 'class_id';
     public $timestamps = false;
 

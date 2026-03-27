@@ -56,12 +56,12 @@ class AccountInfoTest extends TestCase
         $response->assertRedirect(route('account.info'));
         $response->assertSessionHas('success');
 
-        $this->assertDatabaseHas('wp_3x_usermeta', [
+        $this->assertDatabaseHas('usermeta', [
             'user_id'    => $student->ID,
             'meta_key'   => 'billing_birthdate',
             'meta_value' => '2010-05-15',
         ]);
-        $this->assertDatabaseHas('wp_3x_usermeta', [
+        $this->assertDatabaseHas('usermeta', [
             'user_id'    => $student->ID,
             'meta_key'   => 'billing_gender',
             'meta_value' => 'female',
@@ -126,19 +126,19 @@ class AccountInfoTest extends TestCase
                 'gender'    => 'male',
             ]);
 
-        $this->assertDatabaseHas('wp_3x_usermeta', [
+        $this->assertDatabaseHas('usermeta', [
             'user_id'    => $student->ID,
             'meta_key'   => 'billing_birthdate',
             'meta_value' => '2011-08-20',
         ]);
-        $this->assertDatabaseHas('wp_3x_usermeta', [
+        $this->assertDatabaseHas('usermeta', [
             'user_id'    => $student->ID,
             'meta_key'   => 'billing_gender',
             'meta_value' => 'male',
         ]);
 
         // Ensure only one row per meta key
-        $this->assertDatabaseCount('wp_3x_usermeta', 2);
+        $this->assertDatabaseCount('usermeta', 2);
     }
 
     public function test_view_shows_existing_values(): void

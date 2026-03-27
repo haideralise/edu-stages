@@ -5,7 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Creates wp_3x_ tables matching the existing WordPress/edu2 schema.
+ * Creates tables matching the existing WordPress/edu2 schema.
+ * The wp_3x_ prefix is applied automatically via config/database.php.
  * Uses Schema::hasTable() guards so this can run safely against
  * a production DB that already has these tables.
  */
@@ -15,8 +16,8 @@ return new class extends Migration
     {
         // WordPress core tables (minimal — just what we need for auth)
 
-        if (! Schema::hasTable('wp_3x_users')) {
-            Schema::create('wp_3x_users', function (Blueprint $table) {
+        if (! Schema::hasTable('users')) {
+            Schema::create('users', function (Blueprint $table) {
                 $table->bigIncrements('ID');
                 $table->string('user_login', 60)->default('')->index();
                 $table->string('user_pass', 255)->default('');
@@ -30,8 +31,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('wp_3x_usermeta')) {
-            Schema::create('wp_3x_usermeta', function (Blueprint $table) {
+        if (! Schema::hasTable('usermeta')) {
+            Schema::create('usermeta', function (Blueprint $table) {
                 $table->bigIncrements('umeta_id');
                 $table->unsignedBigInteger('user_id')->default(0)->index();
                 $table->string('meta_key', 255)->nullable()->index();
@@ -41,8 +42,8 @@ return new class extends Migration
 
         // ── edu tables (doc 07 schema) ────────────────────────────
 
-        if (! Schema::hasTable('wp_3x_edu_class')) {
-            Schema::create('wp_3x_edu_class', function (Blueprint $table) {
+        if (! Schema::hasTable('edu_class')) {
+            Schema::create('edu_class', function (Blueprint $table) {
                 $table->integerIncrements('class_id');
                 $table->text('class_name')->nullable();
                 $table->integer('district_id')->default(0)->index();
@@ -57,8 +58,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('wp_3x_edu_class_user')) {
-            Schema::create('wp_3x_edu_class_user', function (Blueprint $table) {
+        if (! Schema::hasTable('edu_class_user')) {
+            Schema::create('edu_class_user', function (Blueprint $table) {
                 $table->integerIncrements('id');
                 $table->integer('class_id')->default(0)->index();
                 $table->string('month', 255)->default('');
@@ -76,8 +77,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('wp_3x_edu_user')) {
-            Schema::create('wp_3x_edu_user', function (Blueprint $table) {
+        if (! Schema::hasTable('edu_user')) {
+            Schema::create('edu_user', function (Blueprint $table) {
                 $table->integer('user_id')->primary();
                 $table->text('note')->nullable();
                 $table->float('hourly_wage', 10, 2)->default(0);
@@ -85,8 +86,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('wp_3x_edu_order')) {
-            Schema::create('wp_3x_edu_order', function (Blueprint $table) {
+        if (! Schema::hasTable('edu_order')) {
+            Schema::create('edu_order', function (Blueprint $table) {
                 $table->integerIncrements('id');
                 $table->integer('class_id')->nullable()->index();
                 $table->string('month', 255)->default('');
@@ -109,8 +110,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('wp_3x_edu_bmi')) {
-            Schema::create('wp_3x_edu_bmi', function (Blueprint $table) {
+        if (! Schema::hasTable('edu_bmi')) {
+            Schema::create('edu_bmi', function (Blueprint $table) {
                 $table->integerIncrements('id');
                 $table->integer('user_id')->default(0)->index();
                 $table->float('height', 10, 2)->default(0);
@@ -121,8 +122,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('wp_3x_edu_attendance')) {
-            Schema::create('wp_3x_edu_attendance', function (Blueprint $table) {
+        if (! Schema::hasTable('edu_attendance')) {
+            Schema::create('edu_attendance', function (Blueprint $table) {
                 $table->integerIncrements('id');
                 $table->integer('class_id')->default(0)->index();
                 $table->string('month', 255)->default('');
@@ -133,8 +134,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('wp_3x_edu_admin_log')) {
-            Schema::create('wp_3x_edu_admin_log', function (Blueprint $table) {
+        if (! Schema::hasTable('edu_admin_log')) {
+            Schema::create('edu_admin_log', function (Blueprint $table) {
                 $table->integerIncrements('id');
                 $table->integer('admin_user_id')->default(0);
                 $table->integer('created')->default(0);
@@ -145,8 +146,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('wp_3x_edu_result')) {
-            Schema::create('wp_3x_edu_result', function (Blueprint $table) {
+        if (! Schema::hasTable('edu_result')) {
+            Schema::create('edu_result', function (Blueprint $table) {
                 $table->integerIncrements('id');
                 $table->integer('class_id')->default(0)->index();
                 $table->string('class_month', 255)->default('');
@@ -172,8 +173,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('wp_3x_edu_class_user_days')) {
-            Schema::create('wp_3x_edu_class_user_days', function (Blueprint $table) {
+        if (! Schema::hasTable('edu_class_user_days')) {
+            Schema::create('edu_class_user_days', function (Blueprint $table) {
                 $table->integerIncrements('id');
                 $table->integer('class_id')->default(0)->index();
                 $table->string('month', 255)->default('');
@@ -184,8 +185,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('wp_3x_edu_level')) {
-            Schema::create('wp_3x_edu_level', function (Blueprint $table) {
+        if (! Schema::hasTable('edu_level')) {
+            Schema::create('edu_level', function (Blueprint $table) {
                 $table->integerIncrements('id');
                 $table->integer('pid')->default(0);
                 $table->string('name', 255)->default('');
@@ -195,8 +196,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('wp_3x_edu_order_status')) {
-            Schema::create('wp_3x_edu_order_status', function (Blueprint $table) {
+        if (! Schema::hasTable('edu_order_status')) {
+            Schema::create('edu_order_status', function (Blueprint $table) {
                 $table->string('order_id', 100)->primary();
                 $table->integer('user_id')->default(0);
                 $table->string('type', 25)->default('');
@@ -204,8 +205,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('wp_3x_edu_private')) {
-            Schema::create('wp_3x_edu_private', function (Blueprint $table) {
+        if (! Schema::hasTable('edu_private')) {
+            Schema::create('edu_private', function (Blueprint $table) {
                 $table->increments('id');
                 $table->unsignedInteger('coach_id')->default(0)->index();
                 $table->unsignedBigInteger('enrollment_id')->default(0);
@@ -234,20 +235,20 @@ return new class extends Migration
     public function down(): void
     {
         $tables = [
-            'wp_3x_edu_private',
-            'wp_3x_edu_order_status',
-            'wp_3x_edu_level',
-            'wp_3x_edu_class_user_days',
-            'wp_3x_edu_result',
-            'wp_3x_edu_admin_log',
-            'wp_3x_edu_attendance',
-            'wp_3x_edu_bmi',
-            'wp_3x_edu_order',
-            'wp_3x_edu_user',
-            'wp_3x_edu_class_user',
-            'wp_3x_edu_class',
-            'wp_3x_usermeta',
-            'wp_3x_users',
+            'edu_private',
+            'edu_order_status',
+            'edu_level',
+            'edu_class_user_days',
+            'edu_result',
+            'edu_admin_log',
+            'edu_attendance',
+            'edu_bmi',
+            'edu_order',
+            'edu_user',
+            'edu_class_user',
+            'edu_class',
+            'usermeta',
+            'users',
         ];
 
         foreach ($tables as $table) {

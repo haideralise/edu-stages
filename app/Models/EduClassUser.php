@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 
 class EduClassUser extends Model
 {
-    protected $table = 'wp_3x_edu_class_user';
+    protected $table = 'edu_class_user';
     public $timestamps = false;
 
     protected $guarded = ['*'];
