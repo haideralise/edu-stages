@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->seedUsers();
         $this->seedClasses();
         $this->seedClassUsers();
+        $this->seed2024ClassUsers();
         $this->seedLevels();
         $this->seedBmiRecords();
         $this->seedResults();
@@ -240,16 +241,43 @@ class DatabaseSeeder extends Seeder
         $s = $this->studentIds;
 
         $records = [
-            // student_chan — 3 records
-            ['user_id' => $s['student_chan'], 'height' => 140.5, 'weight' => 35.2, 'hc' => 52.0, 'bmi' => round(35.2 / ((140.5/100) ** 2), 2), 'date' => strtotime('2025-01-15')],
-            ['user_id' => $s['student_chan'], 'height' => 141.0, 'weight' => 35.5, 'hc' => 52.5, 'bmi' => round(35.5 / ((141.0/100) ** 2), 2), 'date' => strtotime('2025-03-15')],
+            // student_chan (born 2010-05-12, male) — 8 records over 3 years
+            ['user_id' => $s['student_chan'], 'height' => 132.0, 'weight' => 30.0, 'hc' => 51.0, 'bmi' => round(30.0 / ((132.0/100) ** 2), 2), 'date' => strtotime('2023-01-15')],
+            ['user_id' => $s['student_chan'], 'height' => 134.5, 'weight' => 31.5, 'hc' => 51.5, 'bmi' => round(31.5 / ((134.5/100) ** 2), 2), 'date' => strtotime('2023-06-15')],
+            ['user_id' => $s['student_chan'], 'height' => 136.0, 'weight' => 32.5, 'hc' => 51.8, 'bmi' => round(32.5 / ((136.0/100) ** 2), 2), 'date' => strtotime('2024-01-15')],
+            ['user_id' => $s['student_chan'], 'height' => 138.0, 'weight' => 33.5, 'hc' => 52.0, 'bmi' => round(33.5 / ((138.0/100) ** 2), 2), 'date' => strtotime('2024-06-15')],
+            ['user_id' => $s['student_chan'], 'height' => 139.5, 'weight' => 34.5, 'hc' => 52.2, 'bmi' => round(34.5 / ((139.5/100) ** 2), 2), 'date' => strtotime('2024-09-15')],
+            ['user_id' => $s['student_chan'], 'height' => 140.5, 'weight' => 35.2, 'hc' => 52.5, 'bmi' => round(35.2 / ((140.5/100) ** 2), 2), 'date' => strtotime('2025-01-15')],
+            ['user_id' => $s['student_chan'], 'height' => 141.0, 'weight' => 35.5, 'hc' => 52.8, 'bmi' => round(35.5 / ((141.0/100) ** 2), 2), 'date' => strtotime('2025-03-15')],
             ['user_id' => $s['student_chan'], 'height' => 142.0, 'weight' => 36.0, 'hc' => 53.0, 'bmi' => round(36.0 / ((142.0/100) ** 2), 2), 'date' => strtotime('2025-06-15')],
-            // student_li — 2 records
-            ['user_id' => $s['student_li'],  'height' => 135.0, 'weight' => 30.0, 'hc' => 50.0, 'bmi' => round(30.0 / ((135.0/100) ** 2), 2), 'date' => strtotime('2025-02-10')],
-            ['user_id' => $s['student_li'],  'height' => 136.0, 'weight' => 31.0, 'hc' => 50.5, 'bmi' => round(31.0 / ((136.0/100) ** 2), 2), 'date' => strtotime('2025-05-10')],
-            // student_wong — 2 records
-            ['user_id' => $s['student_wong'],'height' => 150.0, 'weight' => 45.0, 'hc' => 55.0, 'bmi' => round(45.0 / ((150.0/100) ** 2), 2), 'date' => strtotime('2025-01-20')],
-            ['user_id' => $s['student_wong'],'height' => 151.0, 'weight' => 46.0, 'hc' => 55.5, 'bmi' => round(46.0 / ((151.0/100) ** 2), 2), 'date' => strtotime('2025-04-20')],
+
+            // student_li (born 2011-08-23, female) — 6 records
+            ['user_id' => $s['student_li'], 'height' => 128.0, 'weight' => 26.0, 'hc' => 49.0, 'bmi' => round(26.0 / ((128.0/100) ** 2), 2), 'date' => strtotime('2023-03-10')],
+            ['user_id' => $s['student_li'], 'height' => 130.0, 'weight' => 27.5, 'hc' => 49.5, 'bmi' => round(27.5 / ((130.0/100) ** 2), 2), 'date' => strtotime('2023-09-10')],
+            ['user_id' => $s['student_li'], 'height' => 132.5, 'weight' => 28.5, 'hc' => 49.8, 'bmi' => round(28.5 / ((132.5/100) ** 2), 2), 'date' => strtotime('2024-03-10')],
+            ['user_id' => $s['student_li'], 'height' => 134.0, 'weight' => 29.5, 'hc' => 50.0, 'bmi' => round(29.5 / ((134.0/100) ** 2), 2), 'date' => strtotime('2024-09-10')],
+            ['user_id' => $s['student_li'], 'height' => 135.0, 'weight' => 30.0, 'hc' => 50.2, 'bmi' => round(30.0 / ((135.0/100) ** 2), 2), 'date' => strtotime('2025-02-10')],
+            ['user_id' => $s['student_li'], 'height' => 136.0, 'weight' => 31.0, 'hc' => 50.5, 'bmi' => round(31.0 / ((136.0/100) ** 2), 2), 'date' => strtotime('2025-05-10')],
+
+            // student_wong (born 2009-11-03, male) — 6 records
+            ['user_id' => $s['student_wong'], 'height' => 142.0, 'weight' => 38.0, 'hc' => 53.5, 'bmi' => round(38.0 / ((142.0/100) ** 2), 2), 'date' => strtotime('2023-02-20')],
+            ['user_id' => $s['student_wong'], 'height' => 145.0, 'weight' => 40.0, 'hc' => 54.0, 'bmi' => round(40.0 / ((145.0/100) ** 2), 2), 'date' => strtotime('2023-08-20')],
+            ['user_id' => $s['student_wong'], 'height' => 147.5, 'weight' => 42.5, 'hc' => 54.5, 'bmi' => round(42.5 / ((147.5/100) ** 2), 2), 'date' => strtotime('2024-02-20')],
+            ['user_id' => $s['student_wong'], 'height' => 149.0, 'weight' => 44.0, 'hc' => 55.0, 'bmi' => round(44.0 / ((149.0/100) ** 2), 2), 'date' => strtotime('2024-08-20')],
+            ['user_id' => $s['student_wong'], 'height' => 150.0, 'weight' => 45.0, 'hc' => 55.2, 'bmi' => round(45.0 / ((150.0/100) ** 2), 2), 'date' => strtotime('2025-01-20')],
+            ['user_id' => $s['student_wong'], 'height' => 151.0, 'weight' => 46.0, 'hc' => 55.5, 'bmi' => round(46.0 / ((151.0/100) ** 2), 2), 'date' => strtotime('2025-04-20')],
+
+            // student_lam (born 2012-02-17, female) — 4 records
+            ['user_id' => $s['student_lam'], 'height' => 125.0, 'weight' => 25.0, 'hc' => 49.0, 'bmi' => round(25.0 / ((125.0/100) ** 2), 2), 'date' => strtotime('2024-01-05')],
+            ['user_id' => $s['student_lam'], 'height' => 127.0, 'weight' => 26.0, 'hc' => 49.3, 'bmi' => round(26.0 / ((127.0/100) ** 2), 2), 'date' => strtotime('2024-07-05')],
+            ['user_id' => $s['student_lam'], 'height' => 128.5, 'weight' => 27.0, 'hc' => 49.5, 'bmi' => round(27.0 / ((128.5/100) ** 2), 2), 'date' => strtotime('2025-01-05')],
+            ['user_id' => $s['student_lam'], 'height' => 130.0, 'weight' => 28.0, 'hc' => 49.8, 'bmi' => round(28.0 / ((130.0/100) ** 2), 2), 'date' => strtotime('2025-05-05')],
+
+            // student_ng (born 2008-07-30, male) — 4 records
+            ['user_id' => $s['student_ng'], 'height' => 155.0, 'weight' => 48.0, 'hc' => 56.0, 'bmi' => round(48.0 / ((155.0/100) ** 2), 2), 'date' => strtotime('2024-01-10')],
+            ['user_id' => $s['student_ng'], 'height' => 157.0, 'weight' => 50.0, 'hc' => 56.2, 'bmi' => round(50.0 / ((157.0/100) ** 2), 2), 'date' => strtotime('2024-07-10')],
+            ['user_id' => $s['student_ng'], 'height' => 158.5, 'weight' => 51.0, 'hc' => 56.5, 'bmi' => round(51.0 / ((158.5/100) ** 2), 2), 'date' => strtotime('2025-01-10')],
+            ['user_id' => $s['student_ng'], 'height' => 160.0, 'weight' => 52.0, 'hc' => 56.8, 'bmi' => round(52.0 / ((160.0/100) ** 2), 2), 'date' => strtotime('2025-06-10')],
         ];
 
         foreach ($records as $r) {
@@ -271,29 +299,120 @@ class DatabaseSeeder extends Seeder
             ->toArray();
 
         $results = [
-            // student_chan results in class 1
+            // ── 2025 results ──────────────────────────────────────
+
+            // student_chan in class 1 (Coach Lee, 1月-2月)
             ['class_id' => $firstClassId, 'class_month' => '1月-2月', 'exam_id' => $levelItems[0] ?? 1, 'user_id' => $s['student_chan'], 'first_name' => 'Tai Man', 'last_name' => 'Chan', 'exam_type' => 'score', 'exam_name' => 'Freestyle 25m', 'exam_data' => '8', 'exam_date' => '2025-01-25', 'class_year' => '2025', 'created' => strtotime('2025-01-25')],
             ['class_id' => $firstClassId, 'class_month' => '1月-2月', 'exam_id' => $levelItems[1] ?? 2, 'user_id' => $s['student_chan'], 'first_name' => 'Tai Man', 'last_name' => 'Chan', 'exam_type' => 'score', 'exam_name' => 'Backstroke 25m', 'exam_data' => '7', 'exam_date' => '2025-01-25', 'class_year' => '2025', 'created' => strtotime('2025-01-25')],
-            // student_li results in class 1
+
+            // student_li in class 1 (Coach Lee, 1月-2月)
             ['class_id' => $firstClassId, 'class_month' => '1月-2月', 'exam_id' => $levelItems[0] ?? 1, 'user_id' => $s['student_li'], 'first_name' => 'Ka Yan', 'last_name' => 'Li', 'exam_type' => 'score', 'exam_name' => 'Freestyle 25m', 'exam_data' => '9', 'exam_date' => '2025-01-25', 'class_year' => '2025', 'created' => strtotime('2025-01-25')],
-            // student_wong results in class 2
+            ['class_id' => $firstClassId, 'class_month' => '1月-2月', 'exam_id' => $levelItems[2] ?? 3, 'user_id' => $s['student_li'], 'first_name' => 'Ka Yan', 'last_name' => 'Li', 'exam_type' => 'score', 'exam_name' => 'Water Safety', 'exam_data' => '4', 'exam_date' => '2025-02-01', 'class_year' => '2025', 'created' => strtotime('2025-02-01')],
+
+            // student_wong in class 2 (Coach Lee, 1月-2月)
             ['class_id' => $firstClassId + 1, 'class_month' => '1月-2月', 'exam_id' => $levelItems[3] ?? 4, 'user_id' => $s['student_wong'], 'first_name' => 'Siu Ming', 'last_name' => 'Wong', 'exam_type' => 'score', 'exam_name' => 'Freestyle 50m', 'exam_data' => '6', 'exam_date' => '2025-01-25', 'class_year' => '2025', 'created' => strtotime('2025-01-25')],
-            // student_ng results in class 3 (Coach Wong)
+            ['class_id' => $firstClassId + 1, 'class_month' => '1月-2月', 'exam_id' => $levelItems[4] ?? 5, 'user_id' => $s['student_wong'], 'first_name' => 'Siu Ming', 'last_name' => 'Wong', 'exam_type' => 'score', 'exam_name' => 'Breaststroke 50m', 'exam_data' => '5', 'exam_date' => '2025-02-08', 'class_year' => '2025', 'created' => strtotime('2025-02-08')],
+
+            // student_lam in class 2 (Coach Lee, 1月-2月)
+            ['class_id' => $firstClassId + 1, 'class_month' => '1月-2月', 'exam_id' => $levelItems[3] ?? 4, 'user_id' => $s['student_lam'], 'first_name' => 'Hoi Yin', 'last_name' => 'Lam', 'exam_type' => 'score', 'exam_name' => 'Freestyle 50m', 'exam_data' => '7', 'exam_date' => '2025-01-25', 'class_year' => '2025', 'created' => strtotime('2025-01-25')],
+
+            // student_ng in class 3 (Coach Wong, 1月-2月)
+            ['class_id' => $firstClassId + 2, 'class_month' => '1月-2月', 'exam_id' => $levelItems[0] ?? 1, 'user_id' => $s['student_ng'], 'first_name' => 'Chi Wai', 'last_name' => 'Ng', 'exam_type' => 'score', 'exam_name' => 'Freestyle 25m', 'exam_data' => '9', 'exam_date' => '2025-01-26', 'class_year' => '2025', 'created' => strtotime('2025-01-26')],
             ['class_id' => $firstClassId + 2, 'class_month' => '1月-2月', 'exam_id' => $levelItems[2] ?? 3, 'user_id' => $s['student_ng'], 'first_name' => 'Chi Wai', 'last_name' => 'Ng', 'exam_type' => 'score', 'exam_name' => 'Water Safety', 'exam_data' => '5', 'exam_date' => '2025-01-26', 'class_year' => '2025', 'created' => strtotime('2025-01-26')],
+
+            // student_chan in class 3 (Coach Wong, 1月-2月)
+            ['class_id' => $firstClassId + 2, 'class_month' => '1月-2月', 'exam_id' => $levelItems[0] ?? 1, 'user_id' => $s['student_chan'], 'first_name' => 'Tai Man', 'last_name' => 'Chan', 'exam_type' => 'score', 'exam_name' => 'Freestyle 25m', 'exam_data' => '8', 'exam_date' => '2025-01-26', 'class_year' => '2025', 'created' => strtotime('2025-01-26')],
+
+            // Coach Wong's class 4 (3月-4月)
+            ['class_id' => $firstClassId + 3, 'class_month' => '3月-4月', 'exam_id' => $levelItems[5] ?? 6, 'user_id' => $s['student_li'], 'first_name' => 'Ka Yan', 'last_name' => 'Li', 'exam_type' => 'score', 'exam_name' => 'Butterfly 25m', 'exam_data' => '6', 'exam_date' => '2025-03-22', 'class_year' => '2025', 'created' => strtotime('2025-03-22')],
+            ['class_id' => $firstClassId + 3, 'class_month' => '3月-4月', 'exam_id' => $levelItems[5] ?? 6, 'user_id' => $s['student_ng'], 'first_name' => 'Chi Wai', 'last_name' => 'Ng', 'exam_type' => 'score', 'exam_name' => 'Butterfly 25m', 'exam_data' => '8', 'exam_date' => '2025-03-22', 'class_year' => '2025', 'created' => strtotime('2025-03-22')],
+            ['class_id' => $firstClassId + 3, 'class_month' => '3月-4月', 'exam_id' => $levelItems[5] ?? 6, 'user_id' => $s['student_lam'], 'first_name' => 'Hoi Yin', 'last_name' => 'Lam', 'exam_type' => 'score', 'exam_name' => 'Butterfly 25m', 'exam_data' => '7', 'exam_date' => '2025-03-22', 'class_year' => '2025', 'created' => strtotime('2025-03-22')],
+
+            // ── 2024 results (history) ────────────────────────────
+
+            // student_chan in 2024 class 8 (Coach Lee)
+            ['class_id' => $firstClassId + 7, 'class_month' => '7月-8月', 'exam_id' => $levelItems[0] ?? 1, 'user_id' => $s['student_chan'], 'first_name' => 'Tai Man', 'last_name' => 'Chan', 'exam_type' => 'score', 'exam_name' => 'Freestyle 25m', 'exam_data' => '6', 'exam_date' => '2024-07-27', 'class_year' => '2024', 'created' => strtotime('2024-07-27')],
+            ['class_id' => $firstClassId + 7, 'class_month' => '7月-8月', 'exam_id' => $levelItems[1] ?? 2, 'user_id' => $s['student_chan'], 'first_name' => 'Tai Man', 'last_name' => 'Chan', 'exam_type' => 'score', 'exam_name' => 'Backstroke 25m', 'exam_data' => '5', 'exam_date' => '2024-07-27', 'class_year' => '2024', 'created' => strtotime('2024-07-27')],
+            ['class_id' => $firstClassId + 7, 'class_month' => '9月-10月', 'exam_id' => $levelItems[0] ?? 1, 'user_id' => $s['student_chan'], 'first_name' => 'Tai Man', 'last_name' => 'Chan', 'exam_type' => 'score', 'exam_name' => 'Freestyle 25m', 'exam_data' => '7', 'exam_date' => '2024-09-21', 'class_year' => '2024', 'created' => strtotime('2024-09-21')],
+
+            // student_li in 2024 class 8 (Coach Lee)
+            ['class_id' => $firstClassId + 7, 'class_month' => '7月-8月', 'exam_id' => $levelItems[0] ?? 1, 'user_id' => $s['student_li'], 'first_name' => 'Ka Yan', 'last_name' => 'Li', 'exam_type' => 'score', 'exam_name' => 'Freestyle 25m', 'exam_data' => '7', 'exam_date' => '2024-07-27', 'class_year' => '2024', 'created' => strtotime('2024-07-27')],
+
+            // student_wong in 2024 class 9 (Coach Wong)
+            ['class_id' => $firstClassId + 8, 'class_month' => '9月-10月', 'exam_id' => $levelItems[3] ?? 4, 'user_id' => $s['student_wong'], 'first_name' => 'Siu Ming', 'last_name' => 'Wong', 'exam_type' => 'score', 'exam_name' => 'Freestyle 50m', 'exam_data' => '5', 'exam_date' => '2024-09-22', 'class_year' => '2024', 'created' => strtotime('2024-09-22')],
+            ['class_id' => $firstClassId + 8, 'class_month' => '11月-12月', 'exam_id' => $levelItems[4] ?? 5, 'user_id' => $s['student_wong'], 'first_name' => 'Siu Ming', 'last_name' => 'Wong', 'exam_type' => 'score', 'exam_name' => 'Breaststroke 50m', 'exam_data' => '4', 'exam_date' => '2024-11-17', 'class_year' => '2024', 'created' => strtotime('2024-11-17')],
+
+            // student_ng in 2024 class 10 (Coach Wong)
+            ['class_id' => $firstClassId + 9, 'class_month' => '11月-12月', 'exam_id' => $levelItems[5] ?? 6, 'user_id' => $s['student_ng'], 'first_name' => 'Chi Wai', 'last_name' => 'Ng', 'exam_type' => 'score', 'exam_name' => 'Butterfly 25m', 'exam_data' => '7', 'exam_date' => '2024-11-23', 'class_year' => '2024', 'created' => strtotime('2024-11-23')],
+        ];
+
+        $defaults = [
+            'gender'              => '',
+            'birthdate'           => '',
+            'exam_lap_times'      => null,
+            'exam_fastest_lap_sec' => 0,
+            'exam_slowest_lap_sec' => 0,
+            'exam_avg_lap_sec'    => 0,
+            'exam_history'        => null,
+            'exam_note'           => '',
+            'status'              => 1,
         ];
 
         foreach ($results as $r) {
-            DB::table('edu_result')->insert(array_merge([
-                'gender'              => '',
-                'birthdate'           => '',
-                'exam_lap_times'      => null,
-                'exam_fastest_lap_sec' => 0,
-                'exam_slowest_lap_sec' => 0,
-                'exam_avg_lap_sec'    => 0,
-                'exam_history'        => null,
-                'exam_note'           => '',
-                'status'              => 1,
-            ], $r));
+            DB::table('edu_result')->insert(array_merge($defaults, $r));
+        }
+    }
+
+    // ── 2024 Class–User assignments (for history data) ──────────
+
+    private function seed2024ClassUsers(): void
+    {
+        $lee  = (string) $this->coachLeeId;
+        $wong = (string) $this->coachWongId;
+        $s    = $this->studentIds;
+
+        $firstClassId = DB::table('edu_class')->min('class_id');
+
+        $assignments = [
+            // 2024 class 8: Coach Lee — chan + li
+            [
+                'class_id'   => $firstClassId + 7,
+                'month'      => '7月-8月',
+                'student'    => json_encode([(string)$s['student_chan'], (string)$s['student_li']]),
+                'teacher'    => json_encode([$lee]),
+                'class_year' => '2024',
+                'sort'       => 202407,
+            ],
+            // 2024 class 9: Coach Wong — wong
+            [
+                'class_id'   => $firstClassId + 8,
+                'month'      => '9月-10月',
+                'student'    => json_encode([(string)$s['student_wong']]),
+                'teacher'    => json_encode([$wong]),
+                'class_year' => '2024',
+                'sort'       => 202409,
+            ],
+            // 2024 class 10: Coach Wong — ng
+            [
+                'class_id'   => $firstClassId + 9,
+                'month'      => '11月-12月',
+                'student'    => json_encode([(string)$s['student_ng']]),
+                'teacher'    => json_encode([$wong]),
+                'class_year' => '2024',
+                'sort'       => 202411,
+            ],
+        ];
+
+        foreach ($assignments as $a) {
+            DB::table('edu_class_user')->insert(array_merge([
+                'days'                    => '',
+                'student_makeup'          => null,
+                'student_transfer'        => null,
+                'student_order'           => null,
+                'order_id'                => null,
+                'class_exam'              => null,
+                'history_students_status' => 0,
+            ], $a));
         }
     }
 }

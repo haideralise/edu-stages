@@ -8,8 +8,10 @@
  */
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\CoachHistoryController;
 use App\Http\Controllers\CoachResultController;
 use App\Http\Controllers\StudentBmiController;
+use App\Http\Controllers\StudentChartController;
 use App\Http\Controllers\StudentResultController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +31,12 @@ Route::middleware(['web', 'auth:sanctum'])->prefix('edu')->group(function () {
     // Student test results
     Route::get('/account/test-result', [StudentResultController::class, 'index'])->name('account.test-result');
 
+    // Student growth chart
+    Route::get('/account/chart2', [StudentChartController::class, 'index'])->name('account.chart2');
+
     // Coach results (read-only)
     Route::get('/coach/results', [CoachResultController::class, 'index'])->name('coach.results');
+
+    // Coach history results
+    Route::get('/result/history', [CoachHistoryController::class, 'index'])->name('coach.history');
 });

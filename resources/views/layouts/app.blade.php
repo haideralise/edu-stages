@@ -76,12 +76,20 @@
                        class="sidebar-link {{ request()->routeIs('account.mybmi*') ? 'active' : '' }}">
                         Health Records
                     </a>
+                    <a href="{{ route('account.chart2') }}"
+                       class="sidebar-link {{ request()->routeIs('account.chart2') ? 'active' : '' }}">
+                        Growth Chart
+                    </a>
                 @endif
 
                 @if ($role === 'coach' || $role === 'admin')
                     <a href="{{ route('coach.results') }}"
                        class="sidebar-link {{ request()->routeIs('coach.results') ? 'active' : '' }}">
                         Coach Results
+                    </a>
+                    <a href="{{ route('coach.history') }}"
+                       class="sidebar-link {{ request()->routeIs('coach.history') ? 'active' : '' }}">
+                        History Results
                     </a>
                 @endif
 
