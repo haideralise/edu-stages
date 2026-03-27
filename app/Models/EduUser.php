@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class EduUser extends Model
 {
-    protected $table = 'wp_3x_edu_user';
+    protected $table = 'edu_user';
     protected $primaryKey = 'user_id';
     public $timestamps = false;
 

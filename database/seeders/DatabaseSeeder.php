@@ -30,41 +30,41 @@ class DatabaseSeeder extends Seeder
         $pass = Hash::make('password');
 
         // Admin
-        $this->adminId = DB::table('wp_3x_users')->insertGetId([
+        $this->adminId = DB::table('users')->insertGetId([
             'user_login'    => 'admin',
             'user_pass'     => $pass,
             'user_nicename' => 'admin',
             'user_email'    => 'admin@edu.test',
             'display_name'  => 'Admin User',
         ]);
-        DB::table('wp_3x_usermeta')->insert([
+        DB::table('usermeta')->insert([
             'user_id'    => $this->adminId,
             'meta_key'   => 'wp_3x_capabilities',
             'meta_value' => serialize(['administrator' => true]),
         ]);
 
         // Coach Lee
-        $this->coachLeeId = DB::table('wp_3x_users')->insertGetId([
+        $this->coachLeeId = DB::table('users')->insertGetId([
             'user_login'    => 'coach_lee',
             'user_pass'     => $pass,
             'user_nicename' => 'coach-lee',
             'user_email'    => 'lee@edu.test',
             'display_name'  => 'Coach Lee',
         ]);
-        DB::table('wp_3x_edu_user')->insert([
+        DB::table('edu_user')->insert([
             'user_id' => $this->coachLeeId, 'note' => 'Senior swimming coach',
             'hourly_wage' => 350.00, 'class_fee' => 0,
         ]);
 
         // Coach Wong
-        $this->coachWongId = DB::table('wp_3x_users')->insertGetId([
+        $this->coachWongId = DB::table('users')->insertGetId([
             'user_login'    => 'coach_wong',
             'user_pass'     => $pass,
             'user_nicename' => 'coach-wong',
             'user_email'    => 'wong@edu.test',
             'display_name'  => 'Coach Wong',
         ]);
-        DB::table('wp_3x_edu_user')->insert([
+        DB::table('edu_user')->insert([
             'user_id' => $this->coachWongId, 'note' => 'Junior swimming coach',
             'hourly_wage' => 280.00, 'class_fee' => 0,
         ]);
@@ -79,17 +79,17 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($students as $s) {
-            $id = DB::table('wp_3x_users')->insertGetId([
+            $id = DB::table('users')->insertGetId([
                 'user_login'    => $s['login'],
                 'user_pass'     => $pass,
                 'user_nicename' => $s['login'],
                 'user_email'    => $s['login'] . '@edu.test',
                 'display_name'  => $s['name'],
             ]);
-            DB::table('wp_3x_edu_user')->insert([
+            DB::table('edu_user')->insert([
                 'user_id' => $id, 'note' => '', 'hourly_wage' => 0, 'class_fee' => $s['fee'],
             ]);
-            DB::table('wp_3x_usermeta')->insert([
+            DB::table('usermeta')->insert([
                 ['user_id' => $id, 'meta_key' => 'billing_birthdate', 'meta_value' => $s['birthdate']],
                 ['user_id' => $id, 'meta_key' => 'billing_gender',    'meta_value' => $s['gender']],
             ]);
@@ -119,7 +119,7 @@ class DatabaseSeeder extends Seeder
             $c['date_month'] = json_encode($c['date_month']);
             $c['class_date'] = json_encode($c['class_date']);
             $c['class_exam'] = json_encode($c['class_exam']);
-            DB::table('wp_3x_edu_class')->insert($c);
+            DB::table('edu_class')->insert($c);
         }
     }
 
@@ -131,7 +131,7 @@ class DatabaseSeeder extends Seeder
         $wong = (string) $this->coachWongId;
         $s    = $this->studentIds;
 
-        $firstClassId = DB::table('wp_3x_edu_class')->min('class_id');
+        $firstClassId = DB::table('edu_class')->min('class_id');
 
         $assignments = [
             [
@@ -182,7 +182,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($assignments as $a) {
-            DB::table('wp_3x_edu_class_user')->insert(array_merge([
+            DB::table('edu_class_user')->insert(array_merge([
                 'student_makeup'          => null,
                 'student_transfer'        => null,
                 'student_order'           => null,
@@ -198,35 +198,35 @@ class DatabaseSeeder extends Seeder
     private function seedLevels(): void
     {
         // Course (top-level, pid = 0)
-        $courseId = DB::table('wp_3x_edu_level')->insertGetId([
+        $courseId = DB::table('edu_level')->insertGetId([
             'pid'  => 0,
             'name' => 'Swimming Assessment',
             'data' => null,
         ]);
 
         // Level 1 under course
-        $level1Id = DB::table('wp_3x_edu_level')->insertGetId([
+        $level1Id = DB::table('edu_level')->insertGetId([
             'pid'  => $courseId,
             'name' => 'Beginner',
             'data' => null,
         ]);
 
         // Level 2 under course
-        $level2Id = DB::table('wp_3x_edu_level')->insertGetId([
+        $level2Id = DB::table('edu_level')->insertGetId([
             'pid'  => $courseId,
             'name' => 'Intermediate',
             'data' => null,
         ]);
 
         // Items under Level 1
-        DB::table('wp_3x_edu_level')->insert([
+        DB::table('edu_level')->insert([
             ['pid' => $level1Id, 'name' => 'Freestyle 25m',    'data' => json_encode(['max_score' => 10])],
             ['pid' => $level1Id, 'name' => 'Backstroke 25m',   'data' => json_encode(['max_score' => 10])],
             ['pid' => $level1Id, 'name' => 'Water Safety',     'data' => json_encode(['max_score' => 5])],
         ]);
 
         // Items under Level 2
-        DB::table('wp_3x_edu_level')->insert([
+        DB::table('edu_level')->insert([
             ['pid' => $level2Id, 'name' => 'Freestyle 50m',    'data' => json_encode(['max_score' => 10])],
             ['pid' => $level2Id, 'name' => 'Breaststroke 50m', 'data' => json_encode(['max_score' => 10])],
             ['pid' => $level2Id, 'name' => 'Butterfly 25m',    'data' => json_encode(['max_score' => 10])],
@@ -253,7 +253,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($records as $r) {
-            DB::table('wp_3x_edu_bmi')->insert($r);
+            DB::table('edu_bmi')->insert($r);
         }
     }
 
@@ -262,10 +262,10 @@ class DatabaseSeeder extends Seeder
     private function seedResults(): void
     {
         $s = $this->studentIds;
-        $firstClassId = DB::table('wp_3x_edu_class')->min('class_id');
+        $firstClassId = DB::table('edu_class')->min('class_id');
 
         // Get level item IDs (leaf nodes)
-        $levelItems = DB::table('wp_3x_edu_level')->where('pid', '>', 0)
+        $levelItems = DB::table('edu_level')->where('pid', '>', 0)
             ->whereRaw('id NOT IN (SELECT DISTINCT pid FROM wp_3x_edu_level WHERE pid > 0)')
             ->pluck('id')
             ->toArray();
@@ -283,7 +283,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($results as $r) {
-            DB::table('wp_3x_edu_result')->insert(array_merge([
+            DB::table('edu_result')->insert(array_merge([
                 'gender'              => '',
                 'birthdate'           => '',
                 'exam_lap_times'      => null,

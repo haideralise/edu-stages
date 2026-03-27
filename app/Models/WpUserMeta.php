@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class WpUserMeta extends Model
 {
-    protected $table = 'wp_3x_usermeta';
+    protected $table = 'usermeta';
     protected $primaryKey = 'umeta_id';
     public $timestamps = false;
 

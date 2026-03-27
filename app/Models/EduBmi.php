@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class EduBmi extends Model
 {
-    protected $table = 'wp_3x_edu_bmi';
+    protected $table = 'edu_bmi';
     public $timestamps = false;
 
     protected $fillable = [

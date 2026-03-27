@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class EduResult extends Model
 {
-    protected $table = 'wp_3x_edu_result';
+    protected $table = 'edu_result';
     public $timestamps = false;
 
     protected $guarded = ['*']; // read-only for students

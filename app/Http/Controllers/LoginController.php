@@ -11,6 +11,12 @@ class LoginController extends Controller
 {
     public function showLoginForm()
     {
+        if (Auth::guard('web')->check()) {
+            $role = Auth::guard('web')->user()->resolveRole();
+
+            return redirect()->route($role === 'coach' ? 'coach.results' : 'account.mybmi');
+        }
+
         return view('auth.login');
     }
 
@@ -32,7 +38,10 @@ class LoginController extends Controller
         Auth::guard('web')->login($user);
         $request->session()->regenerate();
 
-        return redirect()->intended(route('account.mybmi'));
+        $role = $user->resolveRole();
+        $default = route($role === 'coach' ? 'coach.results' : 'account.mybmi');
+
+        return redirect()->intended($default);
     }
 
     public function logout(Request $request)

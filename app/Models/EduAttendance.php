@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class EduAttendance extends Model
 {
-    protected $table = 'wp_3x_edu_attendance';
+    protected $table = 'edu_attendance';
     public $timestamps = false;
 
     protected $guarded = ['*'];

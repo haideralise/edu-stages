@@ -89,7 +89,7 @@ class StudentBmiTest extends TestCase
             ]);
 
         $response->assertRedirect(route('account.mybmi'));
-        $this->assertDatabaseHas('wp_3x_edu_bmi', [
+        $this->assertDatabaseHas('edu_bmi', [
             'user_id' => $student->ID,
             'height'  => 145.5,
             'weight'  => 38.0,
@@ -183,7 +183,7 @@ class StudentBmiTest extends TestCase
             ]);
 
         $response->assertRedirect(route('account.mybmi'));
-        $this->assertDatabaseHas('wp_3x_edu_bmi', [
+        $this->assertDatabaseHas('edu_bmi', [
             'id'     => $bmi->id,
             'height' => 142.0,
             'weight' => 36.0,
@@ -233,7 +233,7 @@ class StudentBmiTest extends TestCase
             ->delete("/edu/account/bmi/{$bmi->id}");
 
         $response->assertRedirect(route('account.mybmi'));
-        $this->assertDatabaseMissing('wp_3x_edu_bmi', ['id' => $bmi->id]);
+        $this->assertDatabaseMissing('edu_bmi', ['id' => $bmi->id]);
     }
 
     public function test_student_can_delete_own_bmi_via_json(): void
@@ -246,7 +246,7 @@ class StudentBmiTest extends TestCase
 
         $response->assertOk();
         $response->assertJson(['message' => 'Deleted']);
-        $this->assertDatabaseMissing('wp_3x_edu_bmi', ['id' => $bmi->id]);
+        $this->assertDatabaseMissing('edu_bmi', ['id' => $bmi->id]);
     }
 
     public function test_student_cannot_delete_other_bmi(): void
@@ -295,7 +295,7 @@ class StudentBmiTest extends TestCase
             ]);
 
         $response->assertStatus(201);
-        $this->assertDatabaseHas('wp_3x_edu_bmi', [
+        $this->assertDatabaseHas('edu_bmi', [
             'user_id' => $student->ID,
             'height'  => 145.5,
         ]);
@@ -316,11 +316,11 @@ class StudentBmiTest extends TestCase
 
         $response->assertStatus(201);
         // Student's user_id should be used, not the other student's
-        $this->assertDatabaseHas('wp_3x_edu_bmi', [
+        $this->assertDatabaseHas('edu_bmi', [
             'user_id' => $student->ID,
             'height'  => 145.5,
         ]);
-        $this->assertDatabaseMissing('wp_3x_edu_bmi', [
+        $this->assertDatabaseMissing('edu_bmi', [
             'user_id' => $other->ID,
         ]);
     }
@@ -351,7 +351,7 @@ class StudentBmiTest extends TestCase
             ->delete("/edu/account/bmi/{$bmi->id}");
 
         $response->assertRedirect(route('account.mybmi'));
-        $this->assertDatabaseMissing('wp_3x_edu_bmi', ['id' => $bmi->id]);
+        $this->assertDatabaseMissing('edu_bmi', ['id' => $bmi->id]);
     }
 
     // ── Role restrictions ─────────────────────────────────────────
@@ -366,12 +366,12 @@ class StudentBmiTest extends TestCase
         ]);
 
         // Make them a coach by adding to a class as teacher
-        \Illuminate\Support\Facades\DB::table('wp_3x_edu_class')->insert([
+        \Illuminate\Support\Facades\DB::table('edu_class')->insert([
             'class_name' => 'Test Class', 'district_id' => 101, 'class_year' => '2025',
         ]);
-        $classId = \Illuminate\Support\Facades\DB::table('wp_3x_edu_class')->max('class_id');
+        $classId = \Illuminate\Support\Facades\DB::table('edu_class')->max('class_id');
 
-        \Illuminate\Support\Facades\DB::table('wp_3x_edu_class_user')->insert([
+        \Illuminate\Support\Facades\DB::table('edu_class_user')->insert([
             'class_id'   => $classId,
             'month'      => '1月-2月',
             'student'    => json_encode([]),
@@ -393,12 +393,12 @@ class StudentBmiTest extends TestCase
             'display_name' => 'Coach Test',
         ]);
 
-        \Illuminate\Support\Facades\DB::table('wp_3x_edu_class')->insert([
+        \Illuminate\Support\Facades\DB::table('edu_class')->insert([
             'class_name' => 'Test Class', 'district_id' => 101, 'class_year' => '2025',
         ]);
-        $classId = \Illuminate\Support\Facades\DB::table('wp_3x_edu_class')->max('class_id');
+        $classId = \Illuminate\Support\Facades\DB::table('edu_class')->max('class_id');
 
-        \Illuminate\Support\Facades\DB::table('wp_3x_edu_class_user')->insert([
+        \Illuminate\Support\Facades\DB::table('edu_class_user')->insert([
             'class_id'   => $classId,
             'month'      => '1月-2月',
             'student'    => json_encode([]),

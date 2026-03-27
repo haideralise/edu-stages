@@ -126,12 +126,12 @@ class BmiPolicyTest extends TestCase
             'user_email' => 'coach@edu.test', 'display_name' => 'Coach',
         ]);
 
-        \Illuminate\Support\Facades\DB::table('wp_3x_edu_class')->insert([
+        \Illuminate\Support\Facades\DB::table('edu_class')->insert([
             'class_name' => 'Test Class', 'district_id' => 101, 'class_year' => '2025',
         ]);
-        $classId = \Illuminate\Support\Facades\DB::table('wp_3x_edu_class')->max('class_id');
+        $classId = \Illuminate\Support\Facades\DB::table('edu_class')->max('class_id');
 
-        \Illuminate\Support\Facades\DB::table('wp_3x_edu_class_user')->insert([
+        \Illuminate\Support\Facades\DB::table('edu_class_user')->insert([
             'class_id'   => $classId,
             'month'      => '1月-2月',
             'student'    => json_encode([]),
@@ -150,12 +150,12 @@ class BmiPolicyTest extends TestCase
             'user_email' => 'coach@edu.test', 'display_name' => 'Coach',
         ]);
 
-        \Illuminate\Support\Facades\DB::table('wp_3x_edu_class')->insert([
+        \Illuminate\Support\Facades\DB::table('edu_class')->insert([
             'class_name' => 'Test Class', 'district_id' => 101, 'class_year' => '2025',
         ]);
-        $classId = \Illuminate\Support\Facades\DB::table('wp_3x_edu_class')->max('class_id');
+        $classId = \Illuminate\Support\Facades\DB::table('edu_class')->max('class_id');
 
-        \Illuminate\Support\Facades\DB::table('wp_3x_edu_class_user')->insert([
+        \Illuminate\Support\Facades\DB::table('edu_class_user')->insert([
             'class_id'   => $classId,
             'month'      => '1月-2月',
             'student'    => json_encode([]),

@@ -17,7 +17,7 @@ class StoreBmiRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['nullable', 'integer', 'exists:wp_3x_users,ID'],
+            'user_id' => ['nullable', 'integer', 'exists:users,ID'],
             'date'    => ['required'],
             'height'  => ['required', 'numeric', 'min:30', 'max:250'],
             'weight'  => ['required', 'numeric', 'min:1', 'max:300'],

@@ -13,9 +13,9 @@ class EduLevelTest extends TestCase
 
     private function seedTree(): int
     {
-        $courseId = DB::table('wp_3x_edu_level')->insertGetId(['pid' => 0, 'name' => 'Swimming']);
-        $levelId = DB::table('wp_3x_edu_level')->insertGetId(['pid' => $courseId, 'name' => 'Beginner']);
-        DB::table('wp_3x_edu_level')->insert([
+        $courseId = DB::table('edu_level')->insertGetId(['pid' => 0, 'name' => 'Swimming']);
+        $levelId = DB::table('edu_level')->insertGetId(['pid' => $courseId, 'name' => 'Beginner']);
+        DB::table('edu_level')->insert([
             ['pid' => $levelId, 'name' => 'Freestyle 25m', 'data' => json_encode(['max_score' => 10])],
             ['pid' => $levelId, 'name' => 'Backstroke 25m', 'data' => json_encode(['max_score' => 10])],
         ]);

@@ -25,17 +25,17 @@ class StudentResultTest extends TestCase
 
     private function seedLevelsAndResults(int $userId): void
     {
-        $courseId = DB::table('wp_3x_edu_level')->insertGetId(['pid' => 0, 'name' => 'Swimming']);
-        $levelId = DB::table('wp_3x_edu_level')->insertGetId(['pid' => $courseId, 'name' => 'Beginner']);
-        $itemId = DB::table('wp_3x_edu_level')->insertGetId([
+        $courseId = DB::table('edu_level')->insertGetId(['pid' => 0, 'name' => 'Swimming']);
+        $levelId = DB::table('edu_level')->insertGetId(['pid' => $courseId, 'name' => 'Beginner']);
+        $itemId = DB::table('edu_level')->insertGetId([
             'pid' => $levelId, 'name' => 'Freestyle 25m', 'data' => json_encode(['max_score' => 10]),
         ]);
 
-        $classId = DB::table('wp_3x_edu_class')->insertGetId([
+        $classId = DB::table('edu_class')->insertGetId([
             'class_name' => 'Test Class', 'district_id' => 101, 'class_year' => '2025',
         ]);
 
-        DB::table('wp_3x_edu_result')->insert([
+        DB::table('edu_result')->insert([
             'class_id'    => $classId,
             'class_month' => '1月-2月',
             'exam_id'     => $itemId,
@@ -106,11 +106,11 @@ class StudentResultTest extends TestCase
             'display_name' => 'Coach Test',
         ]);
 
-        $classId = DB::table('wp_3x_edu_class')->insertGetId([
+        $classId = DB::table('edu_class')->insertGetId([
             'class_name' => 'Test Class', 'district_id' => 101, 'class_year' => '2025',
         ]);
 
-        DB::table('wp_3x_edu_class_user')->insert([
+        DB::table('edu_class_user')->insert([
             'class_id'   => $classId,
             'month'      => '1月-2月',
             'student'    => json_encode([]),
