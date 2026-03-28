@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class EduAttendance extends Model
 {
     protected $table = 'edu_attendance';
+
     public $timestamps = false;
 
     protected $guarded = ['*'];
@@ -15,7 +16,7 @@ class EduAttendance extends Model
     {
         return [
             'class_id' => 'integer',
-            'user_id'  => 'integer',
+            'user_id' => 'integer',
         ];
     }
 
@@ -25,9 +26,9 @@ class EduAttendance extends Model
     public function getAttendanceAttribute($value): string
     {
         return match ($value) {
-            'late'   => 'leave',
+            'late' => 'leave',
             'absent' => 'cancelled',
-            default  => $value ?? '',
+            default => $value ?? '',
         };
     }
 }

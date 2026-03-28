@@ -2,13 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\Http\Requests\Concerns\SchemeD422;
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class WebLoginRequest extends FormRequest
 {
-    use SchemeD422;
-
     public function authorize(): bool
     {
         return true;

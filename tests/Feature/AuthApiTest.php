@@ -13,9 +13,9 @@ class AuthApiTest extends TestCase
     private function createUser(string $password = 'secret'): WpUser
     {
         return WpUser::create([
-            'user_login'   => 'coach_lee',
-            'user_pass'    => bcrypt($password),
-            'user_email'   => 'lee@edu.test',
+            'user_login' => 'coach_lee',
+            'user_pass' => bcrypt($password),
+            'user_email' => 'lee@edu.test',
             'display_name' => 'Coach Lee',
         ]);
     }
@@ -28,7 +28,7 @@ class AuthApiTest extends TestCase
 
         $this->postJson('/api/login', [
             'user_login' => 'coach_lee',
-            'password'   => 'secret',
+            'password' => 'secret',
         ])
             ->assertOk()
             ->assertJsonStructure([
@@ -46,7 +46,7 @@ class AuthApiTest extends TestCase
 
         $this->postJson('/api/login', [
             'user_login' => 'lee@edu.test',
-            'password'   => 'secret',
+            'password' => 'secret',
         ])
             ->assertOk()
             ->assertJsonPath('data.user.user_email', 'lee@edu.test');
@@ -58,7 +58,7 @@ class AuthApiTest extends TestCase
 
         $this->postJson('/api/login', [
             'user_login' => 'coach_lee',
-            'password'   => 'wrong',
+            'password' => 'wrong',
         ])
             ->assertStatus(401)
             ->assertJson(['message' => 'Unauthorized', 'code' => 'UNAUTHORIZED']);
@@ -68,7 +68,7 @@ class AuthApiTest extends TestCase
     {
         $this->postJson('/api/login', [
             'user_login' => 'nobody',
-            'password'   => 'anything',
+            'password' => 'anything',
         ])->assertStatus(401);
     }
 
@@ -87,7 +87,7 @@ class AuthApiTest extends TestCase
 
         $login = $this->postJson('/api/login', [
             'user_login' => 'coach_lee',
-            'password'   => 'secret',
+            'password' => 'secret',
         ]);
         $token = $login->json('data.token');
 
@@ -135,7 +135,7 @@ class AuthApiTest extends TestCase
 
         $token = $this->postJson('/api/login', [
             'user_login' => 'coach_lee',
-            'password'   => 'secret',
+            'password' => 'secret',
         ])->json('data.token');
 
         $this->withHeader('Authorization', "Bearer {$token}")

@@ -72,11 +72,11 @@ class StudentBmiController extends Controller
 
         $bmi = EduBmi::create([
             'user_id' => $targetUserId,
-            'date'    => EduBmi::normalizeDate($request->input('date')),
-            'height'  => $request->input('height'),
-            'weight'  => $request->input('weight'),
-            'hc'      => $request->input('hc', 0),
-            'bmi'     => EduBmi::calculateBmi($request->input('height'), $request->input('weight')),
+            'date' => EduBmi::normalizeDate($request->input('date')),
+            'height' => $request->input('height'),
+            'weight' => $request->input('weight'),
+            'hc' => $request->input('hc', 0),
+            'bmi' => EduBmi::calculateBmi($request->input('height'), $request->input('weight')),
         ]);
 
         if ($request->expectsJson()) {
@@ -93,11 +93,11 @@ class StudentBmiController extends Controller
         $this->authorize('update', $bmi);
 
         $bmi->update([
-            'date'   => EduBmi::normalizeDate($request->input('date')),
+            'date' => EduBmi::normalizeDate($request->input('date')),
             'height' => $request->input('height'),
             'weight' => $request->input('weight'),
-            'hc'     => $request->input('hc', 0),
-            'bmi'    => EduBmi::calculateBmi($request->input('height'), $request->input('weight')),
+            'hc' => $request->input('hc', 0),
+            'bmi' => EduBmi::calculateBmi($request->input('height'), $request->input('weight')),
         ]);
 
         if ($request->expectsJson()) {

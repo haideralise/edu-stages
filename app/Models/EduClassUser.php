@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 class EduClassUser extends Model
 {
     protected $table = 'edu_class_user';
+
     public $timestamps = false;
 
     protected $guarded = ['*'];
@@ -16,13 +17,13 @@ class EduClassUser extends Model
     protected function casts(): array
     {
         return [
-            'student'          => 'array',
-            'student_makeup'   => 'array',
+            'student' => 'array',
+            'student_makeup' => 'array',
             'student_transfer' => 'array',
-            'student_order'    => 'array',
-            'order_id'         => 'array',
-            'teacher'          => 'array',
-            'class_exam'       => 'array',
+            'student_order' => 'array',
+            'order_id' => 'array',
+            'teacher' => 'array',
+            'class_exam' => 'array',
         ];
     }
 

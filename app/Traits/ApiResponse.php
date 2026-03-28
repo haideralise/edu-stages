@@ -28,10 +28,10 @@ trait ApiResponse
             'data' => $data,
             'meta' => [
                 'current_page' => $paginator->currentPage(),
-                'per_page'     => $paginator->perPage(),
-                'total'        => $paginator->total(),
-                'last_page'    => $paginator->lastPage(),
-                'timestamp'    => time(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'last_page' => $paginator->lastPage(),
+                'timestamp' => time(),
             ],
             'links' => [
                 'next' => $paginator->nextPageUrl(),
@@ -44,7 +44,7 @@ trait ApiResponse
     {
         return response()->json([
             'message' => $message,
-            'code'    => $code,
+            'code' => $code,
         ], $status);
     }
 }

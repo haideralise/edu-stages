@@ -2,13 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\Http\Requests\Concerns\SchemeD422;
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class UpdateAccountRequest extends FormRequest
 {
-    use SchemeD422;
-
     public function authorize(): bool
     {
         return true;
@@ -17,8 +14,8 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_login' => ['required', 'string'],
-            'password' => ['required', 'string'],
+            'birthdate' => ['required', 'date', 'before:today'],
+            'gender' => ['required', 'in:male,female'],
         ];
     }
 }

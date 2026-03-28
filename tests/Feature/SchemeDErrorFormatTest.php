@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\EduBmi;
 use App\Models\WpUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class SchemeDErrorFormatTest extends TestCase
@@ -14,9 +16,9 @@ class SchemeDErrorFormatTest extends TestCase
     private function createStudent(): WpUser
     {
         return WpUser::create([
-            'user_login'   => 'student_test',
-            'user_pass'    => bcrypt('password'),
-            'user_email'   => 'student_test@edu.test',
+            'user_login' => 'student_test',
+            'user_pass' => bcrypt('password'),
+            'user_email' => 'student_test@edu.test',
             'display_name' => 'Test Student',
         ]);
     }
@@ -30,7 +32,7 @@ class SchemeDErrorFormatTest extends TestCase
         $response->assertStatus(401);
         $response->assertExactJson([
             'message' => 'Unauthorized',
-            'code'    => 'UNAUTHORIZED',
+            'code' => 'UNAUTHORIZED',
         ]);
     }
 
@@ -40,24 +42,24 @@ class SchemeDErrorFormatTest extends TestCase
     {
         $student = $this->createStudent();
         $other = WpUser::create([
-            'user_login'   => 'student_other',
-            'user_pass'    => bcrypt('password'),
-            'user_email'   => 'other@edu.test',
+            'user_login' => 'student_other',
+            'user_pass' => bcrypt('password'),
+            'user_email' => 'other@edu.test',
             'display_name' => 'Other Student',
         ]);
 
         $bmi = EduBmi::create([
             'user_id' => $other->ID,
-            'height'  => 140.0,
-            'weight'  => 35.0,
-            'hc'      => 52.0,
-            'bmi'     => EduBmi::calculateBmi(140.0, 35.0),
-            'date'    => strtotime('2025-01-15'),
+            'height' => 140.0,
+            'weight' => 35.0,
+            'hc' => 52.0,
+            'bmi' => EduBmi::calculateBmi(140.0, 35.0),
+            'date' => strtotime('2025-01-15'),
         ]);
 
         $response = $this->actingAs($student, 'web')
             ->putJson("/edu/account/bmi/{$bmi->id}", [
-                'date'   => '2025-01-15',
+                'date' => '2025-01-15',
                 'height' => 142.0,
                 'weight' => 36.0,
             ]);
@@ -65,7 +67,7 @@ class SchemeDErrorFormatTest extends TestCase
         $response->assertStatus(403);
         $response->assertExactJson([
             'message' => 'Forbidden',
-            'code'    => 'FORBIDDEN',
+            'code' => 'FORBIDDEN',
         ]);
     }
 
@@ -81,7 +83,7 @@ class SchemeDErrorFormatTest extends TestCase
         $response->assertStatus(404);
         $response->assertExactJson([
             'message' => 'Not found',
-            'code'    => 'NOT_FOUND',
+            'code' => 'NOT_FOUND',
         ]);
     }
 
@@ -90,8 +92,8 @@ class SchemeDErrorFormatTest extends TestCase
     public function test_419_returns_scheme_d_json(): void
     {
         // Register a test route that throws TokenMismatchException
-        \Illuminate\Support\Facades\Route::post('/test-csrf-419', function () {
-            throw new \Illuminate\Session\TokenMismatchException();
+        Route::post('/test-csrf-419', function () {
+            throw new TokenMismatchException;
         });
 
         $response = $this->postJson('/test-csrf-419');
@@ -99,7 +101,7 @@ class SchemeDErrorFormatTest extends TestCase
         $response->assertStatus(419);
         $response->assertExactJson([
             'message' => 'CSRF token mismatch',
-            'code'    => 'TOKEN_MISMATCH',
+            'code' => 'TOKEN_MISMATCH',
         ]);
     }
 

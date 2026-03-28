@@ -7,6 +7,7 @@ use App\Models\WpUser;
 use App\Models\WpUserMeta;
 use App\Policies\BmiPolicy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class BmiPolicyTest extends TestCase
@@ -39,6 +40,7 @@ class BmiPolicyTest extends TestCase
             'user_id' => $user->ID, 'meta_key' => 'wp_3x_capabilities',
             'meta_value' => serialize(['administrator' => true]),
         ]);
+
         return $user;
     }
 
@@ -126,18 +128,18 @@ class BmiPolicyTest extends TestCase
             'user_email' => 'coach@edu.test', 'display_name' => 'Coach',
         ]);
 
-        \Illuminate\Support\Facades\DB::table('edu_class')->insert([
+        DB::table('edu_class')->insert([
             'class_name' => 'Test Class', 'district_id' => 101, 'class_year' => '2025',
         ]);
-        $classId = \Illuminate\Support\Facades\DB::table('edu_class')->max('class_id');
+        $classId = DB::table('edu_class')->max('class_id');
 
-        \Illuminate\Support\Facades\DB::table('edu_class_user')->insert([
-            'class_id'   => $classId,
-            'month'      => '1月-2月',
-            'student'    => json_encode([]),
-            'teacher'    => json_encode([(string) $coach->ID]),
+        DB::table('edu_class_user')->insert([
+            'class_id' => $classId,
+            'month' => '1月-2月',
+            'student' => json_encode([]),
+            'teacher' => json_encode([(string) $coach->ID]),
             'class_year' => '2025',
-            'sort'       => 202501,
+            'sort' => 202501,
         ]);
 
         $this->assertFalse($this->policy->viewAny($coach));
@@ -150,18 +152,18 @@ class BmiPolicyTest extends TestCase
             'user_email' => 'coach@edu.test', 'display_name' => 'Coach',
         ]);
 
-        \Illuminate\Support\Facades\DB::table('edu_class')->insert([
+        DB::table('edu_class')->insert([
             'class_name' => 'Test Class', 'district_id' => 101, 'class_year' => '2025',
         ]);
-        $classId = \Illuminate\Support\Facades\DB::table('edu_class')->max('class_id');
+        $classId = DB::table('edu_class')->max('class_id');
 
-        \Illuminate\Support\Facades\DB::table('edu_class_user')->insert([
-            'class_id'   => $classId,
-            'month'      => '1月-2月',
-            'student'    => json_encode([]),
-            'teacher'    => json_encode([(string) $coach->ID]),
+        DB::table('edu_class_user')->insert([
+            'class_id' => $classId,
+            'month' => '1月-2月',
+            'student' => json_encode([]),
+            'teacher' => json_encode([(string) $coach->ID]),
             'class_year' => '2025',
-            'sort'       => 202501,
+            'sort' => 202501,
         ]);
 
         $this->assertFalse($this->policy->create($coach));
