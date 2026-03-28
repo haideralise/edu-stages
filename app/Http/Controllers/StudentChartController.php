@@ -6,18 +6,15 @@ use App\Models\EduBmi;
 use App\Models\WpUser;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class StudentChartController extends Controller
 {
     public function index(Request $request): View
     {
+        $this->authorize('chart2.viewAny');
+
         $user = $request->user();
         $role = $user->resolveRole();
-
-        if ($role !== 'student' && $role !== 'admin') {
-            throw new AccessDeniedHttpException;
-        }
 
         $students = null;
 

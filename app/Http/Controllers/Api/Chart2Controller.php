@@ -11,7 +11,6 @@ use App\Support\BmiForAge;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class Chart2Controller extends Controller
 {
@@ -19,10 +18,9 @@ class Chart2Controller extends Controller
 
     public function bmi(Chart2BmiRequest $request, int $userId): JsonResponse
     {
-        $type = $request->input('type', 'bmi');
+        $this->authorize('chart2.view', $userId);
 
-        $user = $request->user();
-        $this->authorizeChart($user, $userId);
+        $type = $request->input('type', 'bmi');
 
         $target = WpUser::with('meta')->findOrFail($userId);
         $birthdate = $target->birthdate;
@@ -65,8 +63,7 @@ class Chart2Controller extends Controller
 
     public function result(Request $request, int $userId): JsonResponse
     {
-        $user = $request->user();
-        $this->authorizeChart($user, $userId);
+        $this->authorize('chart2.view', $userId);
 
         $results = EduResult::where('user_id', $userId)->orderBy('exam_date')->get();
 
@@ -80,21 +77,6 @@ class Chart2Controller extends Controller
             'labels' => ['x' => 'Date', 'y' => 'Score'],
             'series' => ['student' => $studentSeries],
         ]);
-    }
-
-    private function authorizeChart(WpUser $user, int $targetUserId): void
-    {
-        $role = $user->resolveRole();
-
-        if ($role === 'admin') {
-            return;
-        }
-
-        if ($role === 'student' && $user->ID === $targetUserId) {
-            return;
-        }
-
-        throw new AccessDeniedHttpException;
     }
 
     /**

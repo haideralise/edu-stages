@@ -7,6 +7,16 @@ use App\Models\WpUser;
 class Chart2Policy
 {
     /**
+     * Student and admin can access the chart page.
+     */
+    public function viewAny(WpUser $user): bool
+    {
+        $role = $user->resolveRole();
+
+        return $role === 'student' || $role === 'admin';
+    }
+
+    /**
      * Student can only view own chart; admin can view any.
      * Coach gets 403 (chart2 is student-only per 05eng).
      */
