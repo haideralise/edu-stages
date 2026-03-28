@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\WebLoginRequest;
 use App\Models\WpUser;
 use App\Support\PasswordCheck;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -22,13 +22,8 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function login(Request $request): RedirectResponse
+    public function login(WebLoginRequest $request): RedirectResponse
     {
-        $request->validate([
-            'user_login' => 'required|string',
-            'password' => 'required|string',
-        ]);
-
         $user = WpUser::where('user_login', $request->input('user_login'))
             ->orWhere('user_email', $request->input('user_login'))
             ->first();
