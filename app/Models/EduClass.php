@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class EduClass extends Model
 {
     protected $table = 'edu_class';
+
     protected $primaryKey = 'class_id';
+
     public $timestamps = false;
 
     protected $guarded = ['*']; // readonly — no mass assignment
@@ -16,11 +18,11 @@ class EduClass extends Model
     protected function casts(): array
     {
         return [
-            'date_month'  => 'array',
-            'class_date'  => 'array',
-            'class_exam'  => 'array',
+            'date_month' => 'array',
+            'class_date' => 'array',
+            'class_exam' => 'array',
             'district_id' => 'integer',
-            'product_id'  => 'integer',
+            'product_id' => 'integer',
         ];
     }
 

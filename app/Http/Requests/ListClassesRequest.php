@@ -17,9 +17,9 @@ class ListClassesRequest extends FormRequest
     {
         return [
             'district_id' => ['sometimes', 'integer', 'min:1'],
-            'class_year'  => ['sometimes', 'string', 'regex:/^\d{4}$/'],
-            'page'        => ['sometimes', 'integer', 'min:1'],
-            'per_page'    => ['sometimes', 'integer', 'min:1', 'max:100'],
+            'class_year' => ['sometimes', 'string', 'regex:/^\d{4}$/'],
+            'page' => ['sometimes', 'integer', 'min:1'],
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
         ];
     }
 
@@ -27,7 +27,7 @@ class ListClassesRequest extends FormRequest
     {
         throw new HttpResponseException(response()->json([
             'message' => 'Validation failed',
-            'errors'  => $validator->errors()->toArray(),
+            'errors' => $validator->errors()->toArray(),
         ], 422));
     }
 }

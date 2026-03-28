@@ -2,8 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\EduLevel;
-use App\Models\EduResult;
 use App\Models\WpUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -16,9 +14,9 @@ class StudentResultTest extends TestCase
     private function createStudent(string $login = 'student_a'): WpUser
     {
         return WpUser::create([
-            'user_login'   => $login,
-            'user_pass'    => bcrypt('password'),
-            'user_email'   => "{$login}@edu.test",
+            'user_login' => $login,
+            'user_pass' => bcrypt('password'),
+            'user_email' => "{$login}@edu.test",
             'display_name' => ucfirst($login),
         ]);
     }
@@ -36,19 +34,19 @@ class StudentResultTest extends TestCase
         ]);
 
         DB::table('edu_result')->insert([
-            'class_id'    => $classId,
+            'class_id' => $classId,
             'class_month' => '1月-2月',
-            'exam_id'     => $itemId,
-            'user_id'     => $userId,
-            'first_name'  => 'Test',
-            'last_name'   => 'Student',
-            'exam_type'   => 'score',
-            'exam_name'   => 'Freestyle 25m',
-            'exam_data'   => '8',
-            'exam_date'   => '2025-01-25',
-            'class_year'  => '2025',
-            'created'     => time(),
-            'status'      => 1,
+            'exam_id' => $itemId,
+            'user_id' => $userId,
+            'first_name' => 'Test',
+            'last_name' => 'Student',
+            'exam_type' => 'score',
+            'exam_name' => 'Freestyle 25m',
+            'exam_data' => '8',
+            'exam_date' => '2025-01-25',
+            'class_year' => '2025',
+            'created' => time(),
+            'status' => 1,
         ]);
     }
 
@@ -100,9 +98,9 @@ class StudentResultTest extends TestCase
     public function test_coach_cannot_access_student_results(): void
     {
         $coach = WpUser::create([
-            'user_login'   => 'coach_test',
-            'user_pass'    => bcrypt('password'),
-            'user_email'   => 'coach@edu.test',
+            'user_login' => 'coach_test',
+            'user_pass' => bcrypt('password'),
+            'user_email' => 'coach@edu.test',
             'display_name' => 'Coach Test',
         ]);
 
@@ -111,12 +109,12 @@ class StudentResultTest extends TestCase
         ]);
 
         DB::table('edu_class_user')->insert([
-            'class_id'   => $classId,
-            'month'      => '1月-2月',
-            'student'    => json_encode([]),
-            'teacher'    => json_encode([(string) $coach->ID]),
+            'class_id' => $classId,
+            'month' => '1月-2月',
+            'student' => json_encode([]),
+            'teacher' => json_encode([(string) $coach->ID]),
             'class_year' => '2025',
-            'sort'       => 202501,
+            'sort' => 202501,
         ]);
 
         $response = $this->actingAs($coach, 'web')

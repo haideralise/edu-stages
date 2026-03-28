@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Chart2BmiRequest;
 use App\Models\EduBmi;
 use App\Models\EduResult;
 use App\Models\WpUser;
@@ -16,18 +17,9 @@ class Chart2Controller extends Controller
 {
     use ApiResponse;
 
-    private const VALID_TYPES = ['height', 'weight', 'bmi', 'hc'];
-
-    public function bmi(Request $request, int $userId): JsonResponse
+    public function bmi(Chart2BmiRequest $request, int $userId): JsonResponse
     {
         $type = $request->input('type', 'bmi');
-
-        if (! in_array($type, self::VALID_TYPES, true)) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors'  => ['type' => ['The selected type is invalid.']],
-            ], 422);
-        }
 
         $user = $request->user();
         $this->authorizeChart($user, $userId);
@@ -42,8 +34,8 @@ class Chart2Controller extends Controller
             $y = match ($type) {
                 'height' => $r->height,
                 'weight' => $r->weight,
-                'hc'     => $r->hc,
-                default  => $r->bmi,
+                'hc' => $r->hc,
+                default => $r->bmi,
             };
 
             $x = $this->ageToX($birthdate, $r->date);
@@ -62,10 +54,10 @@ class Chart2Controller extends Controller
 
         return $this->success([
             'datasets' => $studentSeries,
-            'labels'   => $labels,
-            'series'   => $series,
-            'meta'     => [
-                'gender'    => $gender,
+            'labels' => $labels,
+            'series' => $series,
+            'meta' => [
+                'gender' => $gender,
                 'birthdate' => $birthdate,
             ],
         ]);
@@ -85,8 +77,8 @@ class Chart2Controller extends Controller
 
         return $this->success([
             'datasets' => $studentSeries,
-            'labels'   => ['x' => 'Date', 'y' => 'Score'],
-            'series'   => ['student' => $studentSeries],
+            'labels' => ['x' => 'Date', 'y' => 'Score'],
+            'series' => ['student' => $studentSeries],
         ]);
     }
 
@@ -129,8 +121,8 @@ class Chart2Controller extends Controller
         return match ($type) {
             'height' => ['x' => 'Age (months)', 'y' => 'Height (cm)'],
             'weight' => ['x' => 'Age (months)', 'y' => 'Weight (kg)'],
-            'hc'     => ['x' => 'Age (months)', 'y' => 'Head Circumference (cm)'],
-            default  => ['x' => 'Age (months)', 'y' => 'BMI (kg/m²)'],
+            'hc' => ['x' => 'Age (months)', 'y' => 'Head Circumference (cm)'],
+            default => ['x' => 'Age (months)', 'y' => 'BMI (kg/m²)'],
         };
     }
 
@@ -153,7 +145,7 @@ class Chart2Controller extends Controller
         }
 
         return [
-            'p5'  => $p5,
+            'p5' => $p5,
             'p85' => $p85,
             'p95' => $p95,
         ];

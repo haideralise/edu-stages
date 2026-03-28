@@ -14,9 +14,9 @@ class EduClassApiTest extends TestCase
     private function createUser(): WpUser
     {
         return WpUser::create([
-            'user_login'   => 'testuser',
-            'user_pass'    => bcrypt('secret'),
-            'user_email'   => 'test@example.com',
+            'user_login' => 'testuser',
+            'user_pass' => bcrypt('secret'),
+            'user_email' => 'test@example.com',
             'display_name' => 'Test User',
         ]);
     }
@@ -25,16 +25,16 @@ class EduClassApiTest extends TestCase
     {
         $model = new EduClass;
         $model->forceFill(array_merge([
-            'class_name'   => '游泳初班',
-            'district_id'  => 101,
-            'product_id'   => 5001,
+            'class_name' => '游泳初班',
+            'district_id' => 101,
+            'product_id' => 5001,
             'product_name' => '游泳初班',
-            'date_time'    => 'Sat|09:00am-10:00am',
-            'date_month'   => json_encode(['1月-2月']),
-            'class_date'   => json_encode(['2025-01-04']),
-            'class_exam'   => json_encode([1]),
-            'lv3'          => '鑽石山',
-            'class_year'   => '2025',
+            'date_time' => 'Sat|09:00am-10:00am',
+            'date_month' => json_encode(['1月-2月']),
+            'class_date' => json_encode(['2025-01-04']),
+            'class_exam' => json_encode([1]),
+            'lv3' => '鑽石山',
+            'class_year' => '2025',
         ], $attrs));
         $model->save();
 

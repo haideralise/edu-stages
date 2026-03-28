@@ -11,7 +11,9 @@ class WpUser extends Authenticatable
     use HasApiTokens;
 
     protected $table = 'users';
+
     protected $primaryKey = 'ID';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -81,11 +83,11 @@ class WpUser extends Authenticatable
         $driver = $this->getConnection()->getDriverName();
         if ($driver === 'sqlite') {
             $isCoach = EduClassUser::whereRaw(
-                "teacher LIKE ?", ['%"' . $this->ID . '"%']
+                'teacher LIKE ?', ['%"'.$this->ID.'"%']
             )->exists();
         } else {
             $isCoach = EduClassUser::whereRaw(
-                "JSON_CONTAINS(teacher, ?)", [json_encode((string) $this->ID)]
+                'JSON_CONTAINS(teacher, ?)', [json_encode((string) $this->ID)]
             )->exists();
         }
 

@@ -35,12 +35,12 @@ class CoachHistoryTest extends TestCase
         ]);
 
         DB::table('edu_class_user')->insert([
-            'class_id'   => $classId,
-            'month'      => '1月-2月',
-            'student'    => json_encode([(string) $studentA->ID]),
-            'teacher'    => json_encode([(string) $coach->ID]),
+            'class_id' => $classId,
+            'month' => '1月-2月',
+            'student' => json_encode([(string) $studentA->ID]),
+            'teacher' => json_encode([(string) $coach->ID]),
             'class_year' => '2025',
-            'sort'       => 202501,
+            'sort' => 202501,
         ]);
 
         // Result for student A (in coach's class)
@@ -93,12 +93,12 @@ class CoachHistoryTest extends TestCase
         ]);
 
         DB::table('edu_class_user')->insert([
-            'class_id'   => $otherClassId,
-            'month'      => '1月-2月',
-            'student'    => json_encode([]),
-            'teacher'    => json_encode([(string) $otherCoach->ID]),
+            'class_id' => $otherClassId,
+            'month' => '1月-2月',
+            'student' => json_encode([]),
+            'teacher' => json_encode([(string) $otherCoach->ID]),
             'class_year' => '2025',
-            'sort'       => 202501,
+            'sort' => 202501,
         ]);
 
         $response = $this->actingAs($otherCoach, 'web')
@@ -159,12 +159,12 @@ class CoachHistoryTest extends TestCase
         ]);
 
         DB::table('edu_class_user')->insert([
-            'class_id'   => $classId2,
-            'month'      => '9月-10月',
-            'student'    => json_encode([(string) $studentA->ID]),
-            'teacher'    => json_encode([(string) $coach->ID]),
+            'class_id' => $classId2,
+            'month' => '9月-10月',
+            'student' => json_encode([(string) $studentA->ID]),
+            'teacher' => json_encode([(string) $coach->ID]),
             'class_year' => '2024',
-            'sort'       => 202409,
+            'sort' => 202409,
         ]);
 
         DB::table('edu_result')->insert([

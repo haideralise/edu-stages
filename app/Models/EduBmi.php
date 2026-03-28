@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class EduBmi extends Model
 {
     protected $table = 'edu_bmi';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -25,11 +26,11 @@ class EduBmi extends Model
     {
         return [
             'user_id' => 'integer',
-            'height'  => 'float',
-            'weight'  => 'float',
-            'hc'      => 'float',
-            'bmi'     => 'float',
-            'date'    => 'integer',
+            'height' => 'float',
+            'weight' => 'float',
+            'hc' => 'float',
+            'bmi' => 'float',
+            'date' => 'integer',
         ];
     }
 

@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 class EduLevel extends Model
 {
     protected $table = 'edu_level';
+
     public $timestamps = false;
 
     protected $guarded = ['*'];
@@ -15,7 +16,7 @@ class EduLevel extends Model
     protected function casts(): array
     {
         return [
-            'pid'  => 'integer',
+            'pid' => 'integer',
             'data' => 'array',
         ];
     }

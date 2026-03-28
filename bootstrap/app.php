@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -30,7 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([
                     'message' => 'Unauthorized',
-                    'code'    => 'UNAUTHORIZED',
+                    'code' => 'UNAUTHORIZED',
                 ], 401);
             }
         });
@@ -40,7 +41,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([
                     'message' => 'CSRF token mismatch',
-                    'code'    => 'TOKEN_MISMATCH',
+                    'code' => 'TOKEN_MISMATCH',
                 ], 419);
             }
         });
@@ -50,7 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([
                     'message' => 'Forbidden',
-                    'code'    => 'FORBIDDEN',
+                    'code' => 'FORBIDDEN',
                 ], 403);
             }
         });
@@ -60,7 +61,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([
                     'message' => 'Not found',
-                    'code'    => 'NOT_FOUND',
+                    'code' => 'NOT_FOUND',
                 ], 404);
             }
         });
@@ -71,8 +72,18 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($e->getStatusCode() === 419 && ($request->expectsJson() || $request->is('api/*'))) {
                 return response()->json([
                     'message' => 'CSRF token mismatch',
-                    'code'    => 'TOKEN_MISMATCH',
+                    'code' => 'TOKEN_MISMATCH',
                 ], 419);
+            }
+        });
+
+        // Doc 09 Scheme D — 422 Validation Error
+        $exceptions->render(function (ValidationException $e, Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors(),
+                ], 422);
             }
         });
 
@@ -83,7 +94,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 if ($statusCode >= 500) {
                     return response()->json([
                         'message' => 'Server error',
-                        'code'    => 'SERVER_ERROR',
+                        'code' => 'SERVER_ERROR',
                     ], 500);
                 }
             }
