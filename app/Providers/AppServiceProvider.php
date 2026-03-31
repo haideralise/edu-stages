@@ -22,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(EduBmi::class, BmiPolicy::class);
         Gate::policy(EduResult::class, ResultPolicy::class);
 
+        Gate::define('bmi.listApi', [new BmiPolicy, 'listApi']);
+        Gate::define('result.listApi', [new ResultPolicy, 'listApi']);
+
         $chart2Policy = new Chart2Policy;
         Gate::define('chart2.viewAny', [$chart2Policy, 'viewAny']);
         Gate::define('chart2.view', [$chart2Policy, 'view']);

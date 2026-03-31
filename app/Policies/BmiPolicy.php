@@ -14,6 +14,11 @@ class BmiPolicy
         return $role === 'student' || $role === 'admin';
     }
 
+    public function listApi(WpUser $user): bool
+    {
+        return in_array($user->resolveRole(), ['student', 'coach', 'admin'], true);
+    }
+
     public function view(WpUser $user, EduBmi $bmi): bool
     {
         if ($user->resolveRole() === 'admin') {

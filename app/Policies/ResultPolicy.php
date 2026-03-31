@@ -19,6 +19,11 @@ class ResultPolicy
         return $role === 'student' || $role === 'admin';
     }
 
+    public function listApi(WpUser $user): bool
+    {
+        return in_array($user->resolveRole(), ['student', 'coach', 'admin'], true);
+    }
+
     /**
      * Coach can view results of students in their own classes.
      */

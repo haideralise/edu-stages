@@ -18,6 +18,7 @@ class BmiResource extends JsonResource
             'date' => $this->date,
             'date_formatted' => date('Y-m-d', $this->date),
             'bmi' => $this->bmi,
+            'category' => $this->category,
         ];
     }
 }
