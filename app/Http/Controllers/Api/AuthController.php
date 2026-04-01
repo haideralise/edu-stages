@@ -3,89 +3,57 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
 use App\Models\WpUser;
+use App\Support\PasswordCheck;
+use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Services\PasswordHash;
 
 class AuthController extends Controller
 {
-    // PWA: validate WP cookie → issue Sanctum Bearer token
-    public function issue(Request $request)
+    use ApiResponse;
+
+    public function login(LoginRequest $request): JsonResponse
     {
-        $guard = auth('wp');
-
-        if (!$guard->check()) {
-            return response()->json([
-                'message' => 'Unauthorized',
-                'code'    => 'UNAUTHORIZED',
-            ], 401);
-        }
-
-        $user       = $guard->user();
-        $expiration = now()->addDays(7);
-        $token      = $user->createToken('pwa-token', ['*'], $expiration);
-
-        return response()->json([
-            'data' => [
-                'token'      => $token->plainTextToken,
-                'expires_at' => $expiration->toISOString(),
-            ],
-        ]);
-    }
-
-    // API login with WP username + password
-    public function login(Request $request)
-    {
-        $request->validate([
-            'login'    => 'required|string',
-            'password' => 'required|string',
-        ]);
-
-        $user = WpUser::where('user_login', $request->login)
-            ->orWhere('user_email', $request->login)
+        $user = WpUser::where('user_login', $request->input('user_login'))
+            ->orWhere('user_email', $request->input('user_login'))
             ->first();
 
-        if (!$user || !$this->checkPassword($request->password, $user->user_pass)) {
-            return response()->json([
-                'message' => 'Unauthorized',
-                'code'    => 'UNAUTHORIZED',
-            ], 401);
+        if (! $user || ! PasswordCheck::verify($request->input('password'), $user->user_pass)) {
+            return $this->error('Unauthorized', 'UNAUTHORIZED', 401);
         }
 
-        $expiration = now()->addDays(7);
-        $token      = $user->createToken('api-token', ['*'], $expiration);
+        // One token per device context — clean up old "api" tokens first
+        $user->tokens()->where('name', 'api')->delete();
+        $token = $user->createToken('api')->plainTextToken;
 
-        return response()->json([
-            'data' => [
-                'token'      => $token->plainTextToken,
-                'expires_at' => $expiration->toISOString(),
-            ],
+        return $this->success([
+            'user' => $this->formatUser($user),
+            'token' => $token,
         ]);
     }
 
-    private function checkPassword(string $password, string $hash): bool
+    public function logout(Request $request): JsonResponse
     {
-        // 1. MD5 (very old WP)
-        if (strlen($hash) <= 32) {
-            return hash_equals($hash, md5($password));
-        }
+        $request->user()->currentAccessToken()->delete();
 
-        // 2. New WordPress hashing (WP 6.8+ → $wp prefix)
-        if (str_starts_with($hash, '$wp')) {
-            $passwordToVerify = base64_encode(
-                hash_hmac('sha384', $password, 'wp-sha384', true)
-            );
+        return $this->success(['message' => 'Logged out']);
+    }
 
-            return password_verify($passwordToVerify, substr($hash, 3));
-        }
+    public function me(Request $request): JsonResponse
+    {
+        return $this->success($this->formatUser($request->user()));
+    }
 
-        // 3. phpass ($P$ or $H$)
-        if (str_starts_with($hash, '$P$') || str_starts_with($hash, '$H$')) {
-            $hasher = new PasswordHash(8, true);
-            return $hasher->CheckPassword($password, $hash);
-        }
-
-        // 4. Modern bcrypt (or anything else)
-        return password_verify($password, $hash);
+    private function formatUser(WpUser $user): array
+    {
+        return [
+            'id' => $user->ID,
+            'user_login' => $user->user_login,
+            'user_email' => $user->user_email,
+            'display_name' => $user->display_name,
+            'role' => $user->resolveRole(),
+        ];
     }
 }

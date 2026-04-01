@@ -10,18 +10,12 @@ class EduUser extends Model
 
     protected $primaryKey = 'user_id';
 
-    public $incrementing = false;
-
     public $timestamps = false;
 
-    protected $fillable = [
-        'note',
-        'hourly_wage',
-        'class_fee',
-    ];
+    protected $guarded = ['*'];
 
-    public function isCoach(): bool
+    public function wpUser()
     {
-        return ! is_null($this->hourly_wage);
+        return $this->belongsTo(WpUser::class, 'user_id', 'ID');
     }
 }

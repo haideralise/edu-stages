@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class EduClass extends Model
 {
@@ -14,21 +13,7 @@ class EduClass extends Model
 
     public $timestamps = false;
 
-    public $incrementing = false;
-
-    protected $fillable = [
-        'class_id',
-        'class_name',
-        'district_id',
-        'product_id',
-        'product_name',
-        'date_time',
-        'date_month',
-        'class_date',
-        'class_exam',
-        'lv3',
-        'class_year',
-    ];
+    protected $guarded = ['*']; // readonly — no mass assignment
 
     protected function casts(): array
     {
@@ -41,28 +26,30 @@ class EduClass extends Model
         ];
     }
 
-    // ---------------------------------------------------------------
-    // Scopes
-    // ---------------------------------------------------------------
+    // ── Relationships ────────────────────────────────────────────
 
-    public function scopeByYear(Builder $query, string $year): Builder
-    {
-        return $query->where('class_year', $year);
-    }
-
-    public function scopeByDistrict(Builder $query, int|array $districtId): Builder
-    {
-        return is_array($districtId)
-            ? $query->whereIn('district_id', $districtId)
-            : $query->where('district_id', $districtId);
-    }
-
-    // ---------------------------------------------------------------
-    // Relationships
-    // ---------------------------------------------------------------
-
-    public function classUsers(): HasMany
+    public function classUsers()
     {
         return $this->hasMany(EduClassUser::class, 'class_id', 'class_id');
+    }
+
+    // ── Query Scopes ─────────────────────────────────────────────
+
+    public function scopeForDistrict(Builder $query, null|int|array $districtId): Builder
+    {
+        if (is_null($districtId)) {
+            return $query;
+        }
+
+        if (is_array($districtId)) {
+            return $query->whereIn('district_id', $districtId);
+        }
+
+        return $query->where('district_id', $districtId);
+    }
+
+    public function scopeForYear(Builder $query, ?string $year): Builder
+    {
+        return $year ? $query->where('class_year', $year) : $query;
     }
 }

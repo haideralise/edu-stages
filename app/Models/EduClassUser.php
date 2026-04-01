@@ -2,32 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Collection;
 
 class EduClassUser extends Model
 {
     protected $table = 'edu_class_user';
 
-    protected $primaryKey = 'id';
-
     public $timestamps = false;
 
-    protected $fillable = [
-        'class_id',
-        'month',
-        'student',
-        'student_makeup',
-        'student_transfer',
-        'student_order',
-        'order_id',
-        'teacher',
-        'days',
-        'class_year',
-        'class_exam',
-        'sort',
-        'history_students_status',
-    ];
+    protected $guarded = ['*'];
 
     protected function casts(): array
     {
@@ -42,8 +27,43 @@ class EduClassUser extends Model
         ];
     }
 
-    public function eduClass(): BelongsTo
+    // ── Relationships ────────────────────────────────────────────
+
+    public function eduClass()
     {
         return $this->belongsTo(EduClass::class, 'class_id', 'class_id');
+    }
+
+    // ── Scopes ───────────────────────────────────────────────────
+
+    public function scopeWhereTeacher(Builder $query, int $userId): Builder
+    {
+        $driver = $query->getConnection()->getDriverName();
+
+        if ($driver === 'sqlite') {
+            return $query->where('teacher', 'LIKE', '%"'.$userId.'"%');
+        }
+
+        return $query->whereRaw('JSON_CONTAINS(teacher, ?)', [json_encode((string) $userId)]);
+    }
+
+    // ── Query helpers ────────────────────────────────────────────
+
+    public static function studentIdsForTeacher(int $teacherId): Collection
+    {
+        return static::whereTeacher($teacherId)
+            ->pluck('student')
+            ->flatMap(fn ($s) => $s ?? [])
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+    }
+
+    public static function allTeacherIds(): Collection
+    {
+        return static::pluck('teacher')
+            ->flatMap(fn ($t) => $t ?? [])
+            ->map(fn ($id) => (int) $id)
+            ->unique();
     }
 }
