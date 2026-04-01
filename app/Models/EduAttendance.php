@@ -2,33 +2,51 @@
 
 namespace App\Models;
 
+use App\Casts\LegacyEduAttendanceStatusCast;
+use App\ValueObjects\EduMonthWindow;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EduAttendance extends Model
 {
     protected $table = 'edu_attendance';
 
+    protected $primaryKey = 'id';
+
     public $timestamps = false;
 
-    protected $guarded = ['*'];
+    protected $fillable = [
+        'month',
+        'date',
+        'attendance',
+        'class_year',
+    ];
 
-    protected function casts(): array
+    protected $casts = [
+        'date' => 'date:Y-m-d',
+        'attendance' => LegacyEduAttendanceStatusCast::class,
+    ];
+
+    public function eduClass(): BelongsTo
     {
-        return [
-            'class_id' => 'integer',
-            'user_id' => 'integer',
-        ];
+        return $this->belongsTo(EduClass::class, 'class_id');
     }
 
-    /**
-     * Accessor fallback: 'late' → 'leave', 'absent' → 'cancelled'.
-     */
-    public function getAttendanceAttribute($value): string
+    public function eduUser(): BelongsTo
     {
-        return match ($value) {
-            'late' => 'leave',
-            'absent' => 'cancelled',
-            default => $value ?? '',
-        };
+        return $this->belongsTo(EduUser::class, 'user_id');
+    }
+
+    public function scopeWhereMonthWindow(Builder $builder, EduMonthWindow $monthWindow): void
+    {
+        $builder
+            ->where(function (Builder $whereGroup) use ($monthWindow) {
+                $whereGroup->where('month', 'like', "%{$monthWindow->start}%");
+
+                if (! $monthWindow->isSingleMonth()) {
+                    $whereGroup->orWhere('month', 'like', "%{$monthWindow->end}%");
+                }
+            });
     }
 }

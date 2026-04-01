@@ -3,48 +3,39 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class EduLevel extends Model
 {
     protected $table = 'edu_level';
 
+    protected $primaryKey = 'id';
+
     public $timestamps = false;
 
-    protected $guarded = ['*'];
+    protected $fillable = [
+        'pid',
+        'name',
+        'data',
+        'file_level',
+        'link',
+    ];
 
     protected function casts(): array
     {
         return [
-            'pid' => 'integer',
             'data' => 'array',
         ];
     }
 
-    // ── Relationships ────────────────────────────────────────────
-
-    public function parent()
+    public function parent(): BelongsTo
     {
-        return $this->belongsTo(self::class, 'pid', 'id');
+        return $this->belongsTo(self::class, 'pid');
     }
 
-    public function children()
+    public function children(): HasMany
     {
-        return $this->hasMany(self::class, 'pid', 'id');
-    }
-
-    public function descendants()
-    {
-        return $this->children()->with('descendants');
-    }
-
-    // ── Static helpers ───────────────────────────────────────────
-
-    /**
-     * Build full level tree from root nodes (pid = 0).
-     */
-    public static function getTree(): Collection
-    {
-        return self::where('pid', 0)->with('descendants')->get();
+        return $this->hasMany(self::class, 'pid');
     }
 }

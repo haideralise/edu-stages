@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -11,9 +10,7 @@ class WpUser extends Authenticatable
     use HasApiTokens;
 
     protected $table = 'users';
-
     protected $primaryKey = 'ID';
-
     public $timestamps = false;
 
     protected $fillable = [
@@ -28,6 +25,21 @@ class WpUser extends Authenticatable
         'user_pass',
     ];
 
+    public function getAuthIdentifierName(): string
+    {
+        return 'ID';
+    }
+
+    public function getAuthIdentifier()
+    {
+        return $this->ID;
+    }
+
+    public function getAuthPassword(): string
+    {
+        return $this->user_pass;
+    }
+
     // ── Relationships ────────────────────────────────────────────
 
     public function meta()
@@ -40,26 +52,10 @@ class WpUser extends Authenticatable
         return $this->hasOne(EduUser::class, 'user_id', 'ID');
     }
 
-    // ── Accessors ─────────────────────────────────────────────────
-
-    protected function birthdate(): Attribute
-    {
-        return Attribute::get(fn () => $this->getMetaValue('billing_birthdate'));
-    }
-
-    protected function gender(): Attribute
-    {
-        return Attribute::get(fn () => $this->getMetaValue('billing_gender'));
-    }
-
     // ── Helpers ──────────────────────────────────────────────────
 
     public function getMetaValue(string $key): ?string
     {
-        if ($this->relationLoaded('meta')) {
-            return $this->meta->firstWhere('meta_key', $key)?->meta_value;
-        }
-
         return $this->meta()->where('meta_key', $key)->value('meta_value');
     }
 
@@ -79,17 +75,9 @@ class WpUser extends Authenticatable
             }
         }
 
-        // SQLite fallback: JSON_CONTAINS is MySQL-only
-        $driver = $this->getConnection()->getDriverName();
-        if ($driver === 'sqlite') {
-            $isCoach = EduClassUser::whereRaw(
-                'teacher LIKE ?', ['%"'.$this->ID.'"%']
-            )->exists();
-        } else {
-            $isCoach = EduClassUser::whereRaw(
-                'JSON_CONTAINS(teacher, ?)', [json_encode((string) $this->ID)]
-            )->exists();
-        }
+        $isCoach = EduClassUser::whereRaw(
+            "JSON_CONTAINS(teacher, ?)", [json_encode((string) $this->ID)]
+        )->exists();
 
         return $isCoach ? 'coach' : 'student';
     }
