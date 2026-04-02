@@ -27,16 +27,12 @@ class AuthApiTest extends TestCase
         $this->createUser('secret');
 
         $this->postJson('/api/login', [
-            'user_login' => 'coach_lee',
+            'login' => 'coach_lee',
             'password' => 'secret',
         ])
             ->assertOk()
             ->assertJsonStructure([
-                'data' => [
-                    'user' => ['id', 'user_login', 'user_email', 'display_name', 'role'],
-                    'token',
-                ],
-                'meta' => ['timestamp'],
+                'data' => ['token', 'expires_at'],
             ]);
     }
 
@@ -45,11 +41,11 @@ class AuthApiTest extends TestCase
         $this->createUser('secret');
 
         $this->postJson('/api/login', [
-            'user_login' => 'lee@edu.test',
+            'login' => 'lee@edu.test',
             'password' => 'secret',
         ])
             ->assertOk()
-            ->assertJsonPath('data.user.user_email', 'lee@edu.test');
+            ->assertJsonStructure(['data' => ['token']]);
     }
 
     public function test_login_wrong_password(): void
@@ -57,7 +53,7 @@ class AuthApiTest extends TestCase
         $this->createUser('secret');
 
         $this->postJson('/api/login', [
-            'user_login' => 'coach_lee',
+            'login' => 'coach_lee',
             'password' => 'wrong',
         ])
             ->assertStatus(401)
@@ -67,7 +63,7 @@ class AuthApiTest extends TestCase
     public function test_login_nonexistent_user(): void
     {
         $this->postJson('/api/login', [
-            'user_login' => 'nobody',
+            'login' => 'nobody',
             'password' => 'anything',
         ])->assertStatus(401);
     }
@@ -76,7 +72,7 @@ class AuthApiTest extends TestCase
     {
         $this->postJson('/api/login', [])
             ->assertStatus(422)
-            ->assertJsonStructure(['message', 'errors' => ['user_login', 'password']]);
+            ->assertJsonStructure(['message', 'errors' => ['login', 'password']]);
     }
 
     // ── Logout ───────────────────────────────────────────────────
@@ -86,7 +82,7 @@ class AuthApiTest extends TestCase
         $user = $this->createUser('secret');
 
         $login = $this->postJson('/api/login', [
-            'user_login' => 'coach_lee',
+            'login' => 'coach_lee',
             'password' => 'secret',
         ]);
         $token = $login->json('data.token');
@@ -134,7 +130,7 @@ class AuthApiTest extends TestCase
         $user = $this->createUser('secret');
 
         $token = $this->postJson('/api/login', [
-            'user_login' => 'coach_lee',
+            'login' => 'coach_lee',
             'password' => 'secret',
         ])->json('data.token');
 
