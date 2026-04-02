@@ -22,8 +22,16 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'auth.wp'    => \App\Http\Middleware\AuthMiddleware::class,
+            'role.admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'role.coach' => \App\Http\Middleware\CoachMiddleware::class,
+        ]);
         $middleware->statefulApi();
     })
+    ->withProviders([
+        App\Providers\AuthServiceProvider::class,
+    ])
     ->withExceptions(function (Exceptions $exceptions) {
 
         // Doc 09 Scheme D — 401 Unauthorized

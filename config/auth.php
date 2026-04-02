@@ -6,7 +6,7 @@ use App\Models\WpUser;
 return [
 
     'defaults' => [
-        'guard' => env('AUTH_GUARD', 'sanctum'),
+        'guard' => env('AUTH_GUARD', 'wp'),
         'passwords' => env('AUTH_PASSWORD_BROKER', 'wp_users'),
     ],
 
@@ -15,9 +15,14 @@ return [
             'driver' => 'session',
             'provider' => 'wp_users',
         ],
-        // Sanctum reads Bearer token and resolves via wp_users provider
+        // P1: WP cookie-based auth
+        'wp' => [
+            'driver'   => 'wp-cookie',
+            'provider' => 'wp_users',
+        ],
+        // P3: Sanctum Bearer token auth
         'sanctum' => [
-            'driver' => 'sanctum',
+            'driver'   => 'sanctum',
             'provider' => 'wp_users',
         ],
     ],

@@ -9,14 +9,18 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Public
+| P1: Public
 |--------------------------------------------------------------------------
 */
+// PWA: exchange WP cookie for Bearer token
+Route::get('/auth/token', [AuthController::class, 'issue']);
+
+// Login with WP credentials
 Route::post('/login', [AuthController::class, 'login']);
 
 /*
 |--------------------------------------------------------------------------
-| Protected — Sanctum token required
+| P3: Protected — Sanctum token required
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:sanctum')->group(function () {
