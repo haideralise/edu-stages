@@ -24,7 +24,7 @@ class StudentChartTest extends TestCase
             'user_email' => 'chart_s@edu.test', 'display_name' => 'Chart Student',
         ]);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->get('/edu/account/chart2');
 
         $response->assertOk();
@@ -49,7 +49,7 @@ class StudentChartTest extends TestCase
             'class_year' => '2025', 'sort' => 202501,
         ]);
 
-        $response = $this->actingAs($coach, 'web')
+        $response = $this->actingAs($coach, 'wp')
             ->get('/edu/account/chart2');
 
         $response->assertForbidden();
@@ -57,7 +57,7 @@ class StudentChartTest extends TestCase
 
     public function test_guest_redirects_to_login(): void
     {
-        $this->get('/edu/account/chart2')->assertRedirect('/login');
+        $this->get('/edu/account/chart2')->assertRedirect('/wp-login.php');
     }
 
     public function test_admin_can_view_chart_page(): void
@@ -72,7 +72,7 @@ class StudentChartTest extends TestCase
             'meta_value' => serialize(['administrator' => true]),
         ]);
 
-        $response = $this->actingAs($admin, 'web')
+        $response = $this->actingAs($admin, 'wp')
             ->get('/edu/account/chart2');
 
         $response->assertOk();

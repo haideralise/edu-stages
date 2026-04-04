@@ -38,12 +38,6 @@ class EduClassUser extends Model
 
     public function scopeWhereTeacher(Builder $query, int $userId): Builder
     {
-        $driver = $query->getConnection()->getDriverName();
-
-        if ($driver === 'sqlite') {
-            return $query->where('teacher', 'LIKE', '%"'.$userId.'"%');
-        }
-
         return $query->whereRaw('JSON_CONTAINS(teacher, ?)', [json_encode((string) $userId)]);
     }
 

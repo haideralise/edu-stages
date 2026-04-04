@@ -63,7 +63,7 @@ class StudentBmiTest extends TestCase
         $this->createBmi($student->ID);
         $this->createBmi($other->ID);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->get('/edu/account/mybmi');
 
         $response->assertOk();
@@ -72,7 +72,7 @@ class StudentBmiTest extends TestCase
 
     public function test_index_requires_auth(): void
     {
-        $this->get('/edu/account/mybmi')->assertRedirect('/login');
+        $this->get('/edu/account/mybmi')->assertRedirect('/wp-login.php');
     }
 
     // ── Create / Store ───────────────────────────────────────────
@@ -81,7 +81,7 @@ class StudentBmiTest extends TestCase
     {
         $student = $this->createStudent();
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->post('/edu/account/bmi', [
                 'date' => '2025-06-01',
                 'height' => 145.5,
@@ -101,7 +101,7 @@ class StudentBmiTest extends TestCase
     {
         $student = $this->createStudent();
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->postJson('/edu/account/bmi', [
                 'date' => '2025-06-01',
                 'height' => 145.5,
@@ -117,7 +117,7 @@ class StudentBmiTest extends TestCase
     {
         $student = $this->createStudent();
 
-        $this->actingAs($student, 'web')
+        $this->actingAs($student, 'wp')
             ->post('/edu/account/bmi', [
                 'date' => '2025-06-01',
                 'height' => 170.0,
@@ -133,7 +133,7 @@ class StudentBmiTest extends TestCase
     {
         $student = $this->createStudent();
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->postJson('/edu/account/bmi', []);
 
         $response->assertStatus(422);
@@ -144,7 +144,7 @@ class StudentBmiTest extends TestCase
     {
         $student = $this->createStudent();
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->postJson('/edu/account/bmi', [
                 'date' => '2025-01-01',
                 'height' => 5,    // below 30 min
@@ -161,7 +161,7 @@ class StudentBmiTest extends TestCase
         $student = $this->createStudent();
         $bmi = $this->createBmi($student->ID);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->getJson("/edu/account/bmi/{$bmi->id}");
 
         $response->assertOk();
@@ -176,7 +176,7 @@ class StudentBmiTest extends TestCase
         $student = $this->createStudent();
         $bmi = $this->createBmi($student->ID);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->put("/edu/account/bmi/{$bmi->id}", [
                 'date' => '2025-01-15',
                 'height' => 142.0,
@@ -196,7 +196,7 @@ class StudentBmiTest extends TestCase
         $student = $this->createStudent();
         $bmi = $this->createBmi($student->ID);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->putJson("/edu/account/bmi/{$bmi->id}", [
                 'date' => '2025-01-15',
                 'height' => 142.0,
@@ -213,7 +213,7 @@ class StudentBmiTest extends TestCase
         $other = $this->createStudent('student_b');
         $bmi = $this->createBmi($other->ID);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->put("/edu/account/bmi/{$bmi->id}", [
                 'date' => '2025-01-15',
                 'height' => 142.0,
@@ -230,7 +230,7 @@ class StudentBmiTest extends TestCase
         $student = $this->createStudent();
         $bmi = $this->createBmi($student->ID);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->delete("/edu/account/bmi/{$bmi->id}");
 
         $response->assertRedirect(route('account.mybmi'));
@@ -242,7 +242,7 @@ class StudentBmiTest extends TestCase
         $student = $this->createStudent();
         $bmi = $this->createBmi($student->ID);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->deleteJson("/edu/account/bmi/{$bmi->id}");
 
         $response->assertOk();
@@ -256,7 +256,7 @@ class StudentBmiTest extends TestCase
         $other = $this->createStudent('student_b');
         $bmi = $this->createBmi($other->ID);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->delete("/edu/account/bmi/{$bmi->id}");
 
         $response->assertForbidden();
@@ -273,7 +273,7 @@ class StudentBmiTest extends TestCase
         $this->createBmi($studentA->ID);
         $this->createBmi($studentB->ID);
 
-        $response = $this->actingAs($admin, 'web')
+        $response = $this->actingAs($admin, 'wp')
             ->get('/edu/account/mybmi');
 
         $response->assertOk();
@@ -286,7 +286,7 @@ class StudentBmiTest extends TestCase
         $admin = $this->createAdmin();
         $student = $this->createStudent();
 
-        $response = $this->actingAs($admin, 'web')
+        $response = $this->actingAs($admin, 'wp')
             ->postJson('/edu/account/bmi', [
                 'user_id' => $student->ID,
                 'date' => '2025-06-01',
@@ -307,7 +307,7 @@ class StudentBmiTest extends TestCase
         $student = $this->createStudent();
         $other = $this->createStudent('student_b');
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->postJson('/edu/account/bmi', [
                 'user_id' => $other->ID,
                 'date' => '2025-06-01',
@@ -332,7 +332,7 @@ class StudentBmiTest extends TestCase
         $student = $this->createStudent();
         $bmi = $this->createBmi($student->ID);
 
-        $response = $this->actingAs($admin, 'web')
+        $response = $this->actingAs($admin, 'wp')
             ->put("/edu/account/bmi/{$bmi->id}", [
                 'date' => '2025-01-15',
                 'height' => 150.0,
@@ -348,7 +348,7 @@ class StudentBmiTest extends TestCase
         $student = $this->createStudent();
         $bmi = $this->createBmi($student->ID);
 
-        $response = $this->actingAs($admin, 'web')
+        $response = $this->actingAs($admin, 'wp')
             ->delete("/edu/account/bmi/{$bmi->id}");
 
         $response->assertRedirect(route('account.mybmi'));
@@ -381,7 +381,7 @@ class StudentBmiTest extends TestCase
             'sort' => 202501,
         ]);
 
-        $response = $this->actingAs($coach, 'web')->get('/edu/account/mybmi');
+        $response = $this->actingAs($coach, 'wp')->get('/edu/account/mybmi');
         $response->assertForbidden();
     }
 
@@ -408,7 +408,7 @@ class StudentBmiTest extends TestCase
             'sort' => 202501,
         ]);
 
-        $response = $this->actingAs($coach, 'web')
+        $response = $this->actingAs($coach, 'wp')
             ->postJson('/edu/account/bmi', [
                 'date' => '2025-06-01',
                 'height' => 145.5,
@@ -425,7 +425,7 @@ class StudentBmiTest extends TestCase
         $student = $this->createStudent();
 
         // Without CSRF middleware bypass (direct HTTP call)
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->from('/edu/account/mybmi')
             ->post('/edu/account/bmi', [
                 'date' => '2025-01-01',

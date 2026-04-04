@@ -52,7 +52,7 @@ class Chart2ApiTest extends TestCase
         $token = $student->createToken('api')->plainTextToken;
 
         $response = $this->withToken($token)
-            ->getJson("/api/chart2/bmi/{$student->ID}");
+            ->getJson('/api/account/growth-chart');
 
         $response->assertOk();
         $response->assertJsonStructure([
@@ -77,7 +77,7 @@ class Chart2ApiTest extends TestCase
         ]);
 
         $response = $this->withToken($token)
-            ->getJson("/api/chart2/bmi/{$other->ID}");
+            ->getJson('/api/account/growth-chart?user_id='.$other->ID);
 
         $response->assertForbidden();
     }
@@ -89,7 +89,7 @@ class Chart2ApiTest extends TestCase
         $token = $admin->createToken('api')->plainTextToken;
 
         $response = $this->withToken($token)
-            ->getJson("/api/chart2/bmi/{$student->ID}");
+            ->getJson('/api/account/growth-chart?user_id='.$student->ID);
 
         $response->assertOk();
         $response->assertJsonPath('data.meta.gender', 'male');
@@ -118,7 +118,7 @@ class Chart2ApiTest extends TestCase
         $token = $coach->createToken('api')->plainTextToken;
 
         $response = $this->withToken($token)
-            ->getJson("/api/chart2/bmi/{$student->ID}");
+            ->getJson('/api/account/growth-chart');
 
         $response->assertForbidden();
     }
@@ -129,7 +129,7 @@ class Chart2ApiTest extends TestCase
         $token = $student->createToken('api')->plainTextToken;
 
         $response = $this->withToken($token)
-            ->getJson("/api/chart2/bmi/{$student->ID}");
+            ->getJson('/api/account/growth-chart');
 
         $response->assertOk();
         $response->assertJsonStructure([
@@ -144,7 +144,7 @@ class Chart2ApiTest extends TestCase
         $token = $student->createToken('api')->plainTextToken;
 
         $response = $this->withToken($token)
-            ->getJson("/api/chart2/bmi/{$student->ID}?type=bmi");
+            ->getJson('/api/account/growth-chart?type=bmi');
 
         $response->assertOk();
 
@@ -165,17 +165,17 @@ class Chart2ApiTest extends TestCase
         $token = $student->createToken('api')->plainTextToken;
 
         $response = $this->withToken($token)
-            ->getJson("/api/chart2/bmi/{$student->ID}?type=invalid");
+            ->getJson('/api/account/growth-chart?type=invalid');
 
         $response->assertStatus(422);
     }
 
     public function test_guest_gets_401(): void
     {
-        $this->getJson('/api/chart2/bmi/1')->assertUnauthorized();
+        $this->getJson('/api/account/growth-chart')->assertUnauthorized();
     }
 
-    public function test_result_endpoint(): void
+    public function test_result_type(): void
     {
         $student = $this->createStudentWithBmi();
         $token = $student->createToken('api')->plainTextToken;
@@ -189,7 +189,7 @@ class Chart2ApiTest extends TestCase
         ]);
 
         $response = $this->withToken($token)
-            ->getJson("/api/chart2/result/{$student->ID}");
+            ->getJson('/api/account/growth-chart?type=result');
 
         $response->assertOk();
         $response->assertJsonStructure([
@@ -204,7 +204,7 @@ class Chart2ApiTest extends TestCase
         $token = $student->createToken('api')->plainTextToken;
 
         $response = $this->withToken($token)
-            ->getJson("/api/chart2/bmi/{$student->ID}?type=height");
+            ->getJson('/api/account/growth-chart?type=height');
 
         $response->assertOk();
         $response->assertJsonPath('data.labels.y', 'Height (cm)');

@@ -25,14 +25,14 @@ class AccountInfoTest extends TestCase
 
     public function test_guest_cannot_see_account_info(): void
     {
-        $this->get('/edu/account/info')->assertRedirect('/login');
+        $this->get('/edu/account/info')->assertRedirect('/wp-login.php');
     }
 
     public function test_student_can_see_account_info(): void
     {
         $student = $this->createStudent();
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->get('/edu/account/info');
 
         $response->assertOk();
@@ -47,7 +47,7 @@ class AccountInfoTest extends TestCase
     {
         $student = $this->createStudent();
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->post('/edu/account/info', [
                 'birthdate' => '2010-05-15',
                 'gender' => 'female',
@@ -74,7 +74,7 @@ class AccountInfoTest extends TestCase
     {
         $student = $this->createStudent();
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->post('/edu/account/info', []);
 
         $response->assertSessionHasErrors(['birthdate', 'gender']);
@@ -84,7 +84,7 @@ class AccountInfoTest extends TestCase
     {
         $student = $this->createStudent();
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->post('/edu/account/info', [
                 'birthdate' => '2099-01-01',
                 'gender' => 'male',
@@ -97,7 +97,7 @@ class AccountInfoTest extends TestCase
     {
         $student = $this->createStudent();
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->post('/edu/account/info', [
                 'birthdate' => '2010-05-15',
                 'gender' => 'other',
@@ -113,14 +113,14 @@ class AccountInfoTest extends TestCase
         $student = $this->createStudent();
 
         // First save
-        $this->actingAs($student, 'web')
+        $this->actingAs($student, 'wp')
             ->post('/edu/account/info', [
                 'birthdate' => '2010-05-15',
                 'gender' => 'female',
             ]);
 
         // Second save with different values
-        $this->actingAs($student, 'web')
+        $this->actingAs($student, 'wp')
             ->post('/edu/account/info', [
                 'birthdate' => '2011-08-20',
                 'gender' => 'male',
@@ -156,7 +156,7 @@ class AccountInfoTest extends TestCase
             'meta_value' => 'male',
         ]);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->get('/edu/account/info');
 
         $response->assertOk();

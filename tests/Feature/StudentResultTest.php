@@ -55,7 +55,7 @@ class StudentResultTest extends TestCase
         $student = $this->createStudent();
         $this->seedLevelsAndResults($student->ID);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->get('/edu/account/test-result');
 
         $response->assertOk();
@@ -69,7 +69,7 @@ class StudentResultTest extends TestCase
         $other = $this->createStudent('student_b');
         $this->seedLevelsAndResults($other->ID);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->get('/edu/account/test-result');
 
         $response->assertOk();
@@ -81,7 +81,7 @@ class StudentResultTest extends TestCase
         $student = $this->createStudent();
         $this->seedLevelsAndResults($student->ID);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->get('/edu/account/test-result');
 
         $response->assertOk();
@@ -92,7 +92,7 @@ class StudentResultTest extends TestCase
 
     public function test_requires_auth(): void
     {
-        $this->get('/edu/account/test-result')->assertRedirect('/login');
+        $this->get('/edu/account/test-result')->assertRedirect('/wp-login.php');
     }
 
     public function test_coach_cannot_access_student_results(): void
@@ -117,7 +117,7 @@ class StudentResultTest extends TestCase
             'sort' => 202501,
         ]);
 
-        $response = $this->actingAs($coach, 'web')
+        $response = $this->actingAs($coach, 'wp')
             ->get('/edu/account/test-result');
 
         $response->assertForbidden();
