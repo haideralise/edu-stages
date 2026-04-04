@@ -23,7 +23,7 @@ class ResultApiTest extends TestCase
         $student = WpUser::where('user_login', 'student_chan')->first();
 
         $response = $this->actingAs($student, 'sanctum')
-            ->getJson('/api/results');
+            ->getJson('/api/account/results');
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -44,7 +44,7 @@ class ResultApiTest extends TestCase
         $other = WpUser::where('user_login', 'student_li')->first();
 
         $response = $this->actingAs($student, 'sanctum')
-            ->getJson('/api/results?user_id='.$other->ID);
+            ->getJson('/api/account/results?user_id='.$other->ID);
 
         $response->assertForbidden();
     }
@@ -54,7 +54,7 @@ class ResultApiTest extends TestCase
         $admin = WpUser::where('user_login', 'admin')->first();
 
         $response = $this->actingAs($admin, 'sanctum')
-            ->getJson('/api/results');
+            ->getJson('/api/account/results');
 
         $response->assertOk();
 
@@ -68,7 +68,7 @@ class ResultApiTest extends TestCase
         $student = WpUser::where('user_login', 'student_chan')->first();
 
         $response = $this->actingAs($admin, 'sanctum')
-            ->getJson('/api/results?user_id='.$student->ID);
+            ->getJson('/api/account/results?user_id='.$student->ID);
 
         $response->assertOk();
 
@@ -82,7 +82,7 @@ class ResultApiTest extends TestCase
         $studentIds = EduClassUser::studentIdsForTeacher($coach->ID);
 
         $response = $this->actingAs($coach, 'sanctum')
-            ->getJson('/api/results');
+            ->getJson('/api/account/results');
 
         $response->assertOk();
 
@@ -105,14 +105,14 @@ class ResultApiTest extends TestCase
         }
 
         $response = $this->actingAs($coach, 'sanctum')
-            ->getJson('/api/results?user_id='.$outsideStudent);
+            ->getJson('/api/account/results?user_id='.$outsideStudent);
 
         $response->assertForbidden();
     }
 
     public function test_guest_gets_401(): void
     {
-        $response = $this->getJson('/api/results');
+        $response = $this->getJson('/api/account/results');
 
         $response->assertUnauthorized()
             ->assertJson([
@@ -126,7 +126,7 @@ class ResultApiTest extends TestCase
         $student = WpUser::where('user_login', 'student_chan')->first();
 
         $response = $this->actingAs($student, 'sanctum')
-            ->getJson('/api/results');
+            ->getJson('/api/account/results');
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -140,7 +140,7 @@ class ResultApiTest extends TestCase
         $student = WpUser::where('user_login', 'student_chan')->first();
 
         $response = $this->actingAs($student, 'sanctum')
-            ->getJson('/api/results');
+            ->getJson('/api/account/results');
 
         $response->assertOk();
 
