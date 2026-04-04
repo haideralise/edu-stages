@@ -25,16 +25,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
-    // Classes (readonly)
+    // Classes (coach/admin, readonly)
     Route::get('/classes', [EduClassController::class, 'index']);
 
-    // BMI records
-    Route::get('/bmi', [BmiController::class, 'index']);
-
-    // Test results
-    Route::get('/results', [ResultController::class, 'index']);
-
-    // Chart2 — growth charts
-    Route::get('/chart2/bmi/{user_id}', [Chart2Controller::class, 'bmi']);
-    Route::get('/chart2/result/{user_id}', [Chart2Controller::class, 'result']);
+    // Student account endpoints (09eng §PWA Student)
+    Route::prefix('account')->group(function () {
+        Route::get('/bmi', [BmiController::class, 'index']);
+        Route::get('/results', [ResultController::class, 'index']);
+        Route::get('/growth-chart', [Chart2Controller::class, 'index']);
+    });
 });
