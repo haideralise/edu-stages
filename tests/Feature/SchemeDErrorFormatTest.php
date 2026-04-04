@@ -57,7 +57,7 @@ class SchemeDErrorFormatTest extends TestCase
             'date' => strtotime('2025-01-15'),
         ]);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->putJson("/edu/account/bmi/{$bmi->id}", [
                 'date' => '2025-01-15',
                 'height' => 142.0,
@@ -77,7 +77,7 @@ class SchemeDErrorFormatTest extends TestCase
     {
         $student = $this->createStudent();
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->getJson('/edu/account/bmi/99999');
 
         $response->assertStatus(404);
@@ -111,7 +111,7 @@ class SchemeDErrorFormatTest extends TestCase
     {
         $student = $this->createStudent();
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->postJson('/edu/account/bmi', []);
 
         $response->assertStatus(422);
