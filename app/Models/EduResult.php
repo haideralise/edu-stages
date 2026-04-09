@@ -2,15 +2,44 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory; // from P2
 use Illuminate\Database\Eloquent\Model;
 
 class EduResult extends Model
 {
+    use HasFactory; // from P2
+
     protected $table = 'edu_result';
+
+    protected $primaryKey = 'id'; // from P2
 
     public $timestamps = false;
 
-    protected $guarded = ['*']; // read-only for students
+    // from P2
+    protected $fillable = [
+        'class_id',
+        'class_month',
+        'exam_id',
+        'user_id',
+        'first_name',
+        'last_name',
+        'gender',
+        'birthdate',
+        'exam_type',
+        'exam_name',
+        'exam_data',
+        'exam_lap_times',
+        'exam_fastest_lap_sec',
+        'exam_slowest_lap_sec',
+        'exam_avg_lap_sec',
+        'exam_date',
+        'exam_history',
+        'exam_note',
+        'created',
+        'status',
+        'class_year',
+    ];
+    // end from P2
 
     protected function casts(): array
     {
@@ -21,6 +50,13 @@ class EduResult extends Model
             'user_id' => 'integer',
             'exam_id' => 'integer',
             'status' => 'integer',
+            // from P2
+            'id' => 'integer',
+            'created' => 'integer',
+            'exam_fastest_lap_sec' => 'float',
+            'exam_slowest_lap_sec' => 'float',
+            'exam_avg_lap_sec' => 'float',
+            // end from P2
         ];
     }
 
@@ -31,8 +67,18 @@ class EduResult extends Model
         return $this->belongsTo(WpUser::class, 'user_id', 'ID');
     }
 
+    public function student() // from P2 (alias for user — same relationship)
+    {
+        return $this->belongsTo(WpUser::class, 'user_id', 'ID');
+    }
+
     public function eduClass()
     {
         return $this->belongsTo(EduClass::class, 'class_id', 'class_id');
+    }
+
+    public function examLevel() // from P2
+    {
+        return $this->belongsTo(EduLevel::class, 'exam_id', 'id');
     }
 }

@@ -11,6 +11,8 @@ class EduBmi extends Model
 {
     protected $table = 'edu_bmi';
 
+    protected $primaryKey = 'id'; // from P1
+
     public $timestamps = false;
 
     protected $fillable = [

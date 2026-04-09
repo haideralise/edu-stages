@@ -5,7 +5,16 @@ use App\Http\Controllers\Api\BmiController;
 use App\Http\Controllers\Api\Chart2Controller;
 use App\Http\Controllers\Api\EduClassController;
 use App\Http\Controllers\Api\ResultController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+// ── from P1 ─────────────────────────────────────────────────────
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
+
+Route::get('/auth/token', [AuthController::class, 'issue']);
+// ── end from P1 ─────────────────────────────────────────────────
 
 /*
 |--------------------------------------------------------------------------
