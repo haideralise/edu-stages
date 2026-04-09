@@ -70,7 +70,7 @@ class CoachResultTest extends TestCase
     {
         [$coach, $studentA, $studentB] = $this->createCoachWithStudents();
 
-        $response = $this->actingAs($coach, 'web')
+        $response = $this->actingAs($coach, 'wp')
             ->get('/edu/coach/results');
 
         $response->assertOk();
@@ -82,7 +82,7 @@ class CoachResultTest extends TestCase
     {
         [$coach] = $this->createCoachWithStudents();
 
-        $response = $this->actingAs($coach, 'web')
+        $response = $this->actingAs($coach, 'wp')
             ->get('/edu/coach/results');
 
         $response->assertOk();
@@ -97,14 +97,15 @@ class CoachResultTest extends TestCase
             'user_email' => 'just@edu.test', 'display_name' => 'Just Student',
         ]);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->get('/edu/coach/results');
 
-        $response->assertForbidden();
+        // CoachMiddleware redirects non-coach users to WP login
+        $response->assertRedirect('/wp-login.php');
     }
 
     public function test_requires_auth(): void
     {
-        $this->get('/edu/coach/results')->assertRedirect('/login');
+        $this->get('/edu/coach/results')->assertRedirect('/wp-login.php');
     }
 }

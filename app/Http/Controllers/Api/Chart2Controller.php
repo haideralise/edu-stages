@@ -3,30 +3,52 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Chart2BmiRequest;
+use App\Http\Requests\Chart2Request;
 use App\Models\EduBmi;
 use App\Models\EduResult;
 use App\Models\WpUser;
 use App\Support\BmiForAge;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class Chart2Controller extends Controller
 {
     use ApiResponse;
 
-    public function bmi(Chart2BmiRequest $request, int $userId): JsonResponse
+    public function index(Chart2Request $request): JsonResponse
     {
-        $this->authorize('chart2.view', $userId);
-
+        $user = $request->user();
+        $role = $user->resolveRole();
         $type = $request->input('type', 'bmi');
 
-        $target = WpUser::with('meta')->findOrFail($userId);
+        // Resolve target user: Auth::id() for students, optional user_id for admin
+        if ($role === 'admin' && $request->filled('user_id')) {
+            $target = WpUser::with('meta')->findOrFail($request->integer('user_id'));
+        } elseif ($role === 'admin' || $role === 'student') {
+            $target = $user->loadMissing('meta');
+        } else {
+            throw new AccessDeniedHttpException;
+        }
+
+        // Students can only view own chart
+        if ($role === 'student' && $request->filled('user_id') && $request->integer('user_id') !== $user->ID) {
+            throw new AccessDeniedHttpException;
+        }
+
+        if ($type === 'result') {
+            return $this->resultChart($target);
+        }
+
+        return $this->bmiChart($target, $type);
+    }
+
+    private function bmiChart(WpUser $target, string $type): JsonResponse
+    {
         $birthdate = $target->birthdate;
         $gender = $target->gender;
 
-        $records = EduBmi::where('user_id', $userId)->orderBy('date')->get();
+        $records = EduBmi::where('user_id', $target->ID)->orderBy('date')->get();
 
         $studentSeries = $records->map(function (EduBmi $r) use ($type, $birthdate) {
             $y = match ($type) {
@@ -43,7 +65,6 @@ class Chart2Controller extends Controller
 
         $labels = $this->labelsForType($type);
 
-        // Reference curves only available for BMI type
         $series = ['student' => $studentSeries];
 
         if ($type === 'bmi' && $gender) {
@@ -61,11 +82,9 @@ class Chart2Controller extends Controller
         ]);
     }
 
-    public function result(Request $request, int $userId): JsonResponse
+    private function resultChart(WpUser $target): JsonResponse
     {
-        $this->authorize('chart2.view', $userId);
-
-        $results = EduResult::where('user_id', $userId)->orderBy('exam_date')->get();
+        $results = EduResult::where('user_id', $target->ID)->orderBy('exam_date')->get();
 
         $studentSeries = $results->map(fn (EduResult $r) => [
             $r->exam_date,

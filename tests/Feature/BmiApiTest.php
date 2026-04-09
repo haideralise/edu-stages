@@ -23,7 +23,7 @@ class BmiApiTest extends TestCase
         $student = WpUser::where('user_login', 'student_chan')->first();
 
         $response = $this->actingAs($student, 'sanctum')
-            ->getJson('/api/bmi');
+            ->getJson('/api/account/bmi');
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -42,7 +42,7 @@ class BmiApiTest extends TestCase
         $other = WpUser::where('user_login', 'student_li')->first();
 
         $response = $this->actingAs($student, 'sanctum')
-            ->getJson('/api/bmi?user_id='.$other->ID);
+            ->getJson('/api/account/bmi?user_id='.$other->ID);
 
         $response->assertForbidden();
     }
@@ -52,7 +52,7 @@ class BmiApiTest extends TestCase
         $admin = WpUser::where('user_login', 'admin')->first();
 
         $response = $this->actingAs($admin, 'sanctum')
-            ->getJson('/api/bmi');
+            ->getJson('/api/account/bmi');
 
         $response->assertOk();
 
@@ -66,7 +66,7 @@ class BmiApiTest extends TestCase
         $student = WpUser::where('user_login', 'student_chan')->first();
 
         $response = $this->actingAs($admin, 'sanctum')
-            ->getJson('/api/bmi?user_id='.$student->ID);
+            ->getJson('/api/account/bmi?user_id='.$student->ID);
 
         $response->assertOk();
 
@@ -80,7 +80,7 @@ class BmiApiTest extends TestCase
         $studentIds = EduClassUser::studentIdsForTeacher($coach->ID);
 
         $response = $this->actingAs($coach, 'sanctum')
-            ->getJson('/api/bmi');
+            ->getJson('/api/account/bmi');
 
         $response->assertOk();
 
@@ -104,14 +104,14 @@ class BmiApiTest extends TestCase
         }
 
         $response = $this->actingAs($coach, 'sanctum')
-            ->getJson('/api/bmi?user_id='.$outsideStudent);
+            ->getJson('/api/account/bmi?user_id='.$outsideStudent);
 
         $response->assertForbidden();
     }
 
     public function test_guest_gets_401(): void
     {
-        $response = $this->getJson('/api/bmi');
+        $response = $this->getJson('/api/account/bmi');
 
         $response->assertUnauthorized()
             ->assertJson([
@@ -125,7 +125,7 @@ class BmiApiTest extends TestCase
         $student = WpUser::where('user_login', 'student_chan')->first();
 
         $response = $this->actingAs($student, 'sanctum')
-            ->getJson('/api/bmi');
+            ->getJson('/api/account/bmi');
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -139,7 +139,7 @@ class BmiApiTest extends TestCase
         $student = WpUser::where('user_login', 'student_chan')->first();
 
         $response = $this->actingAs($student, 'sanctum')
-            ->getJson('/api/bmi');
+            ->getJson('/api/account/bmi');
 
         $response->assertOk();
 

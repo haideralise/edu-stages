@@ -79,17 +79,9 @@ class WpUser extends Authenticatable
             }
         }
 
-        // SQLite fallback: JSON_CONTAINS is MySQL-only
-        $driver = $this->getConnection()->getDriverName();
-        if ($driver === 'sqlite') {
-            $isCoach = EduClassUser::whereRaw(
-                'teacher LIKE ?', ['%"'.$this->ID.'"%']
-            )->exists();
-        } else {
-            $isCoach = EduClassUser::whereRaw(
-                'JSON_CONTAINS(teacher, ?)', [json_encode((string) $this->ID)]
-            )->exists();
-        }
+        $isCoach = EduClassUser::whereRaw(
+            'JSON_CONTAINS(teacher, ?)', [json_encode((string) $this->ID)]
+        )->exists();
 
         return $isCoach ? 'coach' : 'student';
     }

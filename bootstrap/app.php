@@ -18,12 +18,21 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            require __DIR__.'/../routes/p3.php';
+            require __DIR__.'/../routes/student.php';
+            require __DIR__.'/../routes/coach.php';
         },
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'auth.wp'    => \App\Http\Middleware\AuthMiddleware::class,
+            'role.admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'role.coach' => \App\Http\Middleware\CoachMiddleware::class,
+        ]);
         $middleware->statefulApi();
     })
+    ->withProviders([
+        App\Providers\AuthServiceProvider::class,
+    ])
     ->withExceptions(function (Exceptions $exceptions) {
 
         // Doc 09 Scheme D — 401 Unauthorized

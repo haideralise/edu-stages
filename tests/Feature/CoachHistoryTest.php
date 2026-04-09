@@ -68,7 +68,7 @@ class CoachHistoryTest extends TestCase
     {
         [$coach, $studentA, $studentB] = $this->createCoachWithHistory();
 
-        $response = $this->actingAs($coach, 'web')
+        $response = $this->actingAs($coach, 'wp')
             ->get('/edu/result/history');
 
         $response->assertOk();
@@ -101,7 +101,7 @@ class CoachHistoryTest extends TestCase
             'sort' => 202501,
         ]);
 
-        $response = $this->actingAs($otherCoach, 'web')
+        $response = $this->actingAs($otherCoach, 'wp')
             ->get('/edu/result/history');
 
         $response->assertOk();
@@ -116,10 +116,11 @@ class CoachHistoryTest extends TestCase
             'user_email' => 'plain@edu.test', 'display_name' => 'Plain Student',
         ]);
 
-        $response = $this->actingAs($student, 'web')
+        $response = $this->actingAs($student, 'wp')
             ->get('/edu/result/history');
 
-        $response->assertForbidden();
+        // CoachMiddleware redirects non-coach users to WP login
+        $response->assertRedirect('/wp-login.php');
     }
 
     public function test_admin_sees_all(): void
@@ -136,7 +137,7 @@ class CoachHistoryTest extends TestCase
             'meta_value' => serialize(['administrator' => true]),
         ]);
 
-        $response = $this->actingAs($admin, 'web')
+        $response = $this->actingAs($admin, 'wp')
             ->get('/edu/result/history');
 
         $response->assertOk();
@@ -146,7 +147,7 @@ class CoachHistoryTest extends TestCase
 
     public function test_requires_auth(): void
     {
-        $this->get('/edu/result/history')->assertRedirect('/login');
+        $this->get('/edu/result/history')->assertRedirect('/wp-login.php');
     }
 
     public function test_filter_by_class_year(): void
@@ -176,7 +177,7 @@ class CoachHistoryTest extends TestCase
         ]);
 
         // Filter for 2025 only
-        $response = $this->actingAs($coach, 'web')
+        $response = $this->actingAs($coach, 'wp')
             ->get('/edu/result/history?class_year=2025');
 
         $response->assertOk();
@@ -184,7 +185,7 @@ class CoachHistoryTest extends TestCase
         $response->assertDontSee('Butterfly');
 
         // Filter for 2024 only
-        $response = $this->actingAs($coach, 'web')
+        $response = $this->actingAs($coach, 'wp')
             ->get('/edu/result/history?class_year=2024');
 
         $response->assertOk();
