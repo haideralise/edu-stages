@@ -1,6 +1,6 @@
-# P3 Integration Diffs v2 — Against Current Staging (9 Apr 2026)
+# P3 Integration Diffs v2 — Against Current Staging (Updated 17 Apr 2026)
 
-> **Base:** Current staging snapshot (P1 baseline + P2 Stage 2, downloaded 9 Apr 2026)
+> **Base:** Current staging snapshot (P1 baseline + P2 Stage 2, last verified 17 Apr 2026)
 > **Target:** Staging + P3 additions only (all P1/P2 code preserved)
 > **EduResult.php:** Skipped — P2 already has the relationships P3 needs (`student()`, `eduClass()`)
 
@@ -170,6 +170,8 @@
 
 ### 4. `app/Providers/AppServiceProvider.php`
 
+> Note: Diff is against 17 Apr staging which has 14 P2 singletons. Our version preserves all 14 and adds P3's Gate/Policy registrations.
+
 ```diff
 --- a/app/Providers/AppServiceProvider.php
 +++ b/app/Providers/AppServiceProvider.php
@@ -184,17 +186,23 @@
 +use App\Policies\ResultPolicy;
  use App\Services\AttendanceService;
  use App\Services\ClassService;
+ use App\Services\ClassStudentListService;
++use App\Services\CoachBonusReportService;
  use App\Services\Common\AttendanceSummaryService;
-@@ -11,6 +16,7 @@
+ use App\Services\Common\ClassMonthFacade;
+ use App\Services\Common\ClassStudentQueryService;
+ use App\Services\Common\CoachBonusCalculationService;
+ use App\Services\Common\CoachEntranceFeeService;
+ use App\Services\Common\DistrictManagementService;
  use App\Services\Common\StudentFeeServiceCommon;
  use App\Services\Common\StudentPaymentServiceCommon;
+ use App\Services\PrivateClassService;
  use App\Services\StudentOrderService;
 +use Illuminate\Support\Facades\Gate;
  use Illuminate\Support\ServiceProvider;
 
  class AppServiceProvider extends ServiceProvider
-@@ -36,6 +42,14 @@
-      */
+@@ -42,6 +47,14 @@
      public function boot(): void
      {
 -        //

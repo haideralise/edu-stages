@@ -1,4 +1,4 @@
-# P3 Full Integration — P1 + P2 + P3 Merged (9 Apr 2026)
+# P3 Full Integration — P1 + P2 + P3 Merged (Updated 17 Apr 2026)
 
 > **Branch:** `p3-full-integration`
 > **Base:** P3 `main` (PR #7 merged)
@@ -11,7 +11,7 @@
 | # | File | What was added | Source |
 |---|------|---------------|--------|
 | 1 | `routes/api.php` | `/user` endpoint, `/auth/token` route | P1 |
-| 2 | `app/Providers/AppServiceProvider.php` | 9 service singletons in `register()` | P2 |
+| 2 | `app/Providers/AppServiceProvider.php` | 14 service singletons in `register()` | P2 |
 | 3 | `app/Http/Controllers/Api/AuthController.php` | `issue()` (PWA cookie → token), `checkPassword()` (WP multi-format), `ApiResponse` trait | P1 |
 | 4 | `app/Models/WpUser.php` | `HasFactory`, `getAuthIdentifierName()`, `getAuthIdentifier()`, `getAuthPassword()`, `isAdmin()`, `isCoach()` | P1 |
 | 5 | `app/Models/EduBmi.php` | `$primaryKey` | P1 |
@@ -42,7 +42,7 @@
 - **`EduBmi.php`** — explicit `$primaryKey = 'id'`
 
 ### From P2 (admin features — Stage 2)
-- **`AppServiceProvider.php`** — 9 service singletons: `StudentOrderService`, `CoachBonusCalculationService`, `ClassService`, `AttendanceSummaryService`, `ClassMonthFacade`, `ClassStudentQueryService`, `StudentFeeServiceCommon`, `StudentPaymentServiceCommon`, `AttendanceService`
+- **`AppServiceProvider.php`** — 14 service singletons: `StudentOrderService`, `CoachBonusCalculationService`, `ClassService`, `AttendanceSummaryService`, `ClassMonthFacade`, `ClassStudentQueryService`, `StudentFeeServiceCommon`, `StudentPaymentServiceCommon`, `AttendanceService`, `ClassStudentListService`, `CoachBonusReportService`, `CoachEntranceFeeService`, `DistrictManagementService`, `PrivateClassService`
 - **`EduClass.php`** — `HasFactory`, `$fillable`, `$incrementing = false`, `scopeByYear()`, `scopeByDistrict()` (P3 adds null-safe variants `scopeForYear()`/`scopeForDistrict()` alongside these)
 - **`EduClassUser.php`** — `$primaryKey`, `$fillable`, `scopeForCoach()` (whereJsonContains), `scopeWhereAnyRoleJsonLike()` (P3 adds `scopeWhereTeacher()`, `studentIdsForTeacher()`, `allTeacherIds()` alongside these)
 - **`EduLevel.php`** — `HasFactory`, `$fillable`, `$primaryKey`, `getParsedDataAttribute()`, `scopeRoots()`, `scopeChildrenOf()` (P3 adds `descendants()`, `getTree()` alongside these)
