@@ -10,12 +10,17 @@ use App\Policies\ResultPolicy;
 // from P2
 use App\Services\AttendanceService;
 use App\Services\ClassService;
+use App\Services\ClassStudentListService;
+use App\Services\CoachBonusReportService;
 use App\Services\Common\AttendanceSummaryService;
 use App\Services\Common\ClassMonthFacade;
 use App\Services\Common\ClassStudentQueryService;
 use App\Services\Common\CoachBonusCalculationService;
+use App\Services\Common\CoachEntranceFeeService;
+use App\Services\Common\DistrictManagementService;
 use App\Services\Common\StudentFeeServiceCommon;
 use App\Services\Common\StudentPaymentServiceCommon;
+use App\Services\PrivateClassService;
 use App\Services\StudentOrderService;
 // end from P2
 use Illuminate\Support\Facades\Gate;
@@ -35,6 +40,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(StudentFeeServiceCommon::class);
         $this->app->singleton(StudentPaymentServiceCommon::class);
         $this->app->singleton(AttendanceService::class);
+        $this->app->singleton(ClassStudentListService::class);
+        $this->app->singleton(CoachBonusReportService::class);
+        $this->app->singleton(CoachEntranceFeeService::class);
+        $this->app->singleton(DistrictManagementService::class);
+        $this->app->singleton(PrivateClassService::class);
         // ── end from P2 ─────────────────────────────────────────
     }
 
