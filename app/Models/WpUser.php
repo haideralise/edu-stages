@@ -98,7 +98,8 @@ class WpUser extends Authenticatable
         }
 
         $isCoach = EduClassUser::whereRaw(
-            'JSON_CONTAINS(teacher, ?)', [json_encode((string) $this->ID)]
+            "teacher IS NOT NULL AND teacher != '' AND JSON_CONTAINS(teacher, ?)",
+            [json_encode((string) $this->ID)]
         )->exists();
 
         return $isCoach ? 'coach' : 'student';

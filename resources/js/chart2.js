@@ -5,6 +5,7 @@ if (!container) throw new Error('#chart2-container not found');
 
 let userId = container.dataset.userId;
 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+const basePath = container.dataset.basePath || '';
 
 let chart = echarts.init(container);
 let currentType = 'bmi';
@@ -41,9 +42,8 @@ async function loadChart(type) {
 
     try {
         const isResult = type === 'result';
-        const url = isResult
-            ? `/api/chart2/result/${userId}`
-            : `/api/chart2/bmi/${userId}?type=${type}`;
+        const dataUrl = container.dataset.dataUrl;
+        const url = `${dataUrl}?type=${type}&user_id=${userId}`;
 
         const res = await fetch(url, {
             headers: {

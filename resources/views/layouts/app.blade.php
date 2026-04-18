@@ -37,10 +37,7 @@
                 @php $role = auth()->user()->resolveRole(); @endphp
                 <div class="flex items-center gap-4 text-sm">
                     <span class="text-gray-600">{{ auth()->user()->display_name }} ({{ $role }})</span>
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
-                        @csrf
-                        <button type="submit" class="text-red-500 hover:underline">Logout</button>
-                    </form>
+                    <a href="/wp-login.php?action=logout" class="text-red-500 hover:underline">Logout</a>
                 </div>
             @endauth
         </div>
@@ -101,12 +98,9 @@
                 @endif
 
                 <div class="border-t mt-2 pt-2">
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="sidebar-link w-full text-left text-red-500 hover:text-red-600">
-                            Logout
-                        </button>
-                    </form>
+                    <a href="/wp-login.php?action=logout" class="sidebar-link text-red-500 hover:text-red-600">
+                        Logout
+                    </a>
                 </div>
             </nav>
         </aside>

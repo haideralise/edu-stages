@@ -24,6 +24,7 @@ use App\Services\PrivateClassService;
 use App\Services\StudentOrderService;
 // end from P2
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -50,6 +51,11 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // P1's index.php strips /edu from REQUEST_URI and resets SCRIPT_NAME,
+        // causing Laravel's UrlGenerator to compute the wrong root URL.
+        // Force it to use APP_URL so route() generates correct /edu/edu/… paths.
+        URL::forceRootUrl(config('app.url'));
+
         Gate::policy(EduBmi::class, BmiPolicy::class);
         Gate::policy(EduResult::class, ResultPolicy::class);
 

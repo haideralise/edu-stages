@@ -76,7 +76,10 @@ class EduClassUser extends Model
 
     public function scopeWhereTeacher(Builder $query, int $userId): Builder
     {
-        return $query->whereRaw('JSON_CONTAINS(teacher, ?)', [json_encode((string) $userId)]);
+        return $query->whereRaw(
+            "teacher IS NOT NULL AND teacher != '' AND JSON_CONTAINS(teacher, ?)",
+            [json_encode((string) $userId)]
+        );
     }
 
     // ── Query helpers (P3) ────────────────────────────────────────

@@ -33,4 +33,5 @@ Route::middleware(['web', 'auth.wp'])->prefix('edu/account')->group(function () 
 
     // chart2 — Student growth chart
     Route::get('/chart2', [StudentChartController::class, 'index'])->name('account.chart2');
+    Route::get('/chart2/data', [StudentChartController::class, 'chartData'])->name('account.chart2.data');
 });

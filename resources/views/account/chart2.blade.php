@@ -27,6 +27,7 @@
 <div class="bg-white rounded shadow p-4">
     <div id="chart2-container"
          data-user-id="{{ $isAdmin && $students->isNotEmpty() ? $students->first()->ID : $user->ID }}"
+         data-data-url="{{ route('account.chart2.data') }}"
          style="width: 100%; height: 500px;">
     </div>
 </div>
