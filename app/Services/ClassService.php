@@ -13,7 +13,7 @@ use App\Models\EduUser;
 use App\Models\WpTermTaxonomy;
 use App\Models\WpUser;
 use App\Services\Common\ArrayServiceCommon;
-use App\Services\Common\AttendanceQueryService;
+use App\Services\AttendanceQueryService;
 use App\Services\Common\ClassesServiceCommon;
 use App\Services\Common\DateDayWeekService;
 use App\Services\Common\JsonService;

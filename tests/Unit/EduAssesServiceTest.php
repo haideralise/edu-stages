@@ -96,9 +96,8 @@ class EduAssesServiceTest extends TestCase
         $this->assertEquals('遊泳時間', $updated->name);
         $this->assertEquals('path/to/file.pdf', $updated->file_level);
 
-        $data = json_decode($updated->data, true);
-        $this->assertEquals('number', $data['type']);
-        $this->assertEquals(1, $data['required']);
+        $this->assertEquals('number', $updated->data['type']);
+        $this->assertEquals(1, $updated->data['required']);
     }
 
     #[Test]

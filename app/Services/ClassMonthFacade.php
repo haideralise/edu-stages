@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Services\Common;
+namespace App\Services;
 
 use App\Models\WpUser;
 use App\Services\ClassService;
+use App\Services\Common\AttendanceSummaryService;
+use App\Services\Common\RequestCacheTrait;
 
 /**
  * Ported from edu2/services/Common/ClassMonthFacade.php (10eng §1).

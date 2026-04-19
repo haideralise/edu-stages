@@ -4,6 +4,7 @@ namespace App\Services\Common;
 
 use App\Models\EduClass;
 use App\Models\EduClassUser;
+use App\Services\AttendanceQueryService;
 use Illuminate\Support\Facades\Cache;
 
 /**

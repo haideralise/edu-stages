@@ -2,6 +2,7 @@
 
 namespace App\Services\Common;
 
+use App\Services\AttendanceQueryService;
 use Illuminate\Support\Facades\Log;
 
 /**

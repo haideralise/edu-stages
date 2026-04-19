@@ -1,11 +1,14 @@
 <?php
 // version 1.0.0, create 19-11-2025
-namespace App\Services\Common;
+namespace App\Services;
 
 use App\Models\EduAttendance;
 use App\Models\EduClass;
 use App\Models\EduClassUser;
 use App\Models\EduClassUserDays;
+use App\Services\Common\ArrayServiceCommon;
+use App\Services\Common\DateDayWeekService;
+use App\Services\Common\JsonService;
 
 class AttendanceQueryService
 {

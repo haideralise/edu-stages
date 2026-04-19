@@ -12,7 +12,7 @@ use App\Models\EduClassUser;
 use App\Models\EduClassUserDays;
 use App\Models\EduOrder;
 use App\Models\WpUser;
-use App\Services\Common\AttendanceQueryService;
+use App\Services\AttendanceQueryService;
 
 class ClassStudentListService
 {

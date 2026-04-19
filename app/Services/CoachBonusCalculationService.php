@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Services\Common;
+namespace App\Services;
+
+use App\Services\Common\CoachBonusSupportService;
 
 class CoachBonusCalculationService
 {

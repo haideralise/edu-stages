@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
         $this->seedUsers();
         $this->seedClasses();
         $this->seedClassUsers();
+        $this->seedBmi();
+        $this->seedResults();
+        $this->seedLevels();
     }
 
     // ── Users ────────────────────────────────────────────────────
@@ -28,41 +31,41 @@ class DatabaseSeeder extends Seeder
         $pass = Hash::make('password');
 
         // Admin
-        $this->adminId = DB::table('wp_3x_users')->insertGetId([
+        $this->adminId = DB::table('users')->insertGetId([
             'user_login'    => 'admin',
             'user_pass'     => $pass,
             'user_nicename' => 'admin',
             'user_email'    => 'admin@edu.test',
             'display_name'  => 'Admin User',
         ]);
-        DB::table('wp_3x_usermeta')->insert([
+        DB::table('usermeta')->insert([
             'user_id'    => $this->adminId,
             'meta_key'   => 'wp_3x_capabilities',
             'meta_value' => serialize(['administrator' => true]),
         ]);
 
         // Coach Lee
-        $this->coachLeeId = DB::table('wp_3x_users')->insertGetId([
+        $this->coachLeeId = DB::table('users')->insertGetId([
             'user_login'    => 'coach_lee',
             'user_pass'     => $pass,
             'user_nicename' => 'coach-lee',
             'user_email'    => 'lee@edu.test',
             'display_name'  => 'Coach Lee',
         ]);
-        DB::table('wp_3x_edu_user')->insert([
+        DB::table('edu_user')->insert([
             'user_id' => $this->coachLeeId, 'note' => 'Senior swimming coach',
             'hourly_wage' => 350.00, 'class_fee' => 0,
         ]);
 
         // Coach Wong
-        $this->coachWongId = DB::table('wp_3x_users')->insertGetId([
+        $this->coachWongId = DB::table('users')->insertGetId([
             'user_login'    => 'coach_wong',
             'user_pass'     => $pass,
             'user_nicename' => 'coach-wong',
             'user_email'    => 'wong@edu.test',
             'display_name'  => 'Coach Wong',
         ]);
-        DB::table('wp_3x_edu_user')->insert([
+        DB::table('edu_user')->insert([
             'user_id' => $this->coachWongId, 'note' => 'Junior swimming coach',
             'hourly_wage' => 280.00, 'class_fee' => 0,
         ]);
@@ -77,14 +80,14 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($students as $s) {
-            $id = DB::table('wp_3x_users')->insertGetId([
+            $id = DB::table('users')->insertGetId([
                 'user_login'    => $s['login'],
                 'user_pass'     => $pass,
                 'user_nicename' => $s['login'],
                 'user_email'    => $s['login'] . '@edu.test',
                 'display_name'  => $s['name'],
             ]);
-            DB::table('wp_3x_edu_user')->insert([
+            DB::table('edu_user')->insert([
                 'user_id' => $id, 'note' => '', 'hourly_wage' => 0, 'class_fee' => $s['fee'],
             ]);
             $this->studentIds[$s['login']] = $id;
@@ -113,7 +116,7 @@ class DatabaseSeeder extends Seeder
             $c['date_month'] = json_encode($c['date_month']);
             $c['class_date'] = json_encode($c['class_date']);
             $c['class_exam'] = json_encode($c['class_exam']);
-            DB::table('wp_3x_edu_class')->insert($c);
+            DB::table('edu_class')->insert($c);
         }
     }
 
@@ -126,7 +129,7 @@ class DatabaseSeeder extends Seeder
         $s    = $this->studentIds;
 
         // Get the first class_id from what we just seeded
-        $firstClassId = DB::table('wp_3x_edu_class')->min('class_id');
+        $firstClassId = DB::table('edu_class')->min('class_id');
 
         $assignments = [
             [
@@ -177,7 +180,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($assignments as $a) {
-            DB::table('wp_3x_edu_class_user')->insert(array_merge([
+            DB::table('edu_class_user')->insert(array_merge([
                 'student_makeup'          => null,
                 'student_transfer'        => null,
                 'student_order'           => null,
@@ -186,5 +189,61 @@ class DatabaseSeeder extends Seeder
                 'history_students_status' => 0,
             ], $a));
         }
+    }
+
+    // ── BMI records ────────────────────────────────────────────────
+
+    private function seedBmi(): void
+    {
+        $s = $this->studentIds;
+        $baseDate = strtotime('2025-01-15');
+
+        $records = [
+            ['user_id' => $s['student_chan'], 'height' => 150, 'weight' => 45, 'hc' => 54, 'bmi' => 20.00, 'date' => $baseDate],
+            ['user_id' => $s['student_chan'], 'height' => 151, 'weight' => 46, 'hc' => 54, 'bmi' => 20.17, 'date' => $baseDate + 86400 * 30],
+            ['user_id' => $s['student_li'],  'height' => 140, 'weight' => 38, 'hc' => 52, 'bmi' => 19.39, 'date' => $baseDate],
+            ['user_id' => $s['student_wong'],'height' => 160, 'weight' => 60, 'hc' => 56, 'bmi' => 23.44, 'date' => $baseDate],
+            ['user_id' => $s['student_lam'], 'height' => 145, 'weight' => 42, 'hc' => 53, 'bmi' => 19.98, 'date' => $baseDate],
+            ['user_id' => $s['student_ng'],  'height' => 155, 'weight' => 50, 'hc' => 55, 'bmi' => 20.81, 'date' => $baseDate],
+        ];
+
+        foreach ($records as $r) {
+            DB::table('edu_bmi')->insert($r);
+        }
+    }
+
+    // ── Result records ────────────────────────────────────────────
+
+    private function seedResults(): void
+    {
+        $s = $this->studentIds;
+        $firstClassId = DB::table('edu_class')->min('class_id');
+
+        $results = [
+            ['class_id' => $firstClassId, 'class_month' => '1月-2月', 'exam_id' => 1, 'user_id' => $s['student_chan'], 'first_name' => 'Chan', 'last_name' => 'Tai Man', 'exam_type' => 'score', 'exam_name' => 'Freestyle', 'exam_data' => '8', 'exam_date' => '2025-01-25', 'class_year' => '2025', 'created' => time(), 'status' => 1],
+            ['class_id' => $firstClassId, 'class_month' => '1月-2月', 'exam_id' => 2, 'user_id' => $s['student_chan'], 'first_name' => 'Chan', 'last_name' => 'Tai Man', 'exam_type' => 'score', 'exam_name' => 'Backstroke', 'exam_data' => '7', 'exam_date' => '2025-01-25', 'class_year' => '2025', 'created' => time(), 'status' => 1],
+            ['class_id' => $firstClassId, 'class_month' => '1月-2月', 'exam_id' => 1, 'user_id' => $s['student_li'],  'first_name' => 'Li',   'last_name' => 'Ka Yan',  'exam_type' => 'score', 'exam_name' => 'Freestyle', 'exam_data' => '9', 'exam_date' => '2025-01-25', 'class_year' => '2025', 'created' => time(), 'status' => 1],
+            ['class_id' => $firstClassId + 2, 'class_month' => '1月-2月', 'exam_id' => 1, 'user_id' => $s['student_ng'], 'first_name' => 'Ng', 'last_name' => 'Chi Wai', 'exam_type' => 'score', 'exam_name' => 'Freestyle', 'exam_data' => '6', 'exam_date' => '2025-01-26', 'class_year' => '2025', 'created' => time(), 'status' => 1],
+        ];
+
+        foreach ($results as $r) {
+            DB::table('edu_result')->insert($r);
+        }
+    }
+
+    // ── Levels (assessment structure) ──────────────────────────────
+
+    private function seedLevels(): void
+    {
+        $lv1Id = DB::table('edu_level')->insertGetId(['pid' => 0, 'name' => '游泳課程']);
+        $lv2Id = DB::table('edu_level')->insertGetId(['pid' => $lv1Id, 'name' => '初級']);
+        DB::table('edu_level')->insert([
+            'pid' => $lv2Id, 'name' => 'Freestyle',
+            'data' => json_encode(['name' => 'Freestyle', 'type' => 'score', 'item' => '', 'required' => 1]),
+        ]);
+        DB::table('edu_level')->insert([
+            'pid' => $lv2Id, 'name' => 'Backstroke',
+            'data' => json_encode(['name' => 'Backstroke', 'type' => 'score', 'item' => '', 'required' => 1]),
+        ]);
     }
 }

@@ -7,8 +7,8 @@
 
 namespace App\Services;
 
-use App\Services\Common\AttendanceQueryService;
-use App\Services\Common\CoachBonusCalculationService;
+use App\Services\AttendanceQueryService;
+use App\Services\CoachBonusCalculationService;
 
 class CoachBonusReportService
 {

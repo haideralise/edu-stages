@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Common;
+namespace App\Services;
 
 use App\Models\EduClass;
 use App\Models\EduClassUser;
@@ -8,6 +8,9 @@ use App\Models\EduOrder;
 use App\Models\WpPostmeta;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\Common\ArrayServiceCommon;
+use App\Services\Common\DateDayWeekService;
+use App\Services\Common\StudentFeeServiceCommon;
 use Throwable;
 
 /**

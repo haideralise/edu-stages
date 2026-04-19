@@ -13,13 +13,13 @@ use App\Services\ClassService;
 use App\Services\ClassStudentListService;
 use App\Services\CoachBonusReportService;
 use App\Services\Common\AttendanceSummaryService;
-use App\Services\Common\ClassMonthFacade;
-use App\Services\Common\ClassStudentQueryService;
-use App\Services\Common\CoachBonusCalculationService;
+use App\Services\ClassMonthFacade;
+use App\Services\ClassStudentQueryService;
+use App\Services\CoachBonusCalculationService;
 use App\Services\Common\CoachEntranceFeeService;
 use App\Services\Common\DistrictManagementService;
 use App\Services\Common\StudentFeeServiceCommon;
-use App\Services\Common\StudentPaymentServiceCommon;
+use App\Services\StudentPaymentServiceCommon;
 use App\Services\PrivateClassService;
 use App\Services\StudentOrderService;
 // end from P2

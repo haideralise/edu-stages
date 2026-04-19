@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Common;
+namespace App\Services;
 
 use App\Models\EduClassUser;
 use App\Models\WpUser;

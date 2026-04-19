@@ -55,7 +55,10 @@ class WpUserGuard implements Guard
 
     public function getRole(): ?string
     {
-        $this->user(); // trigger detection if not done yet
+        $user = $this->user(); // trigger detection if not done yet
+        if ($user instanceof WpUser && $this->role === null) {
+            $this->role = $this->detectRole($user);
+        }
         return $this->role;
     }
 
