@@ -15,10 +15,15 @@ class CoachResultController extends Controller
         $this->authorize('viewAsCoach', EduResult::class);
 
         $user = $request->user();
+        $isAdmin = $user->resolveRole() === 'admin';
 
-        $studentIds = EduClassUser::studentIdsForTeacher($user->ID);
-
-        $results = EduResult::whereIn('user_id', $studentIds->all())->get();
+        if ($isAdmin) {
+            $results = EduResult::all();
+            $studentIds = $results->pluck('user_id')->unique();
+        } else {
+            $studentIds = EduClassUser::studentIdsForTeacher($user->ID);
+            $results = EduResult::whereIn('user_id', $studentIds->all())->get();
+        }
 
         $resultsByStudent = $results->groupBy('user_id');
 
