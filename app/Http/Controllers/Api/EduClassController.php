@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\EduClassUser;
 use App\Services\ClassService;
-use App\Services\Common\DateDayWeekService;
-use App\Services\Common\JsonService;
+use App\Services\DateDayWeekService;
+use App\Services\JsonService;
 use Illuminate\Http\Request;
 
 class EduClassController extends Controller

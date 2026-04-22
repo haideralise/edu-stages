@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Services\AttendanceQueryService;
-use App\Services\Common\AttendanceSummaryService;
+use App\Services\AttendanceSummaryService;
 use App\Services\ClassMonthFacade;
 
 /**

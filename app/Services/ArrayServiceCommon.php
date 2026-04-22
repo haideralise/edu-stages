@@ -3,7 +3,7 @@
 // version 1.6.0, update 26-04-2025
 // version 1.3.0, update 21-04-2025
 // version 1.2.0, update 18-04-2025
-namespace App\Services\Common;
+namespace App\Services;
 
 class ArrayServiceCommon
 {

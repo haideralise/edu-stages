@@ -2,7 +2,7 @@
 
 // Ported from edu2/services/Common/JsonService.php (namespace only)
 
-namespace App\Services\Common;
+namespace App\Services;
 
 class JsonService
 {

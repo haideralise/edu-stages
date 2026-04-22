@@ -42,7 +42,7 @@ Route::middleware('role.coach')->group(function () {
 });
 
 
-Route::middleware(['web', 'auth.wp', 'role.admin'])->prefix('edu')->group(function () {
+Route::middleware(['web', 'auth.wp', 'role.admin'])->group(function () {
 
     // ── Classes (Stage 3 stub — data wired when ClassMonthFacade is ready) ──
     Route::get('classes',              [EduClassController::class, 'index']);
@@ -110,7 +110,7 @@ Route::middleware(['web', 'auth.wp', 'role.admin'])->prefix('edu')->group(functi
 });
 
 
-Route::middleware(['web', 'auth.wp'])->prefix('edu')->group(function () {
+Route::middleware(['web', 'auth.wp'])->group(function () {
 
     // Class detail page — Admin can modify (Group 1 PUT above); Coach is view-only
     // $is_admin passed to view controls edit UI visibility
@@ -120,13 +120,6 @@ Route::middleware(['web', 'auth.wp'])->prefix('edu')->group(function () {
     Route::get('attendance',           [EduAttendanceController::class, 'index']);
 });
 
-// Route::middleware(['web', 'auth.wp', 'role.coach'])->prefix('edu')->group(function () {
+// Route::middleware(['web', 'auth.wp', 'role.coach'])->group(function () {
 //     // result entry, coach_salary (own only) — Stage 3
 // });
-
-// ── P3: Web Login ───────────────────────────────────────────────────
-use App\Http\Controllers\LoginController;
-
-Route::get("/login", [LoginController::class, "showLoginForm"])->name("login");
-Route::post("/login", [LoginController::class, "login"])->name("login.submit");
-Route::post("/logout", [LoginController::class, "logout"])->name("logout");

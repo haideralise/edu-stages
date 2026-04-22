@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Services\Common\CoachBonusSupportService;
+use App\Services\CoachBonusSupportService;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;

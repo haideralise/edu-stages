@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Services\Common\CoachBonusSupportService;
+use App\Services\CoachBonusSupportService;
 
 class CoachBonusCalculationService
 {

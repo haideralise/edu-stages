@@ -62,12 +62,12 @@ class WpUser extends Authenticatable
 
     protected function birthdate(): Attribute
     {
-        return Attribute::get(fn () => $this->getMetaValue('billing_birthdate'));
+        return Attribute::get(fn() => $this->getMetaValue('billing_birthdate'));
     }
 
     protected function gender(): Attribute
     {
-        return Attribute::get(fn () => $this->getMetaValue('billing_gender'));
+        return Attribute::get(fn() => $this->getMetaValue('billing_gender'));
     }
 
     // ── Helpers ──────────────────────────────────────────────────
@@ -97,12 +97,7 @@ class WpUser extends Authenticatable
             }
         }
 
-        $isCoach = EduClassUser::whereRaw(
-            "teacher IS NOT NULL AND teacher != '' AND JSON_CONTAINS(teacher, ?)",
-            [json_encode((string) $this->ID)]
-        )->exists();
-
-        return $isCoach ? 'coach' : 'student';
+        return EduClassUser::forCoach($this->ID)->exists() ? 'coach' : 'student';
     }
 
     // ── from P1 ─────────────────────────────────────────────────
@@ -114,6 +109,24 @@ class WpUser extends Authenticatable
     public function isCoach(): bool
     {
         return $this->resolveRole() === 'coach';
+    }
+
+    /**
+     * Get class IDs where this user appears as a teacher in edu_class_user.
+     * Used by ClassMonthFacade to scope Coach's class list.
+     *
+     * @return array<int>
+     */
+    public function getCoachClassIds(): array
+    {
+        return EduClassUser::whereRaw(
+            "teacher IS NOT NULL AND teacher != '' AND JSON_CONTAINS(teacher, ?)",
+            [json_encode((string) $this->ID)]
+        )
+            ->distinct()
+            ->pluck('class_id')
+            ->map(fn($id) => (int) $id)
+            ->toArray();
     }
     // ── end from P1 ─────────────────────────────────────────────
 }

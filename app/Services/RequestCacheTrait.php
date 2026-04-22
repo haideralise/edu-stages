@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Common;
+namespace App\Services;
 
 /**
  * Request-scoped memoization (same pattern as edu2 RequestCacheTrait).

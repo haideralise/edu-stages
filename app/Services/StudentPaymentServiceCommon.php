@@ -8,9 +8,9 @@ use App\Models\EduOrder;
 use App\Models\WpPostmeta;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Services\Common\ArrayServiceCommon;
-use App\Services\Common\DateDayWeekService;
-use App\Services\Common\StudentFeeServiceCommon;
+use App\Services\ArrayServiceCommon;
+use App\Services\DateDayWeekService;
+use App\Services\StudentFeeServiceCommon;
 use Throwable;
 
 /**

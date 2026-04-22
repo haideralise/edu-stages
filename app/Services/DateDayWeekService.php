@@ -7,7 +7,7 @@
 // version 1.4.0, update 22-04-2025
 // version 1.3.0, update 21-04-2025
 // version 1.2.0, update 18-04-2025
-namespace App\Services\Common;
+namespace App\Services;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
@@ -20,7 +20,7 @@ class DateDayWeekService
         if ($days === null || $days === '') {
             return [];
         }
-        
+
         if (!is_array($days))
         {
             // PHP 8.1+ 兼容：確保不是 null 才調用 explode
@@ -30,12 +30,12 @@ class DateDayWeekService
                 return [];
             }
         }
-        
+
         if (!is_array($month))
         {
             $month = $this->get_array_month($month);
         }
-        
+
         // 如果 month 是空數組，返回空數組
         if (empty($month)) {
             return [];
@@ -47,14 +47,14 @@ class DateDayWeekService
             if (empty($value)) {
                 continue;
             }
-            
+
             // 驗證日期格式
             $timestamp = strtotime($value);
             if ($timestamp === false) {
                 unset($days[$key]);
                 continue;
             }
-            
+
             $n = date('n', $timestamp);
             if (!in_array($n, $month))
             {
@@ -73,12 +73,12 @@ class DateDayWeekService
         if (empty($months) || empty($weeks)) {
             return [];
         }
-        
+
         if (empty($year))
         {
             $year = date('Y');
         }
-        
+
         if (!is_array($months))
         {
             // 驗證月份是否有效
@@ -87,7 +87,7 @@ class DateDayWeekService
             }
             $months = array($months);
         }
-        
+
         if (!is_array($weeks))
         {
             // 驗證星期是否有效
@@ -96,12 +96,12 @@ class DateDayWeekService
             }
             $weeks = array($weeks);
         }
-        
+
         // 如果數組為空，返回空數組
         if (empty($months) || empty($weeks)) {
             return [];
         }
-        
+
         $dates = array();
         foreach ($months as $month)
         {
@@ -109,7 +109,7 @@ class DateDayWeekService
             if (empty($month) || !is_numeric($month) || $month < 1 || $month > 12) {
                 continue;
             }
-            
+
             $day_count = $this->get_days_in_month($month, $year);
             for ($day = 1; $day <= $day_count; $day++)
             {
@@ -129,17 +129,17 @@ class DateDayWeekService
         if (empty($input) || (!is_string($input) && !is_numeric($input))) {
             return [];
         }
-        
+
         // 確保輸入是字符串
         $input = (string)$input;
-        
+
         preg_match_all('/(\d{1,2})月/', $input, $matches);
-        
+
         // 如果沒有匹配結果，返回空數組
         if (empty($matches[1])) {
             return [];
         }
-        
+
         $rt = $matches[1];
         return array_unique($rt);
     }
@@ -148,7 +148,7 @@ class DateDayWeekService
      * 检查订单月份是否与班级月份匹配
      * 支持单月（如"9月"）和跨月格式（如"9月-10月"）
      * 统一替代 isMonthMatchedForClassMonth 和 isMonthMatchedLocal
-     * 
+     *
      * @param string $order_month 订单月份
      * @param string $class_month 班级月份
      * @return bool 是否匹配
@@ -158,16 +158,16 @@ class DateDayWeekService
         if (empty($order_month) || empty($class_month)) {
             return false;
         }
-        
+
         // 精确匹配
         if ($order_month === $class_month) {
             return true;
         }
-        
+
         // 解析订单月份和班级月份为数组
         $order_months = $this->get_array_month($order_month);
         $class_months = $this->get_array_month($class_month);
-        
+
         // 检查是否有交集
         $intersection = array_intersect($order_months, $class_months);
         return !empty($intersection);
@@ -176,7 +176,7 @@ class DateDayWeekService
     /**
      * 解析月份范围为数组，并返回年份映射
      * 支持跨年处理（如"12月-1月"）
-     * 
+     *
      * @param string $month_range 月份范围（如"9月"或"11月-12月"或"12月-1月"）
      * @param int $year 基准年份
      * @return array ['months' => [...], 'year_map' => [...]]
@@ -185,12 +185,12 @@ class DateDayWeekService
     {
         $months = [];
         $year_map = [];
-        
+
         if (strpos($month_range, '-') !== false) {
             list($start_text, $end_text) = explode('-', $month_range);
             $start_num = intval(str_replace('月', '', trim($start_text)));
             $end_num = intval(str_replace('月', '', trim($end_text)));
-            
+
             if ($end_num < $start_num) {
                 // 跨年，如 12月-1月
                 for ($m = $start_num; $m <= 12; $m++) {
@@ -214,7 +214,7 @@ class DateDayWeekService
             $months = [$month_text];
             $year_map[$month_text] = $year;
         }
-        
+
         return ['months' => $months, 'year_map' => $year_map];
     }
 
@@ -224,22 +224,22 @@ class DateDayWeekService
         if (empty($input) || !is_string($input)) {
             return [];
         }
-        
+
         // 執行正則匹配
         $matched = preg_match('/星期([一二三四五六天日、]+)/u', $input, $matches);
-        
+
         // 如果匹配失敗或沒有捕獲組，返回空數組
         if (!$matched || !isset($matches[1])) {
             return [];
         }
-        
+
         $week = $matches[1];
-        
+
         // 處理 explode 的 null 輸入（PHP 8.1+ 兼容）
         if (empty($week)) {
             return [];
         }
-        
+
         $week = explode('、', $week);
         $week_mapping = array(
             '一' => 1,
@@ -314,7 +314,7 @@ class DateDayWeekService
         if (empty($month)) {
             return false;
         }
-        
+
         if (empty($now_month))
         {
             $now_month = time();
@@ -418,7 +418,7 @@ class DateDayWeekService
         // Extract only the part that includes "星期" and the days
         $matches = [];
         preg_match('/星期([一二三四五六日天,]+)/u', $weekdayPart, $matches);
-        
+
         if (!isset($matches[1])) {
             return [];
         }
@@ -671,7 +671,7 @@ class DateDayWeekService
         if (empty($timeRange) || !is_string($timeRange)) {
             return '';
         }
-        
+
         // 使用正則表達式提取時間部分：匹配格式如 "8:30am-9:30pm"
         // 格式：\d{1,2}:\d{2}(am|pm)-\d{1,2}:\d{2}(am|pm)
         if (preg_match('/(\d{1,2}:\d{2}(?:am|pm))\s*-\s*(\d{1,2}:\d{2}(?:am|pm))/i', $timeRange, $matches)) {
@@ -684,18 +684,18 @@ class DateDayWeekService
                 error_log("[time_range] 無法解析時間字符串格式: {$timeRange}");
                 return '';
             }
-            
+
             // 清理每個部分，移除中文字符和非時間字符
             $startTime = preg_replace('/[^\d:amp]/i', '', trim($parts[0]));
             $endTime = preg_replace('/[^\d:amp]/i', '', trim($parts[1]));
         }
-        
+
         // 驗證時間格式
         if (empty($startTime) || empty($endTime)) {
             error_log("[time_range] 時間字符串為空: startTime={$startTime}, endTime={$endTime}, original={$timeRange}");
             return '';
         }
-        
+
         try {
             $start = new \DateTime($startTime);
             $end = new \DateTime($endTime);
@@ -704,7 +704,7 @@ class DateDayWeekService
             error_log("[time_range] 無法解析時間字符串: startTime={$startTime}, endTime={$endTime}, original={$timeRange}, error=" . $e->getMessage());
             return '';
         }
-        
+
         $now = new \DateTime();
         if ($end <= new \DateTime('12:00pm')) {
             return 'morning';
@@ -781,7 +781,7 @@ class DateDayWeekService
         $rt = substr($rt, 0, '-1');
         return $rt;
     }
-    
+
     function get_class_year($order_date, $class_month)
     {
         if (!is_numeric($order_date)) {

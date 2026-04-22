@@ -32,9 +32,6 @@ class WpUserGuard implements Guard
         if (!$cookieName || empty($_COOKIE[$cookieName])) {
             return null;
         }
-        if (!$cookieName || empty($_COOKIE[$cookieName])) {
-            return null;
-        }
 
         $user = $this->validateWpCookie($_COOKIE[$cookieName]);
 
@@ -53,9 +50,10 @@ class WpUserGuard implements Guard
         return false; // Not used; we rely on WP cookie
     }
 
+    // P3: lazy-detect role when user is set via actingAs() in tests (bypasses user() method)
     public function getRole(): ?string
     {
-        $user = $this->user(); // trigger detection if not done yet
+        $user = $this->user();
         if ($user instanceof WpUser && $this->role === null) {
             $this->role = $this->detectRole($user);
         }
@@ -159,14 +157,14 @@ class WpUserGuard implements Guard
             $key
         );
 
-        // if (!hash_equals($expected, $hmac)) {
-        //     return null;
-        // }
+        if (!hash_equals($expected, $hmac)) {
+            return null;
+        }
 
-        // // 7. Verify session token (VERY IMPORTANT)
-        // if (!$this->verifySessionToken($user, $token)) {
-        //     return null;
-        // }
+        // 7. Verify session token (VERY IMPORTANT)
+        if (!$this->verifySessionToken($user, $token)) {
+            return null;
+        }
 
         return $user;
     }

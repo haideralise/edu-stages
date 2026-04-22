@@ -6,9 +6,9 @@ use App\Models\EduAttendance;
 use App\Models\EduClass;
 use App\Models\EduClassUser;
 use App\Models\EduClassUserDays;
-use App\Services\Common\ArrayServiceCommon;
-use App\Services\Common\DateDayWeekService;
-use App\Services\Common\JsonService;
+use App\Services\ArrayServiceCommon;
+use App\Services\DateDayWeekService;
+use App\Services\JsonService;
 
 class AttendanceQueryService
 {

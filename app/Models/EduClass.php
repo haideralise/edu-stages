@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory; // from P2
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany; // from P2
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class EduClass extends Model
 {
-    use HasFactory; // from P2
+    use HasFactory;
 
     protected $table = 'edu_class';
 
@@ -17,9 +17,8 @@ class EduClass extends Model
 
     public $timestamps = false;
 
-    public $incrementing = false; // from P2
+    public $incrementing = false;
 
-    // from P2
     protected $fillable = [
         'class_id',
         'class_name',
@@ -33,7 +32,6 @@ class EduClass extends Model
         'lv3',
         'class_year',
     ];
-    // end from P2
 
     protected function casts(): array
     {
@@ -46,44 +44,40 @@ class EduClass extends Model
         ];
     }
 
-    // ── Relationships ────────────────────────────────────────────
+    // ---------------------------------------------------------------
+    // Scopes
+    // ---------------------------------------------------------------
 
-    public function classUsers(): HasMany // type hint from P2
-    {
-        return $this->hasMany(EduClassUser::class, 'class_id', 'class_id');
-    }
-
-    // ── Scopes from P2 ──────────────────────────────────────────
-
-    public function scopeByYear(Builder $query, string $year): Builder // from P2
+    public function scopeByYear(Builder $query, string $year): Builder
     {
         return $query->where('class_year', $year);
     }
 
-    public function scopeByDistrict(Builder $query, int|array $districtId): Builder // from P2
+    public function scopeByDistrict(Builder $query, int|array $districtId): Builder
     {
         return is_array($districtId)
             ? $query->whereIn('district_id', $districtId)
             : $query->where('district_id', $districtId);
     }
 
-    // ── Scopes (P3 — null-safe variants) ────────────────────────
+    // P3: scope alias for API ClassListController — filters by district_id, skips null
+    public function scopeForDistrict(Builder $query, ?int $districtId): Builder
+    {
+        return $districtId ? $query->where('district_id', $districtId) : $query;
+    }
 
+    // P3: scope alias for API ClassListController — filters by class_year, skips null
     public function scopeForYear(Builder $query, ?string $year): Builder
     {
         return $year ? $query->where('class_year', $year) : $query;
     }
 
-    public function scopeForDistrict(Builder $query, null|int|array $districtId): Builder
+    // ---------------------------------------------------------------
+    // Relationships
+    // ---------------------------------------------------------------
+
+    public function classUsers(): HasMany
     {
-        if (is_null($districtId)) {
-            return $query;
-        }
-
-        if (is_array($districtId)) {
-            return $query->whereIn('district_id', $districtId);
-        }
-
-        return $query->where('district_id', $districtId);
+        return $this->hasMany(EduClassUser::class, 'class_id', 'class_id');
     }
 }

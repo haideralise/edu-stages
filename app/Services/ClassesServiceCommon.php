@@ -1,7 +1,9 @@
 <?php
 // version 2.0.7, update 22-06-2025
 // version 1.2.0, update 18-04-2025
-namespace App\Services\Common;
+namespace App\Services;
+
+use App\Services\DateDayWeekService;
 
 class ClassesServiceCommon
 {
@@ -133,14 +135,14 @@ class ClassesServiceCommon
         // Get current day of week (0=Sunday, 6=Saturday)
         $currentDay = date('w');
         $currentTime = date('H:i');
-        
+
         // Chinese weekday names in order (Sunday to Saturday)
         $weekdayNames = ['日', '一', '二', '三', '四', '五', '六'];
-        
+
         // Extract day and time from class names
         foreach ($classes as &$class) {
             $className = $class['class_name'];
-            
+
             // Find the weekday in the class name
             $dayIndex = null;
             foreach ($weekdayNames as $index => $dayName) {
@@ -149,23 +151,23 @@ class ClassesServiceCommon
                     break;
                 }
             }
-            
+
             // Find the time in the class name (assuming format like "7:00pm")
             preg_match('/(\d{1,2}:\d{2})(am|pm)/i', $className, $timeMatches);
             $time = !empty($timeMatches) ? $timeMatches[1] . $timeMatches[2] : '12:00am';
             $time24 = date('H:i', strtotime($time));
-            
+
             $class['_sort_day'] = $dayIndex;
             $class['_sort_time'] = $time24;
         }
         unset($class);
-        
+
         // Custom sorting
         usort($classes, function($a, $b) use ($currentDay, $currentTime) {
             // Compare days relative to today
             $aDayDiff = ($a['_sort_day'] - $currentDay + 7) % 7;
             $bDayDiff = ($b['_sort_day'] - $currentDay + 7) % 7;
-            
+
             // Same day - sort by time (future times first, then past times)
             if ($aDayDiff === $bDayDiff) {
                 if ($aDayDiff === 0) {
@@ -180,11 +182,11 @@ class ClassesServiceCommon
                 // Then sort by time ascending
                 return strcmp($a['_sort_time'], $b['_sort_time']);
             }
-            
+
             // Different days - sort by day difference
             return $aDayDiff - $bDayDiff;
         });
-        
+
         return $classes;
     }
 }
