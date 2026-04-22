@@ -11,8 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Default Laravel users table removed — the WP-style users table
-        // is created in the edu tables migration instead.
+        Schema::create('users', function (Blueprint $table) {
+            $table->bigIncrements('ID');
+            $table->string('user_login', 60)->default('')->index();
+            $table->string('user_pass', 255)->default('');
+            $table->string('user_nicename', 50)->default('');
+            $table->string('user_email', 100)->default('')->index();
+            $table->string('user_url', 100)->default('');
+            $table->dateTime('user_registered')->useCurrent();
+            $table->string('user_activation_key', 255)->default('');
+            $table->integer('user_status')->default(0);
+            $table->string('display_name', 250)->default('');
+        });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
@@ -35,6 +45,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }

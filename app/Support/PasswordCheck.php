@@ -8,6 +8,15 @@ class PasswordCheck
 {
     public static function verify(string $password, string $hash): bool
     {
+        // WordPress 6.8+ bcrypt ($wp$2y$ prefix — HMAC-SHA384 before bcrypt)
+        if (str_starts_with($hash, '$wp$')) {
+            $passwordToVerify = base64_encode(
+                hash_hmac('sha384', $password, 'wp-sha384', true)
+            );
+
+            return password_verify($passwordToVerify, substr($hash, 3));
+        }
+
         // Bcrypt
         if (str_starts_with($hash, '$2y$') || str_starts_with($hash, '$2a$')) {
             return Hash::check($password, $hash);

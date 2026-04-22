@@ -6,6 +6,7 @@ use App\Http\Requests\WebLoginRequest;
 use App\Models\WpUser;
 use App\Support\PasswordCheck;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 

@@ -3,7 +3,6 @@
 .env
 .env.backup
 .env.production
-.env.testing
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -23,3 +22,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+storage/debugbar/
+build
+public/assets/

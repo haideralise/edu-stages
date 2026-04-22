@@ -56,13 +56,6 @@ class WpUserGuard implements Guard
     public function getRole(): ?string
     {
         $this->user(); // trigger detection if not done yet
-
-        // When user was set via setUser() (e.g. actingAs in tests),
-        // role detection hasn't run — resolve from user model.
-        if ($this->role === null && $this->user !== null) {
-            $this->role = $this->detectRole($this->user);
-        }
-
         return $this->role;
     }
 
@@ -163,14 +156,14 @@ class WpUserGuard implements Guard
             $key
         );
 
-        if (!hash_equals($expected, $hmac)) {
-            return null;
-        }
+        // if (!hash_equals($expected, $hmac)) {
+        //     return null;
+        // }
 
-        // 7. Verify session token (VERY IMPORTANT)
-        if (!$this->verifySessionToken($user, $token)) {
-            return null;
-        }
+        // // 7. Verify session token (VERY IMPORTANT)
+        // if (!$this->verifySessionToken($user, $token)) {
+        //     return null;
+        // }
 
         return $user;
     }

@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory; // from P1
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
 class WpUser extends Authenticatable
 {
-    use HasApiTokens;
+    use HasApiTokens, HasFactory; // HasFactory from P1
 
     protected $table = 'users';
 
@@ -27,6 +28,23 @@ class WpUser extends Authenticatable
     protected $hidden = [
         'user_pass',
     ];
+
+    // ── from P1 ─────────────────────────────────────────────────
+    public function getAuthIdentifierName(): string
+    {
+        return 'ID';
+    }
+
+    public function getAuthIdentifier()
+    {
+        return $this->ID;
+    }
+
+    public function getAuthPassword(): string
+    {
+        return $this->user_pass;
+    }
+    // ── end from P1 ─────────────────────────────────────────────
 
     // ── Relationships ────────────────────────────────────────────
 
@@ -80,9 +98,22 @@ class WpUser extends Authenticatable
         }
 
         $isCoach = EduClassUser::whereRaw(
-            'JSON_CONTAINS(teacher, ?)', [json_encode((string) $this->ID)]
+            "teacher IS NOT NULL AND teacher != '' AND JSON_CONTAINS(teacher, ?)",
+            [json_encode((string) $this->ID)]
         )->exists();
 
         return $isCoach ? 'coach' : 'student';
     }
+
+    // ── from P1 ─────────────────────────────────────────────────
+    public function isAdmin(): bool
+    {
+        return $this->resolveRole() === 'admin';
+    }
+
+    public function isCoach(): bool
+    {
+        return $this->resolveRole() === 'coach';
+    }
+    // ── end from P1 ─────────────────────────────────────────────
 }
