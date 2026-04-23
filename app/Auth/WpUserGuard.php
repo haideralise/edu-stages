@@ -22,6 +22,11 @@ class WpUserGuard implements Guard
         $this->request  = $request;
     }
 
+public function viaRemember(): bool
+{
+    return false;
+}
+
     public function user()
     {
         if ($this->user !== null) {

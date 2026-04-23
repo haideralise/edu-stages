@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
-use App\Support\BmiForAge;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Builder;
+use App\Support\BmiForAge;
 class EduBmi extends Model
 {
     protected $table = 'edu_bmi';
@@ -27,11 +26,6 @@ class EduBmi extends Model
     protected function casts(): array
     {
         return [
-            'user_id' => 'integer',
-            'height' => 'float',
-            'weight' => 'float',
-            'hc' => 'float',
-            'bmi' => 'float',
             'date' => 'integer',
         ];
     }

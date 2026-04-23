@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\EduClass;
 use App\Models\EduOrder;
-use App\Services\EduOrdersService;
+use App\Services\EduOrderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -13,7 +13,7 @@ class EduOrdersServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    private EduOrdersService $service;
+    private EduOrderService $service;
 
     private array $validData = [
         'class_id'   => 1,
@@ -27,7 +27,7 @@ class EduOrdersServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new EduOrdersService();
+        $this->service = new EduOrderService();
 
         EduClass::create([
             'class_id'    => 1,

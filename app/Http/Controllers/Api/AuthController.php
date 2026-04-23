@@ -5,50 +5,29 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Models\WpUser;
-// from P1
-use App\Services\PasswordHash;
-// end from P1
-use App\Support\PasswordCheck;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
     use ApiResponse;
 
-    // ── from P1: PWA cookie → Sanctum Bearer token ──────────────
-    public function issue(Request $request)
-    {
-        $guard = auth('wp');
-
-        if (!$guard->check()) {
-            return response()->json([
-                'message' => 'Unauthorized',
-                'code'    => 'UNAUTHORIZED',
-            ], 401);
-        }
-
-        $user       = $guard->user();
-        $expiration = now()->addDays(7);
-        $token      = $user->createToken('pwa-token', ['*'], $expiration);
-
-        return response()->json([
-            'data' => [
-                'token'      => $token->plainTextToken,
-                'expires_at' => $expiration->toISOString(),
-            ],
-        ]);
-    }
-    // ── end from P1 ─────────────────────────────────────────────
-
+    /**
+     * Issue a Sanctum token for WP user credentials.
+     *
+     * Doc 08 describes a WP-cookie guard for browser sessions; this endpoint
+     * serves API/mobile clients using Sanctum tokens instead. Both share the
+     * same WpUser model backed by wp_3x_users.
+     */
     public function login(LoginRequest $request): JsonResponse
     {
         $user = WpUser::where('user_login', $request->input('user_login'))
             ->orWhere('user_email', $request->input('user_login'))
             ->first();
 
-        if (! $user || ! PasswordCheck::verify($request->input('password'), $user->user_pass)) {
+        if (! $user || ! $this->checkPassword($request->input('password'), $user->user_pass)) {
             return $this->error('Unauthorized', 'UNAUTHORIZED', 401);
         }
 
@@ -57,7 +36,7 @@ class AuthController extends Controller
         $token = $user->createToken('api')->plainTextToken;
 
         return $this->success([
-            'user' => $this->formatUser($user),
+            'user'  => $this->formatUser($user),
             'token' => $token,
         ]);
     }
@@ -74,42 +53,79 @@ class AuthController extends Controller
         return $this->success($this->formatUser($request->user()));
     }
 
+    // ── Private ──────────────────────────────────────────────────
+
     private function formatUser(WpUser $user): array
     {
         return [
-            'id' => $user->ID,
-            'user_login' => $user->user_login,
-            'user_email' => $user->user_email,
+            'id'           => $user->ID,
+            'user_login'   => $user->user_login,
+            'user_email'   => $user->user_email,
             'display_name' => $user->display_name,
-            'role' => $user->resolveRole(),
+            'role'         => $user->resolveRole(),
         ];
     }
 
-    // ── from P1: WP multi-format password verification ──────────
+    /**
+     * WP stores passwords as phpass ($P$/$H$), but some may already be
+     * bcrypt if previously migrated. We support both.
+     */
     private function checkPassword(string $password, string $hash): bool
     {
-        // 1. MD5 (very old WP)
-        if (strlen($hash) <= 32) {
+        // Bcrypt — works if WP passwords were rehashed
+        if (str_starts_with($hash, '$2y$') || str_starts_with($hash, '$2a$')) {
+            return Hash::check($password, $hash);
+        }
+
+        // WordPress phpass portable hash ($P$ or $H$)
+        if (str_starts_with($hash, '$P$') || str_starts_with($hash, '$H$')) {
+            return $this->verifyPhpass($password, $hash);
+        }
+
+        // Ancient MD5 fallback (pre-WP 2.5)
+        if (strlen($hash) === 32 && ctype_xdigit($hash)) {
             return hash_equals($hash, md5($password));
         }
 
-        // 2. New WordPress hashing (WP 6.8+ → $wp prefix)
-        if (str_starts_with($hash, '$wp')) {
-            $passwordToVerify = base64_encode(
-                hash_hmac('sha384', $password, 'wp-sha384', true)
-            );
-
-            return password_verify($passwordToVerify, substr($hash, 3));
-        }
-
-        // 3. phpass ($P$ or $H$)
-        if (str_starts_with($hash, '$P$') || str_starts_with($hash, '$H$')) {
-            $hasher = new PasswordHash(8, true);
-            return $hasher->CheckPassword($password, $hash);
-        }
-
-        // 4. Modern bcrypt (or anything else)
-        return password_verify($password, $hash);
+        return false;
     }
-    // ── end from P1 ─────────────────────────────────────────────
+
+    /**
+     * Portable phpass verification — mirrors wp_check_password() internals.
+     */
+    private function verifyPhpass(string $password, string $stored): bool
+    {
+        $itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+        $countLog2 = strpos($itoa64, $stored[3]);
+        $count = 1 << $countLog2;
+        $salt  = substr($stored, 4, 8);
+
+        $hash = md5($salt . $password, true);
+        do {
+            $hash = md5($hash . $password, true);
+        } while (--$count);
+
+        $encoded = substr($stored, 0, 12);
+        $i = 0;
+        $len = 16;
+
+        do {
+            $value = ord($hash[$i++]);
+            $encoded .= $itoa64[$value & 0x3f];
+            if ($i < $len) {
+                $value |= ord($hash[$i]) << 8;
+            }
+            $encoded .= $itoa64[($value >> 6) & 0x3f];
+            if ($i++ >= $len) break;
+            if ($i < $len) {
+                $value |= ord($hash[$i]) << 16;
+            }
+            $encoded .= $itoa64[($value >> 12) & 0x3f];
+            if ($i++ >= $len) break;
+            $encoded .= $itoa64[($value >> 18) & 0x3f];
+        } while ($i < $len);
+
+        return hash_equals($stored, $encoded);
+    }
 }
