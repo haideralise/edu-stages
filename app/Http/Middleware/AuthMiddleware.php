@@ -15,7 +15,7 @@ class AuthMiddleware
                     'code'    => 'UNAUTHORIZED',
                 ], 401);
             }
-            return redirect(env('WP_LOGIN_URL', '/wp-login.php'));
+            return redirect(config('wp.login_url', '/wp-login.php'));
         }
         return $next($request);
     }

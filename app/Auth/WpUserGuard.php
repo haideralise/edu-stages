@@ -100,7 +100,7 @@ public function viaRemember(): bool
     protected function getCookieName(): ?string
     {
         // First try LOGGED_IN_COOKIE from .env
-        $name = env('WP_LOGGED_IN_COOKIE');
+        $name = config('wp.logged_in_cookie');
         if ($name && isset($_COOKIE[$name])) {
             return $name;
         }
@@ -178,14 +178,14 @@ public function viaRemember(): bool
     {
         switch ($scheme) {
             case 'auth':
-                return env('WP_AUTH_KEY') . env('WP_AUTH_SALT');
+                return config('wp.auth_key') . config('wp.auth_salt');
 
             case 'secure_auth':
-                return env('WP_SECURE_AUTH_KEY') . env('WP_SECURE_AUTH_SALT');
+                return config('wp.secure_auth_key') . config('wp.secure_auth_salt');
 
             case 'logged_in':
             default:
-                return env('WP_LOGGED_IN_KEY') . env('WP_LOGGED_IN_SALT');
+                return config('wp.logged_in_key') . config('wp.logged_in_salt');
         }
     }
 

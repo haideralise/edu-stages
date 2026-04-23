@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Support\BmiForAge;
 class EduBmi extends Model
 {
@@ -47,7 +48,7 @@ class EduBmi extends Model
     }
 
     // P3: relationship to WpUser — used by BMI category accessor and API resource
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(WpUser::class, 'user_id', 'ID');
     }

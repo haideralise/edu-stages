@@ -64,7 +64,7 @@ class EduLevel extends Model
     }
 
     // P3: recursive eager-load for level tree — used by student test results page
-    public function descendants()
+    public function descendants(): HasMany
     {
         return $this->children()->with('descendants');
     }
