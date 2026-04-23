@@ -27,7 +27,7 @@ class StudentBmiController extends Controller
             $records = EduBmi::with('user.meta')
                 ->orderByDesc('date')
                 ->get()
-                ->each(fn ($bmi) => $bmi->student_name = $bmi->user?->display_name ?? "Student #{$bmi->user_id}");
+                ->each(fn (EduBmi $bmi) => $bmi->setAttribute('student_name', $bmi->user?->display_name ?? "Student #{$bmi->user_id}"));
 
             $coachIds = EduClassUser::allTeacherIds();
 

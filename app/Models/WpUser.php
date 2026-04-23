@@ -4,9 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory; // from P1
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @property-read string|null $birthdate  billing_birthdate from usermeta
+ * @property-read string|null $gender     billing_gender from usermeta
+ */
 class WpUser extends Authenticatable
 {
     use HasApiTokens, HasFactory; // HasFactory from P1
@@ -48,12 +54,12 @@ class WpUser extends Authenticatable
 
     // ── Relationships ────────────────────────────────────────────
 
-    public function meta()
+    public function meta(): HasMany
     {
         return $this->hasMany(WpUserMeta::class, 'user_id', 'ID');
     }
 
-    public function eduProfile()
+    public function eduProfile(): HasOne
     {
         return $this->hasOne(EduUser::class, 'user_id', 'ID');
     }

@@ -8,6 +8,7 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
+        /** @var \App\Auth\WpUserGuard $guard */
         $guard = auth('wp');
         if (!$guard->check() || $guard->getRole() !== 'admin') {
             if ($request->expectsJson()) {

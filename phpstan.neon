@@ -1,0 +1,25 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app/Models/EduBmi.php
+        - app/Models/EduLevel.php
+        - app/Models/EduClass.php
+        - app/Models/EduClassUser.php
+        - app/Http/Controllers/CoachResultController.php
+        - app/Http/Controllers/CoachHistoryController.php
+        - app/Http/Controllers/StudentChartController.php
+        - app/Http/Controllers/StudentBmiController.php
+        - app/Http/Controllers/StudentResultController.php
+        - app/Http/Controllers/AccountController.php
+        - app/Http/Controllers/Api/BmiController.php
+        - app/Http/Controllers/Api/ResultController.php
+        - app/Http/Controllers/Api/Chart2Controller.php
+        - app/Http/Controllers/Api/ClassListController.php
+        - app/Http/Controllers/Api/AuthController.php
+        - app/Auth/WpUserGuard.php
+        - app/Http/Middleware/AuthMiddleware.php
+        - app/Http/Middleware/AdminMiddleware.php
+        - app/Http/Middleware/CoachMiddleware.php
+    level: 5
