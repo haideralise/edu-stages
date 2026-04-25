@@ -37,7 +37,14 @@
                 @php $role = auth()->user()->resolveRole(); @endphp
                 <div class="flex items-center gap-4 text-sm">
                     <span class="text-gray-600">{{ auth()->user()->display_name }} ({{ $role }})</span>
-                    <a href="/wp-login.php?action=logout" class="text-red-500 hover:underline">Logout</a>
+                    @if (app()->environment('local'))
+                        <form method="POST" action="{{ route('logout') }}" class="inline">
+                            @csrf
+                            <button type="submit" class="text-red-500 hover:underline">Logout</button>
+                        </form>
+                    @else
+                        <a href="/wp-login.php?action=logout" class="text-red-500 hover:underline">Logout</a>
+                    @endif
                 </div>
             @endauth
         </div>
@@ -77,6 +84,14 @@
                        class="sidebar-link {{ request()->routeIs('account.chart2') ? 'active' : '' }}">
                         Growth Chart
                     </a>
+                    <a href="{{ route('account.attend') }}"
+                       class="sidebar-link {{ request()->routeIs('account.attend') ? 'active' : '' }}">
+                        Attendance
+                    </a>
+                    <a href="{{ route('account.myorder') }}"
+                       class="sidebar-link {{ request()->routeIs('account.myorder') ? 'active' : '' }}">
+                        Payment History
+                    </a>
                 @endif
 
                 @if ($role === 'coach' || $role === 'admin')
@@ -98,9 +113,18 @@
                 @endif
 
                 <div class="border-t mt-2 pt-2">
-                    <a href="/wp-login.php?action=logout" class="sidebar-link text-red-500 hover:text-red-600">
-                        Logout
-                    </a>
+                    @if (app()->environment('local'))
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="sidebar-link text-red-500 hover:text-red-600 w-full text-left">
+                                Logout
+                            </button>
+                        </form>
+                    @else
+                        <a href="/wp-login.php?action=logout" class="sidebar-link text-red-500 hover:text-red-600">
+                            Logout
+                        </a>
+                    @endif
                 </div>
             </nav>
         </aside>

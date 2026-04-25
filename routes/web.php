@@ -8,10 +8,22 @@ use App\Http\Controllers\Api\EduCoachController;
 use App\Http\Controllers\Api\EduDistrictController;
 use App\Http\Controllers\Api\EduOrderController;
 use App\Http\Controllers\Api\EduStudentController;
+use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+    if (app()->environment('local')) {
+        return redirect()->route('login');
+    }
+
     return response('Laravel OK', 200)->header('Content-Type', 'text/plain');
+});
+
+// Local dev login (staging uses WordPress /wp-login.php)
+Route::middleware('web')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
 
 Route::get('/test-auth', function () {

@@ -17,7 +17,9 @@ class AdminMiddleware
                     'code'    => 'UNAUTHORIZED',
                 ], 401);
             }
-            return redirect(config('wp.login_url', '/wp-login.php'));
+            return redirect(
+                app()->environment('local') ? route('login') : config('wp.login_url', '/wp-login.php')
+            );
         }
         return $next($request);
     }
