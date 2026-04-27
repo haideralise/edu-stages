@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\EduClassUser;
 use App\Services\ClassService;
-use App\Services\Common\DateDayWeekService;
-use App\Services\Common\JsonService;
+use App\Services\DateDayWeekService;
+use App\Services\JsonService;
 use Illuminate\Http\Request;
 
 class EduClassController extends Controller
@@ -17,63 +17,95 @@ class EduClassController extends Controller
         private JsonService $jsonService,
     ) {}
 
-    /**
-     * TODO Stage 3: wire ClassMonthFacade once P1 delivers it.
-     *   $isAdmin = auth()->user()?->isAdmin();
-     *   $filters = $isAdmin
-     *       ? ['district_id' => ..., 'district_id2' => ..., 'lv3' => ..., 'month' => ...]
-     *       : ['class_ids' => auth()->user()->getCoachClassIds(), 'month' => ...];
-     *   $data = app(\App\Services\ClassMonthFacade::class)
-     *       ->fetchMonthlyClasses($filters, ['with_attendance_level' => 'summary']);
-     *   // Returns: month, classes_lv3, processed_classes, no_teacher_num, no_days_num
-     *   // See: 10eng-edu2-service-signatures.md §1
-     */
     public function index(Request $request)
     {
         $isAdmin = auth()->user()?->isAdmin() ?? false;
 
+        // 03eng §III: coaches cannot read the class list in Laravel
+        if (!$isAdmin) {
+            abort(403);
+        }
+
+        $districtId = $request->integer('district_id', 0);
+        $districtId2 = $request->integer('district_id2', 0);
+        $lv3 = $request->get('lv3', '');
+        $month = $request->get('m', date('Y-m')); // JS uses ?m= param
+
+        $filters = [
+            'district_id' => $districtId,
+            'district_id2' => $districtId2,
+            'lv3' => $lv3,
+            'month' => $month,
+        ];
+
+        // ClassMonthFacade::fetchMonthlyClasses (10eng §1)
+        $data = app(\App\Services\ClassMonthFacade::class)
+            ->fetchMonthlyClasses($filters, ['with_attendance_level' => 'summary']);
+
+        // Prev/next month navigation for month-selector component
+        $preNextMonth = app(\App\Services\ClassService::class)->getPreAndNextMonth();
+
+        // Build district lists from classes_lv3 for district-menu component
+        $district = [];
+        $district2 = [];
+        foreach ($data['classes_lv3'] as $c) {
+            if (!empty($c['district_id']) && !isset($district[$c['district_id']])) {
+                $district[$c['district_id']] = $c['district_name'] ?? $c['district_id'];
+            }
+        }
+
         return view('filament.pages.classes', [
-            // TODO: Stage 3: replace with ClassMonthFacade return values
-            'processedClasses' => [],
-            'district'         => [],
-            'district2'        => [],
-            'classes_lv3'      => [],
-            'no_teacher_num'   => 0,
-            'no_days_num'      => 0,
-            'district_id'      => $request->integer('district_id', 0),
-            'district_id2'     => $request->integer('district_id2', 0),
-            'lv3'              => $request->get('lv3', ''),
-            'is_admin'         => $isAdmin,
+            'processedClasses' => $data['processed_classes'],
+            'classes_lv3' => $data['classes_lv3'],
+            'no_teacher_num' => $data['no_teacher_num'],
+            'no_days_num' => $data['no_days_num'],
+            'month' => $data['month'],
+            'preNextMonth' => $preNextMonth,
+            'district' => $district,
+            'district2' => $district2,
+            'district_id' => $districtId,
+            'district_id2' => $districtId2,
+            'lv3' => $lv3,
+            'current_user' => null, // populated when user_id param present
+            'is_admin' => $isAdmin,
         ]);
     }
 
-    /**
-     * TODO Stage 3: replace stub data with ClassService calls once P1 delivers:
-     *   $classData = app(\App\Services\ClassService::class)->loadClassData($classId);
-     *   $classUser = app(\App\Services\ClassService::class)
-     *       ->getClassUser($classId, $classData['class_month'], $classYear);
-     *   $classExam = app(\App\Services\ClassService::class)->getClassExam($classUser);
-     *   $exam      = app(\App\Services\ClassService::class)->get_class_exam_v2($classExam);
-     *   $level     = app(\App\Services\ClassService::class)->getAllLevels();
-     *   $levelByPid = app(\App\Services\ClassService::class)->sortLevelByPid($level);
-     *   // See: 10eng-edu2-service-signatures.md §ClassService
-     */
     public function showClass(Request $request, int $id)
     {
         $classYear = $request->get('year', date('Y'));
         $isAdmin = auth()->user()?->isAdmin() ?? false;
 
-        // Use ClassService methods
-        $classData = $this->classService->loadClassData($id);
+        $classService = app(\App\Services\ClassService::class);
+
+        // ClassService::loadClassData — loads class, class_users, class_month (10eng §4)
+        // Returns: ['class' => [...], 'class_users' => [...], 'class_month' => '3月-4月']
+        $classData = $classService->loadClassData($id);
         $class = $classData['class'];
         $classUsers = $classData['class_users'];
         $classMonth = $classData['class_month'];
 
-        $classUser = $this->classService->getClassUser($id, $classMonth, $classYear);
-        $classExam = $this->classService->getClassExam($classUser);
-        $exam = $this->classService->get_class_exam_v2($classExam);
-        $level = $this->classService->getAllLevels();
-        $levelByPid = $this->classService->sortLevelByPid($level);
+        // ClassService::getClassUser — single class_user row for selected month/year
+        $classUser = $classService->getClassUser($id, $classMonth, $classYear);
+
+        // ClassService::getClassExam — decode class_exam JSON from class_user
+        $classExam = $classService->getClassExam($classUser);
+
+        // ClassService::get_class_exam_v2 — resolve exam IDs to full level detail
+        $exam = $classService->get_class_exam_v2($classExam);
+
+        // ClassService::getAllLevels + sortLevelByPid — assessment tree
+        $level = $classService->getAllLevels();
+        $levelByPid = $classService->sortLevelByPid($level);
+
+        // StudentPaymentServiceCommon::getStudentPaymentsBatch (10eng §8)
+        $students = is_array($classUser['student']) ? $classUser['student'] : (json_decode($classUser['student'] ?? '[]', true) ?? []);
+        $transfers = is_array($classUser['student_transfer']) ? $classUser['student_transfer'] : (json_decode($classUser['student_transfer'] ?? '[]', true) ?? []);
+        $studentIds = array_values(array_unique(array_merge($students, $transfers)));
+
+        $paymentsBatch = !empty($studentIds)
+            ? app(\App\Services\StudentPaymentServiceCommon::class)->getStudentPaymentsBatch($studentIds)
+            : [];
 
         return view('edu.class.class', [
             'class_id' => $id,
@@ -85,15 +117,8 @@ class EduClassController extends Controller
             'level' => $level,
             'levelByPid' => $levelByPid,
             'is_admin' => $isAdmin,
+            'payments' => $paymentsBatch,
         ]);
-    }
-
-    public function updateClass(Request $request, int $id)
-    {
-        // TODO Stage 3: implement update logic using ClassService once P1 delivers.
-        //   Validate request data, then call appropriate ClassService method to update class info.
-        //   Return success response or error messages as needed.
-        return response()->json(['message' => 'Update class functionality not implemented yet.'], 501);
     }
 
     /**
@@ -213,6 +238,10 @@ class EduClassController extends Controller
             $updateData['student'] = json_encode($request->post('student'));
         }
 
+        if ($request->has('student_makeup')) {
+            $updateData['student_makeup'] = json_encode($request->post('student_makeup'));
+        }
+
         if ($request->has('student_transfer')) {
             $updateData['student_transfer'] = json_encode($request->post('student_transfer'));
         }
@@ -247,19 +276,42 @@ class EduClassController extends Controller
 
             $classUser = $this->classService->getClassUser($id, $targetMonth, $classYear);
 
+            // Decode all student lists
+            $student = $this->jsonService->decode_json($classUser['student']) ?: [];
+            $studentMakeup = $this->jsonService->decode_json($classUser['student_makeup'] ?? '[]') ?: [];
+            $studentTransfer = $this->jsonService->decode_json($classUser['student_transfer']) ?: [];
+
+            // Batch payment data for all students in this period (10eng §8)
+            $allStudentIds = array_values(array_unique(array_filter(
+                array_merge(
+                    array_map('intval', $student),
+                    array_map('intval', $studentMakeup),
+                    array_map('intval', $studentTransfer)
+                )
+            )));
+
+            $payments = !empty($allStudentIds)
+                ? app(\App\Services\StudentPaymentServiceCommon::class)
+                    ->getStudentPaymentsBatch($allStudentIds)
+                : [];
+
             return response()->json([
                 'data' => [
-                    'student' => $this->jsonService->decode_json($classUser['student']),
-                    'student_transfer' => $this->jsonService->decode_json($classUser['student_transfer']),
+                    'student' => $student,
+                    'student_makeup' => $studentMakeup,
+                    'student_transfer' => $studentTransfer,
                     'teacher' => $classUser['teacher'],
                     'class_exam' => $this->jsonService->decode_json($classUser['class_exam']),
+                    'analytisc_days' => $classUser['analytisc_days'] ?? '',
+                    'date_time' => $classUser['days'] ?? '',
+                    'payments' => $payments,
                 ],
-                'message' => '成功'
+                'message' => '成功',
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
                 'message' => '月份不存在',
-                'code' => 'NOT_FOUND'
+                'code' => 'NOT_FOUND',
             ], 404);
         }
     }
@@ -315,6 +367,6 @@ class EduClassController extends Controller
             'class_exam' => json_encode(array_values($classExam))
         ]);
 
-        return response()->json(['message' => '更新成功']);
+        return response()->json(['data' => null, 'message' => '更新成功']);
     }
 }

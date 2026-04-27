@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BmiController;
 use App\Http\Controllers\Api\Chart2Controller;
 use App\Http\Controllers\Api\ClassListController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ResultController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -42,5 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/bmi', [BmiController::class, 'index']);
         Route::get('/results', [ResultController::class, 'index']);
         Route::get('/growth-chart', [Chart2Controller::class, 'index']);
+        Route::get('/attendance', [AttendanceController::class, 'index']);
+        Route::get('/orders', [OrderController::class, 'index']);
     });
 });

@@ -6,16 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Services\ClassService;
 use App\Services\ClassStudentListService;
 use App\Services\CoachBonusReportService;
-use App\Services\Common\ArrayServiceCommon;
-use App\Services\Common\AttendanceQueryService;
-use App\Services\Common\ClassDateTimeParseService;
-use App\Services\Common\CoachBonusCalculationService;
-use App\Services\Common\CoachEntranceFeeService;
+use App\Services\ArrayServiceCommon;
+use App\Services\AttendanceQueryService;
+use App\Services\ClassDateTimeParseService;
+use App\Services\CoachBonusCalculationService;
+use App\Services\CoachEntranceFeeService;
 use App\Services\EduCoachService;
 use App\Services\PrivateClassService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+use App\Services\JsonService;
 
 /**
  * Port of edu2 {@see \Edu\Controllers\CoachSalaryController::salary} (Stage 4).
@@ -186,7 +187,7 @@ class CoachSalaryController extends Controller
                     }
 
                     $normal_ids = array_filter(
-                        array_map('intval', json_decode($class_row['student'] ?? '[]', true) ?: []),
+                        array_map('intval', JsonService::decode_json($class_row['student'] ?? '[]', true) ?: []),
                         fn ($id) => $id > 0
                     );
 

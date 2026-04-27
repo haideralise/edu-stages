@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Common;
+namespace App\Services;
 
 use App\Models\WpTermTaxonomy;
 use Illuminate\Support\Facades\DB;

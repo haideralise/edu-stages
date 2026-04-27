@@ -29,10 +29,7 @@ class CoachHistoryController extends Controller
             $query->where('class_year', $request->input('class_year'));
         }
 
-        $results = $query->orderByDesc('exam_date')->get();
-
-        $studentIds = $results->pluck('user_id')->unique();
-        $students = WpUser::whereIn('ID', $studentIds)->get()->keyBy('ID');
+        $results = $query->with('user')->orderByDesc('exam_date')->get();
 
         // Available years for filter dropdown
         $years = EduResult::distinct()->pluck('class_year')->filter()->sort()->values();
@@ -56,6 +53,6 @@ class CoachHistoryController extends Controller
             });
         }
 
-        return view('coach.history', compact('resultsByClassMonth', 'students', 'years', 'isAdmin', 'coaches'));
+        return view('coach.history', compact('resultsByClassMonth', 'years', 'isAdmin', 'coaches'));
     }
 }

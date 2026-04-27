@@ -8,6 +8,7 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
+        /** @var \App\Auth\WpUserGuard $guard */
         $guard = auth('wp');
         if (!$guard->check() || $guard->getRole() !== 'admin') {
             if ($request->expectsJson()) {
@@ -16,7 +17,9 @@ class AdminMiddleware
                     'code'    => 'UNAUTHORIZED',
                 ], 401);
             }
-            return redirect(env('WP_LOGIN_URL', '/wp-login.php'));
+            return redirect(
+                app()->environment('local') ? route('login') : config('services.wp.login_url', '/wp-login.php')
+            );
         }
         return $next($request);
     }

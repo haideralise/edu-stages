@@ -12,11 +12,11 @@ use App\Models\EduClassUser;
 use App\Models\EduUser;
 use App\Models\WpTermTaxonomy;
 use App\Models\WpUser;
-use App\Services\Common\ArrayServiceCommon;
-use App\Services\Common\AttendanceQueryService;
-use App\Services\Common\ClassesServiceCommon;
-use App\Services\Common\DateDayWeekService;
-use App\Services\Common\JsonService;
+use App\Services\ArrayServiceCommon;
+use App\Services\AttendanceQueryService;
+use App\Services\DateDayWeekService;
+use App\Services\ClassesServiceCommon;
+use App\Services\JsonService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 

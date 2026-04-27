@@ -8,6 +8,7 @@ class CoachMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
+        /** @var \App\Auth\WpUserGuard $guard */
         $guard = auth('wp');
         if (!$guard->check() || !in_array($guard->getRole(), ['admin', 'coach'])) {
             if ($request->expectsJson()) {
@@ -16,7 +17,9 @@ class CoachMiddleware
                     'code'    => 'UNAUTHORIZED',
                 ], 401);
             }
-            return redirect(env('WP_LOGIN_URL', '/wp-login.php'));
+            return redirect(
+                app()->environment('local') ? route('login') : config('services.wp.login_url', '/wp-login.php')
+            );
         }
         return $next($request);
     }

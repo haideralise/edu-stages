@@ -22,6 +22,11 @@ class WpUserGuard implements Guard
         $this->request  = $request;
     }
 
+public function viaRemember(): bool
+{
+    return false;
+}
+
     public function user()
     {
         if ($this->user !== null) {
@@ -29,9 +34,6 @@ class WpUserGuard implements Guard
         }
 
         $cookieName = $this->getCookieName();
-        if (!$cookieName || empty($_COOKIE[$cookieName])) {
-            return null;
-        }
         if (!$cookieName || empty($_COOKIE[$cookieName])) {
             return null;
         }
@@ -53,9 +55,13 @@ class WpUserGuard implements Guard
         return false; // Not used; we rely on WP cookie
     }
 
+    // P3: lazy-detect role when user is set via actingAs() in tests (bypasses user() method)
     public function getRole(): ?string
     {
-        $this->user(); // trigger detection if not done yet
+        $user = $this->user();
+        if ($user instanceof WpUser && $this->role === null) {
+            $this->role = $this->detectRole($user);
+        }
         return $this->role;
     }
 
@@ -69,32 +75,15 @@ class WpUserGuard implements Guard
             return 'admin';
         }
 
-        // Priority 2: usermeta wp_capabilities contains 'administrator' → admin
-        $capabilities = $user->meta()
-            ->where('meta_key', 'wp_3x_capabilities')
-            ->value('meta_value');
-
-        if ($capabilities && str_contains($capabilities, 'administrator')) {
-            return 'admin';
-        }
-
-        // Priority 3: edu_class_user.teacher JSON contains this user_id → coach
-        $isCoach = EduClassUser::whereRaw('JSON_VALID(teacher)')
-            ->whereJsonContains('teacher', (string) $user->ID)
-            ->exists();
-
-        if ($isCoach) {
-            return 'coach';
-        }
-
-        // Priority 4: everyone else → student
-        return 'student';
+        // Delegate to the model's cached resolveRole() to avoid
+        // duplicate wp_3x_capabilities queries per request.
+        return $user->resolveRole();
     }
 
     protected function getCookieName(): ?string
     {
         // First try LOGGED_IN_COOKIE from .env
-        $name = env('WP_LOGGED_IN_COOKIE');
+        $name = config('services.wp.logged_in_cookie');
         if ($name && isset($_COOKIE[$name])) {
             return $name;
         }
@@ -156,14 +145,14 @@ class WpUserGuard implements Guard
             $key
         );
 
-        // if (!hash_equals($expected, $hmac)) {
-        //     return null;
-        // }
+        if (!hash_equals($expected, $hmac)) {
+            return null;
+        }
 
-        // // 7. Verify session token (VERY IMPORTANT)
-        // if (!$this->verifySessionToken($user, $token)) {
-        //     return null;
-        // }
+        // 7. Verify session token (VERY IMPORTANT)
+        if (!$this->verifySessionToken($user, $token)) {
+            return null;
+        }
 
         return $user;
     }
@@ -172,14 +161,14 @@ class WpUserGuard implements Guard
     {
         switch ($scheme) {
             case 'auth':
-                return env('WP_AUTH_KEY') . env('WP_AUTH_SALT');
+                return config('services.wp.auth_key') . config('services.wp.auth_salt');
 
             case 'secure_auth':
-                return env('WP_SECURE_AUTH_KEY') . env('WP_SECURE_AUTH_SALT');
+                return config('services.wp.secure_auth_key') . config('services.wp.secure_auth_salt');
 
             case 'logged_in':
             default:
-                return env('WP_LOGGED_IN_KEY') . env('WP_LOGGED_IN_SALT');
+                return config('services.wp.logged_in_key') . config('services.wp.logged_in_salt');
         }
     }
 

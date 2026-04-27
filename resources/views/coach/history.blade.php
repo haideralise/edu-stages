@@ -38,9 +38,8 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @foreach ($results as $result)
-                        @php $student = $students->get($result->user_id); @endphp
                         <tr>
-                            <td class="px-4 py-2 text-sm">{{ $student ? $student->display_name : "Student #{$result->user_id}" }}</td>
+                            <td class="px-4 py-2 text-sm">{{ $result->user ? $result->user->display_name : "Student #{$result->user_id}" }}</td>
                             @if ($isAdmin)
                                 <td class="px-4 py-2 text-sm text-gray-500">{{ $coaches->get($result->class_id, '—') }}</td>
                             @endif

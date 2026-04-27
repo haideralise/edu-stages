@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\EduClassUser;
+use App\Models\WpUser;
 use App\Models\WpUserMeta;
 use App\Models\EduUser;
 use Illuminate\Support\Facades\DB;
@@ -63,5 +64,44 @@ class EduStudentService
         } catch (\Throwable $e) {
             return '—';
         }
+    }
+
+    public function getUsersWithMeta(int|array|null $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $ids = array_values(array_unique((array)$ids));
+
+        return WpUser::query()
+            ->with(['meta', 'eduProfile'])
+            ->whereIn('ID', $ids)
+            ->get()
+            ->mapWithKeys(function ($user) {
+
+                $data = $user->toArray();
+
+                foreach ($user->meta as $meta) {
+                    $data[$meta->meta_key] = $meta->meta_value;
+                }
+
+                $first = $data['billing_first_name'] ?? $data['first_name'] ?? '';
+                $last = $data['billing_last_name'] ?? $data['last_name'] ?? '';
+
+                $data['first_name'] = $first;
+                $data['billing_first_name'] = $first;
+                $data['last_name'] = $last;
+                $data['billing_last_name'] = $last;
+
+                if ($user->eduProfile) {
+                    $data['edu'] = $user->eduProfile->toArray();
+                }
+
+                unset($data['meta'], $data['edu_profile']);
+
+                return [$user->ID => $data];
+            })
+            ->toArray();
     }
 }

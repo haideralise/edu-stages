@@ -35,4 +35,21 @@ return [
         ],
     ],
 
+    'wp' => [
+        'logged_in_cookie' => env('WP_LOGGED_IN_COOKIE'),
+        'logged_in_key' => env('WP_LOGGED_IN_KEY'),
+        'logged_in_salt' => env('WP_LOGGED_IN_SALT'),
+
+        'auth_key' => env('WP_AUTH_KEY'),
+        'auth_salt' => env('WP_AUTH_SALT'),
+
+        'secure_auth_key' => env('WP_SECURE_AUTH_KEY'),
+        'secure_auth_salt' => env('WP_SECURE_AUTH_SALT'),
+
+        'nonce_key' => env('WP_NONCE_KEY'),
+        'nonce_salt' => env('WP_NONCE_SALT'),
+
+        'login_url' => env('WP_LOGIN_URL'),
+    ],
+
 ];

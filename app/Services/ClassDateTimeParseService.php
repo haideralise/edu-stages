@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Common;
+namespace App\Services;
 
 /**
  * wp_3x_edu_class.date_time format parsing.

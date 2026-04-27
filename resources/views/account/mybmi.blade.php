@@ -163,6 +163,7 @@
 <script>
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 const isAdmin = {{ $isAdmin ? 'true' : 'false' }};
+const bmiBaseUrl = "{{ url('/edu/account/bmi') }}";
 let deleteId = null;
 
 function openAddModal() {
@@ -186,7 +187,7 @@ function openEditModal(id) {
     document.getElementById('modal-title').textContent = 'Edit';
     document.getElementById('modal-errors').classList.add('hidden');
 
-    fetch(`/edu/account/bmi/${id}`, {
+    fetch(`${bmiBaseUrl}/${id}`, {
         headers: {
             'Accept': 'application/json',
             'X-CSRF-TOKEN': csrfToken,
@@ -219,7 +220,7 @@ function submitForm(e) {
     e.preventDefault();
 
     const id = document.getElementById('form-id').value;
-    const url = id ? `/edu/account/bmi/${id}` : '/edu/account/bmi';
+    const url = id ? `${bmiBaseUrl}/${id}` : bmiBaseUrl;
     const method = id ? 'PUT' : 'POST';
 
     const body = {
@@ -279,7 +280,7 @@ function closeDeleteModal() {
 function confirmDelete() {
     if (!deleteId) return;
 
-    fetch(`/edu/account/bmi/${deleteId}`, {
+    fetch(`${bmiBaseUrl}/${deleteId}`, {
         method: 'DELETE',
         headers: {
             'Accept': 'application/json',

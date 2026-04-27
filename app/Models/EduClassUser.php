@@ -4,18 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo; // from P2
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
 
 class EduClassUser extends Model
 {
     protected $table = 'edu_class_user';
 
-    protected $primaryKey = 'id'; // from P2
+    protected $primaryKey = 'id';
 
     public $timestamps = false;
 
-    // from P2
     protected $fillable = [
         'class_id',
         'month',
@@ -31,7 +30,6 @@ class EduClassUser extends Model
         'sort',
         'history_students_status',
     ];
-    // end from P2
 
     protected function casts(): array
     {
@@ -46,24 +44,23 @@ class EduClassUser extends Model
         ];
     }
 
-    // ── Relationships ────────────────────────────────────────────
-
-    public function eduClass(): BelongsTo // type hint from P2
+    public function eduClass(): BelongsTo
     {
         return $this->belongsTo(EduClass::class, 'class_id', 'class_id');
     }
 
-    // ── Scopes from P2 ──────────────────────────────────────────
-
-    public function scopeForCoach(Builder $query, int $coachId): Builder // from P2
+    public function scopeForCoach(Builder $query, int $coachId): Builder
     {
-        return $query->whereJsonContains('teacher', (string)$coachId);
+        return $query->whereRaw(
+            'CASE WHEN JSON_VALID(teacher) THEN JSON_CONTAINS(teacher, ?) ELSE 0 END',
+            [json_encode((string) $coachId)]
+        );
     }
 
     /**
-     * OR LIKE on JSON role columns (from P2).
+     * OR LIKE on JSON role columns (parity with edu2 findClassUserWhere + user filter).
      */
-    public function scopeWhereAnyRoleJsonLike(Builder $query, string $needle): Builder // from P2
+    public function scopeWhereAnyRoleJsonLike(Builder $query, string $needle): Builder
     {
         return $query->where(function (Builder $q) use ($needle) {
             $q->where('teacher', 'like', '%' . $needle . '%')
@@ -72,21 +69,10 @@ class EduClassUser extends Model
         });
     }
 
-    // ── Scopes (P3) ────────────────────────────────────────────
-
-    public function scopeWhereTeacher(Builder $query, int $userId): Builder
-    {
-        return $query->whereRaw(
-            "teacher IS NOT NULL AND teacher != '' AND JSON_CONTAINS(teacher, ?)",
-            [json_encode((string) $userId)]
-        );
-    }
-
-    // ── Query helpers (P3) ────────────────────────────────────────
-
+    // P3: get all student IDs for a coach — used by CoachResultController and CoachHistoryController
     public static function studentIdsForTeacher(int $teacherId): Collection
     {
-        return static::whereTeacher($teacherId)
+        return static::forCoach($teacherId)
             ->pluck('student')
             ->flatMap(fn ($s) => $s ?? [])
             ->map(fn ($id) => (int) $id)
@@ -94,6 +80,7 @@ class EduClassUser extends Model
             ->values();
     }
 
+    // P3: get all teacher IDs across all class rows — used by WpUser::resolveRole fallback
     public static function allTeacherIds(): Collection
     {
         return static::pluck('teacher')

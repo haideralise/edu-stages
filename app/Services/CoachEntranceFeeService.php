@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Services\Common;
+namespace App\Services;
+
+use App\Services\DistrictManagementService;
 
 /**
  * Coach entrance fee calculation.

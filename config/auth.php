@@ -40,7 +40,7 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'wp_users',
         ],
         'wp' => [
             'driver'   => 'wp-cookie',

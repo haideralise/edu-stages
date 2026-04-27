@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Services\Common\AttendanceQueryService;
-use App\Services\Common\AttendanceSummaryService;
-use App\Services\Common\ClassMonthFacade;
+use App\Services\AttendanceQueryService;
+use App\Services\AttendanceSummaryService;
+use App\Services\ClassMonthFacade;
 
 /**
  * Slim Laravel counterpart to edu2 AttendanceService (10eng §3).

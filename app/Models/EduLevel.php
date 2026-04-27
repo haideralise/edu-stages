@@ -2,23 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory; // from P2
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo; // from P2
-use Illuminate\Database\Eloquent\Relations\HasMany; // from P2
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
 class EduLevel extends Model
 {
-    use HasFactory; // from P2
+    use HasFactory;
 
     protected $table = 'edu_level';
 
-    protected $primaryKey = 'id'; // from P2
+    protected $primaryKey = 'id';
 
     public $timestamps = false;
 
-    // from P2
     protected $fillable = [
         'pid',
         'name',
@@ -26,7 +25,6 @@ class EduLevel extends Model
         'file_level',
         'link',
     ];
-    // end from P2
 
     protected function casts(): array
     {
@@ -37,7 +35,6 @@ class EduLevel extends Model
         ];
     }
 
-    // ── from P2 ─────────────────────────────────────────────────
     public function getParsedDataAttribute(): array
     {
         if (empty($this->data)) {
@@ -55,30 +52,24 @@ class EduLevel extends Model
     {
         return $query->where('pid', $parentId);
     }
-    // ── end from P2 ─────────────────────────────────────────────
 
-    // ── Relationships ────────────────────────────────────────────
-
-    public function parent(): BelongsTo // type hint from P2
+    public function parent(): BelongsTo
     {
-        return $this->belongsTo(self::class, 'pid', 'id');
+        return $this->belongsTo(self::class, 'pid');
     }
 
-    public function children(): HasMany // type hint from P2
+    public function children(): HasMany
     {
-        return $this->hasMany(self::class, 'pid', 'id');
+        return $this->hasMany(self::class, 'pid');
     }
 
-    // ── P3 additions ──────────────────────────────────────────────
-
-    public function descendants()
+    // P3: recursive eager-load for level tree — used by student test results page
+    public function descendants(): HasMany
     {
         return $this->children()->with('descendants');
     }
 
-    /**
-     * Build full level tree from root nodes (pid = 0).
-     */
+    // P3: build full level tree from root nodes — used by StudentResultController
     public static function getTree(): Collection
     {
         return self::where('pid', 0)->with('descendants')->get();

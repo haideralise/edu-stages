@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\EduClass;
 use App\Models\EduLevel;
 use App\Models\EduResult;
-use Illuminate\Http\JsonResponse;
+use App\Models\WpUser;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 /*
 The old service had one fat method with 6 if blocks dispatching by $handle.
@@ -52,7 +52,7 @@ class EduAssesService
         EduLevel::create([
             'pid' => $lv2Id,
             'name' => $name,
-            'data' => json_encode([
+            'data' => JsonService::encode_json([
                 'name' => $itemData['name'] ?? $name,
                 'type' => $itemData['type'] ?? 'text',
                 'item' => $itemData['item'] ?? '',
@@ -68,7 +68,7 @@ class EduAssesService
         EduLevel::where('id', $id)->update([
             'pid' => $lv2Id,
             'name' => $itemData['name'] ?? '',
-            'data' => json_encode([
+            'data' => JsonService::encode_json([
                 'name' => $itemData['name'] ?? '',
                 'type' => $itemData['type'] ?? 'text',
                 'item' => $itemData['item'] ?? '',
@@ -165,9 +165,23 @@ class EduAssesService
         $partPath = "{$directory}/{$finalName}.part";
 
         if ($chunks > 0) {
-            $existing = Storage::exists($partPath) ? Storage::get($partPath) : '';
-            $content = $existing . ($file ? file_get_contents($file->getRealPath()) : '');
-            Storage::put($partPath, $content);
+            $localPartPath = storage_path('app/' . $partPath);
+
+            // Ensure the directory exists
+            if (!is_dir(dirname($localPartPath))) {
+                mkdir(dirname($localPartPath), 0755, true);
+            }
+
+            $mode = file_exists($localPartPath) ? 'ab' : 'wb';
+            $handle = fopen($localPartPath, $mode);
+
+            if ($file) {
+                $fileHandle = fopen($file->getRealPath(), 'rb');
+                stream_copy_to_stream($fileHandle, $handle);
+                fclose($fileHandle);
+            }
+
+            fclose($handle);
 
             if ($chunk < $chunks - 1) {
                 return ['error' => 0, 'message' => 'Chunk received.'];
@@ -181,5 +195,52 @@ class EduAssesService
         $url = Storage::url("{$directory}/{$finalName}");
 
         return ['error' => 0, 'message' => 'Upload Success.', 'url' => $url];
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Used by: EduAssessController::assess()
+    // Returns history records + class name map, both batch-loaded.
+    // Zero N+1: 2 queries total regardless of record count.
+    // ─────────────────────────────────────────────────────────────
+    public function getAssessHistory(): array
+    {
+        // Query 1 — group by composite key
+        $history = EduResult::select('class_id', 'class_month', 'exam_date')
+            ->groupBy('class_id', 'class_month', 'exam_date')
+            ->orderByDesc('exam_date')
+            ->get()
+            ->toArray();
+
+        // Query 2 — batch load class names keyed by class_id
+        $classIds = array_unique(array_column($history, 'class_id'));
+        $classes = [];
+        if (!empty($classIds)) {
+            EduClass::whereIn('class_id', $classIds)
+                ->select('class_id', 'class_name')
+                ->get()
+                ->each(function ($row) use (&$classes) {
+                    $classes[$row->class_id] = ['class_name' => $row->class_name];
+                });
+        }
+
+        return ['history' => $history, 'classes' => $classes];
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Used by: EduAssessController::searchUser()
+    // Returns [{id, name}] for the search_asses partial AJAX.
+    // ─────────────────────────────────────────────────────────────
+    public function searchUsers(string $q, int $limit = 20): array
+    {
+        if ($q === '') {
+            return [];
+        }
+
+        return WpUser::where('display_name', 'like', '%' . $q . '%')
+            ->select('ID', 'display_name')
+            ->limit($limit)
+            ->get()
+            ->map(fn($u) => ['id' => $u->ID, 'name' => $u->display_name])
+            ->toArray();
     }
 }

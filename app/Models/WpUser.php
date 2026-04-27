@@ -4,9 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory; // from P1
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @property-read string|null $birthdate  billing_birthdate from usermeta
+ * @property-read string|null $gender     billing_gender from usermeta
+ */
 class WpUser extends Authenticatable
 {
     use HasApiTokens, HasFactory; // HasFactory from P1
@@ -48,12 +54,12 @@ class WpUser extends Authenticatable
 
     // ── Relationships ────────────────────────────────────────────
 
-    public function meta()
+    public function meta(): HasMany
     {
         return $this->hasMany(WpUserMeta::class, 'user_id', 'ID');
     }
 
-    public function eduProfile()
+    public function eduProfile(): HasOne
     {
         return $this->hasOne(EduUser::class, 'user_id', 'ID');
     }
@@ -62,12 +68,12 @@ class WpUser extends Authenticatable
 
     protected function birthdate(): Attribute
     {
-        return Attribute::get(fn () => $this->getMetaValue('billing_birthdate'));
+        return Attribute::get(fn() => $this->getMetaValue('billing_birthdate'));
     }
 
     protected function gender(): Attribute
     {
-        return Attribute::get(fn () => $this->getMetaValue('billing_gender'));
+        return Attribute::get(fn() => $this->getMetaValue('billing_gender'));
     }
 
     // ── Helpers ──────────────────────────────────────────────────
@@ -81,6 +87,8 @@ class WpUser extends Authenticatable
         return $this->meta()->where('meta_key', $key)->value('meta_value');
     }
 
+    private ?string $cachedRole = null;
+
     /**
      * Resolve role per doc 08 §2.3:
      *  - admin  → wp_capabilities contains 'administrator' or 'mssc'
@@ -89,20 +97,19 @@ class WpUser extends Authenticatable
      */
     public function resolveRole(): string
     {
+        if ($this->cachedRole !== null) {
+            return $this->cachedRole;
+        }
+
         $caps = $this->getMetaValue('wp_3x_capabilities');
         if ($caps) {
             $parsed = @unserialize($caps);
             if (is_array($parsed) && (isset($parsed['administrator']) || isset($parsed['mssc']))) {
-                return 'admin';
+                return $this->cachedRole = 'admin';
             }
         }
 
-        $isCoach = EduClassUser::whereRaw(
-            "teacher IS NOT NULL AND teacher != '' AND JSON_CONTAINS(teacher, ?)",
-            [json_encode((string) $this->ID)]
-        )->exists();
-
-        return $isCoach ? 'coach' : 'student';
+        return $this->cachedRole = (EduClassUser::forCoach($this->ID)->exists() ? 'coach' : 'student');
     }
 
     // ── from P1 ─────────────────────────────────────────────────
@@ -114,6 +121,24 @@ class WpUser extends Authenticatable
     public function isCoach(): bool
     {
         return $this->resolveRole() === 'coach';
+    }
+
+    /**
+     * Get class IDs where this user appears as a teacher in edu_class_user.
+     * Used by ClassMonthFacade to scope Coach's class list.
+     *
+     * @return array<int>
+     */
+    public function getCoachClassIds(): array
+    {
+        return EduClassUser::whereRaw(
+            "teacher IS NOT NULL AND teacher != '' AND JSON_CONTAINS(teacher, ?)",
+            [json_encode((string) $this->ID)]
+        )
+            ->distinct()
+            ->pluck('class_id')
+            ->map(fn($id) => (int) $id)
+            ->toArray();
     }
     // ── end from P1 ─────────────────────────────────────────────
 }

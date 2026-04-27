@@ -2,8 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\Services\Common\CoachEntranceFeeService;
-use App\Services\Common\DistrictManagementService;
+use App\Services\CoachEntranceFeeService;
+use App\Services\DistrictManagementService;
 use PHPUnit\Framework\TestCase;
 
 class CoachEntranceFeeServiceTest extends TestCase

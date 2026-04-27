@@ -8,8 +8,10 @@
  */
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\StudentAttendanceController;
 use App\Http\Controllers\StudentBmiController;
 use App\Http\Controllers\StudentChartController;
+use App\Http\Controllers\StudentOrderController;
 use App\Http\Controllers\StudentResultController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,4 +36,11 @@ Route::middleware(['web', 'auth.wp'])->prefix('edu/account')->group(function () 
     // chart2 — Student growth chart
     Route::get('/chart2', [StudentChartController::class, 'index'])->name('account.chart2');
     Route::get('/chart2/data', [StudentChartController::class, 'chartData'])->name('account.chart2.data');
+
+    // account_attend — Student attendance records
+    Route::get('/attend', [StudentAttendanceController::class, 'index'])->name('account.attend');
+    Route::post('/attendance/leave', [StudentAttendanceController::class, 'leaveRequest'])->name('account.attendance.leave');
+
+    // account_myorder — Student payment history
+    Route::get('/myorder', [StudentOrderController::class, 'index'])->name('account.myorder');
 });

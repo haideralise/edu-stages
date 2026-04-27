@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Services\Common\DateDayWeekService;
+use App\Services\DateDayWeekService;
 use Carbon\Carbon;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;

@@ -2,11 +2,11 @@
 
 // Ported from edu2/services/Common/JsonService.php (namespace only)
 
-namespace App\Services\Common;
+namespace App\Services;
 
 class JsonService
 {
-    public function encode_json($data)
+    public static function encode_json($data): string
     {
         return json_encode(
             $data,
@@ -14,16 +14,20 @@ class JsonService
         );
     }
 
-    public function decode_json($json, $defVal = [])
+    public static function decode_json($json, $defVal = [])
     {
         $rt = $defVal;
-        if (! empty($json)) {
+
+        if (!empty($json)) {
+            // Remove BOM
             $json = trim($json, "\xEF\xBB\xBF");
             $json = trim($json, "\xFE\xFF");
-            $rt = json_decode($json, true);
-        }
-        if ($rt == '' || is_null($rt)) {
-            $rt = $defVal;
+
+            $decoded = json_decode($json, true);
+
+            if (!is_null($decoded) && $decoded !== '') {
+                $rt = $decoded;
+            }
         }
 
         return $rt;

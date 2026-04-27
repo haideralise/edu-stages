@@ -12,19 +12,20 @@ use App\Services\AttendanceService;
 use App\Services\ClassService;
 use App\Services\ClassStudentListService;
 use App\Services\CoachBonusReportService;
-use App\Services\Common\AttendanceSummaryService;
-use App\Services\Common\ClassMonthFacade;
-use App\Services\Common\ClassStudentQueryService;
-use App\Services\Common\CoachBonusCalculationService;
-use App\Services\Common\CoachEntranceFeeService;
-use App\Services\Common\DistrictManagementService;
-use App\Services\Common\StudentFeeServiceCommon;
-use App\Services\Common\StudentPaymentServiceCommon;
+use App\Services\AttendanceSummaryService;
+use App\Services\ClassMonthFacade;
+use App\Services\ClassStudentQueryService;
+use App\Services\CoachBonusCalculationService;
+use App\Services\CoachEntranceFeeService;
+use App\Services\DistrictManagementService;
+use App\Services\StudentFeeServiceCommon;
+use App\Services\StudentPaymentServiceCommon;
 use App\Services\PrivateClassService;
 use App\Services\StudentOrderService;
 // end from P2
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -65,5 +66,20 @@ class AppServiceProvider extends ServiceProvider
         $chart2Policy = new Chart2Policy;
         Gate::define('chart2.viewAny', [$chart2Policy, 'viewAny']);
         Gate::define('chart2.view', [$chart2Policy, 'view']);
+
+
+        // Inject $is_admin and $user into all views using the shared layout.
+        // Reads role from P1's auth('wp') guard.
+        View::composer('edu.includes.common_header', function ($view) {
+            $guard = auth('wp');
+            $wpUser = $guard->check() ? $guard->user() : null;
+
+            $view->with([
+                'is_admin' => $wpUser && method_exists($guard, 'getRole') && in_array($guard->getRole(), ['admin']),
+                'user' => $wpUser
+                    ? ['user_login' => $wpUser->user_login]
+                    : [],
+            ]);
+        });
     }
 }

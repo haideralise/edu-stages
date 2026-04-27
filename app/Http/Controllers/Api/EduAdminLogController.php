@@ -11,12 +11,12 @@ class EduAdminLogController extends Controller
 {
     use ApiResponse;
 
-    public function __construct(private readonly EduAdminLogService $adminLogService){}
+    public function __construct(private readonly EduAdminLogService $adminLogService) {}
 
     public function index(): View
     {
-        $logs = $this->adminLogService->getLogs();
+        $rows = $this->adminLogService->getLogs();
 
-        return view('edu.admin.admin_log', compact('logs'));
+        return view('edu.admin.admin_log', compact('rows'));
     }
 }

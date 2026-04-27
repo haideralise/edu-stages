@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory; // from P2
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EduResult extends Model
 {
@@ -62,22 +63,22 @@ class EduResult extends Model
 
     // ── Relationships ────────────────────────────────────────────
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(WpUser::class, 'user_id', 'ID');
     }
 
-    public function student() // from P2 (alias for user — same relationship)
+    public function student(): BelongsTo // from P2 (alias for user — same relationship)
     {
         return $this->belongsTo(WpUser::class, 'user_id', 'ID');
     }
 
-    public function eduClass()
+    public function eduClass(): BelongsTo
     {
         return $this->belongsTo(EduClass::class, 'class_id', 'class_id');
     }
 
-    public function examLevel() // from P2
+    public function examLevel(): BelongsTo // from P2
     {
         return $this->belongsTo(EduLevel::class, 'exam_id', 'id');
     }

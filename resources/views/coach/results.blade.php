@@ -9,7 +9,7 @@
     <p class="text-gray-500">No results found for your students.</p>
 @else
     @foreach ($resultsByStudent as $userId => $results)
-        @php $student = $students->get($userId); @endphp
+        @php $student = $results->first()->user; @endphp
         <div class="bg-white rounded shadow mb-4 p-4">
             <h2 class="text-lg font-semibold mb-3">
                 {{ $student ? $student->display_name : "Student #{$userId}" }}
