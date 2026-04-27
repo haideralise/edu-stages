@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\EduClass;
+use App\Models\EduClassUser;
+use App\Models\EduResult;
+use App\Models\WpUser;
 use App\Services\EduAssesService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -183,5 +187,63 @@ class EduAssessController extends Controller
         );
 
         return response()->json($result);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // GET admin/assess
+    // Admin: all records | Coach: own classes + current year only
+    // ─────────────────────────────────────────────────────────────
+    public function assess(Request $request)
+    {
+        /** @var \App\Models\WpUser $user */
+        $user = $request->user();
+        $isAdmin = $user->isAdmin();
+
+        $data = $this->assesService->getAssessHistory();
+        $levels = $this->assesService->getAllLevels();
+
+        $class_ids = $isAdmin ? [] : $user->getCoachClassIds();
+
+        return view('edu.result.assess', [
+            'history' => $data['history'],
+            'classes' => $data['classes'],
+            'class_ids' => $class_ids,
+            'levels' => $levels,
+            'is_admin' => $isAdmin,
+        ]);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // DELETE admin/assess/delete?class_id=&class_month=&exam_date=
+    // Admin only. Scheme D JSON.
+    // ─────────────────────────────────────────────────────────────
+    public function deleteAssess(Request $request): JsonResponse
+    {
+        $classId = (int)$request->query('class_id');
+        $classMonth = trim((string)$request->query('class_month', ''));
+        $examDate = trim((string)$request->query('exam_date', ''));
+
+        if (!$classId || !$classMonth || !$examDate) {
+            return $this->error('Missing parameters', 'VALIDATION_ERROR', 422);
+        }
+
+        EduResult::where('class_id', $classId)
+            ->where('class_month', $classMonth)
+            ->where('exam_date', $examDate)
+            ->delete();
+
+        return $this->success(['deleted' => true]);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // GET admin/assess/search-user?q=
+    // AJAX for search_asses partial. Scheme D: { data: [{id,name}] }
+    // ─────────────────────────────────────────────────────────────
+    public function searchUser(Request $request): JsonResponse
+    {
+        $q = trim((string)$request->query('q', ''));
+        $users = $this->assesService->searchUsers($q);
+
+        return $this->success($users);
     }
 }

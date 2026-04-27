@@ -16,6 +16,7 @@ use App\Services\PrivateClassService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+use App\Services\JsonService;
 
 /**
  * Port of edu2 {@see \Edu\Controllers\CoachSalaryController::salary} (Stage 4).
@@ -186,7 +187,7 @@ class CoachSalaryController extends Controller
                     }
 
                     $normal_ids = array_filter(
-                        array_map('intval', json_decode($class_row['student'] ?? '[]', true) ?: []),
+                        array_map('intval', JsonService::decode_json($class_row['student'] ?? '[]', true) ?: []),
                         fn ($id) => $id > 0
                     );
 

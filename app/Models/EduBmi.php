@@ -27,6 +27,11 @@ class EduBmi extends Model
     protected function casts(): array
     {
         return [
+            'user_id' => 'integer',
+            'height' => 'float',
+            'weight' => 'float',
+            'hc' => 'float',
+            'bmi' => 'float',
             'date' => 'integer',
         ];
     }

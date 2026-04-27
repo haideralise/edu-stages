@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\EduCoachController;
 use App\Http\Controllers\Api\EduDistrictController;
 use App\Http\Controllers\Api\EduOrderController;
 use App\Http\Controllers\Api\EduStudentController;
+use App\Http\Controllers\CoachSalaryController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,16 +43,15 @@ Route::get('/test-auth', function () {
 Route::middleware(['web', 'auth.wp', 'role.admin'])->prefix('admin')->group(function () {
 
     // ── Classes (Stage 3 stub — data wired when ClassMonthFacade is ready) ──
-    Route::get('classes', [EduClassController::class, 'index'])->name('admin.class.index');
 
     // ── Orders ────────────────────────────────────────────────────────────
     Route::get('order/add', [EduOrderController::class, 'showAdd'])->name('admin.order.add');
     Route::get('order/list', [EduOrderController::class, 'showList'])->name('admin.order.list');
     Route::get('order/refund', [EduOrderController::class, 'showRefund'])->name('admin.order.refund');
     Route::get('order/renew', [EduOrderController::class, 'showRenew'])->name('admin.order.renew');
-    Route::get('order/classes', [EduOrderController::class, 'searchClasses'])->name('oadmin.rder.classes');
+    Route::get('order/classes', [EduOrderController::class, 'searchClasses'])->name('admin.order.classes');
     Route::get('order/months', [EduOrderController::class, 'searchMonths'])->name('admin.order.months'); // select2 AJAX
-    Route::get('order/renew-months', [EduOrderController::class, 'searchRenewMonths'])->name('oadmin.rder.renew.months'); // select2 AJAX
+    Route::get('order/renew-months', [EduOrderController::class, 'searchRenewMonths'])->name('admin.order.renew.months'); // select2 AJAX
     Route::post('order', [EduOrderController::class, 'store'])->name('admin.order.store');
     Route::put('order/{id}', [EduOrderController::class, 'update'])->name('admin.order.update');
     Route::post('order/renew', [EduOrderController::class, 'storeRenew'])->name('admin.order.renew.store');
@@ -89,19 +89,19 @@ Route::middleware(['web', 'auth.wp', 'role.admin'])->prefix('admin')->group(func
     Route::get('student/{id}/salary', [EduStudentController::class, 'downloadSalary'])->name('admin.student.salary.download');
 
     // ── Admin Log ─────────────────────────────────────────────────────────
-    Route::get('admin-log', [EduAdminLogController::class, 'index'])->name('aadmin.dmin-log.index');
+    Route::get('admin-log', [EduAdminLogController::class, 'index'])->name('admin.admin-log.index');
 
     // ── Attendance write — Admin only (01eng §5.2.3) ──────────────────────
     Route::post('attendance/ajax', [EduAttendanceController::class, 'ajaxUpdate'])->name('admin.attendance.ajax');
     Route::post('attendance/delete', [EduAttendanceController::class, 'ajaxDelete'])->name('admin.attendance.delete');
 
     // ── NEW AJAX operations (split from handlePostRequestsClass) ──
-    Route::post('class/{id}/prev-data', [EduClassController::class, 'getPrevData']);
-    Route::post('class/{id}/exam', [EduClassController::class, 'addExam']);
-    Route::put('class/{id}/user', [EduClassController::class, 'updateUser']);  // ✅ RENAMED (was /class/{id})
-    Route::post('class/{id}/month-data', [EduClassController::class, 'getMonthData']);
-    Route::post('class/{id}/levels', [EduClassController::class, 'getLevel2']);
-    Route::put('class/{id}/exam/update', [EduClassController::class, 'updateExam']);  // ✅ RENAMED (was /class/{id}/exam)
+    Route::post('class/{id}/prev-data', [EduClassController::class, 'getPrevData'])->name('admin.class.prev-data');
+    Route::post('class/{id}/exam', [EduClassController::class, 'addExam'])->name('admin.class.exam');
+    Route::put('class/{id}/user', [EduClassController::class, 'updateUser'])->name('admin.class.user.update');
+    Route::post('class/{id}/month-data', [EduClassController::class, 'getMonthData'])->name('admin.class.month-data');
+    Route::post('class/{id}/levels', [EduClassController::class, 'getLevel2'])->name('admin.class.levels');
+    Route::put('class/{id}/exam/update', [EduClassController::class, 'updateExam'])->name('admin.class.exam.update');
 });
 
 
@@ -113,6 +113,14 @@ Route::middleware(['web', 'auth.wp'])->group(function () {
 
     // Attendance page — Admin can modify (Group 1 POSTs above); Coach is view-only
     Route::get('attendance', [EduAttendanceController::class, 'index'])->name('edu.attendance.index');
+
+    // Assess — Admin sees all, Coach sees own classes only
+    Route::get('assess', [EduAssessController::class, 'assess'])->name('edu.assess.index');
+    Route::delete('assess/delete', [EduAssessController::class, 'deleteAssess'])->name('edu.assess.delete');
+    Route::get('assess/search-user', [EduAssessController::class, 'searchUser'])->name('edu.assess.search-user');
+
+    // Coach salary — Coach sees own salary
+    Route::get('coach-salary', [CoachSalaryController::class, 'salary'])->name('edu.coach.salary');
 });
 
 // Route::middleware(['web', 'auth.wp', 'role.coach'])->prefix('edu')->group(function () {

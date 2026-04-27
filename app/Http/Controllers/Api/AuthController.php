@@ -21,6 +21,25 @@ class AuthController extends Controller
      * serves API/mobile clients using Sanctum tokens instead. Both share the
      * same WpUser model backed by wp_3x_users.
      */
+    // PWA: validate WP cookie → issue Sanctum Bearer token
+    public function issue(Request $request)
+    {
+        $guard = auth('wp');
+
+        if (!$guard->check()) {
+            return $this->error('Unauthorized', 'UNAUTHORIZED', 401);
+        }
+
+        $user       = $guard->user();
+        $expiration = now()->addDays(7);
+        $token      = $user->createToken('pwa-token', ['*'], $expiration);
+
+        return $this->success([
+            'token'      => $token->plainTextToken,
+            'expires_at' => $expiration->toISOString(),
+        ]);
+    }
+
     public function login(LoginRequest $request): JsonResponse
     {
         $user = WpUser::where('user_login', $request->input('user_login'))

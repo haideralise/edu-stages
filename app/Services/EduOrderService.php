@@ -110,17 +110,22 @@ class EduOrderService
         $data['created'] = time();
         $data['order_source'] = EduOrder::SOURCE_MANUAL;
 
-        if ($orderId) {
-            EduOrder::where('id', $orderId)->update($data);
-            $order = EduOrder::find($orderId);
-        } else {
-            $data['user_id'] = $studentId;
-            $order = EduOrder::create($data);
-        }
+        // Atomic: the order row and the class-user roster must move together.
+        // If the roster sync throws, the order write rolls back, so we never
+        // leave an "order exists but student not in class" state.
+        return DB::transaction(function () use ($orderId, $studentId, $data) {
+            if ($orderId) {
+                EduOrder::where('id', $orderId)->update($data);
+                $order = EduOrder::find($orderId);
+            } else {
+                $data['user_id'] = $studentId;
+                $order = EduOrder::create($data);
+            }
 
-        $this->syncStudentIntoClassUser($data, $studentId);
+            $this->syncStudentIntoClassUser($data, $studentId);
 
-        return $order;
+            return $order;
+        });
     }
 
     public function orderAddForRenew(array $data, int $studentId): array
@@ -130,23 +135,46 @@ class EduOrderService
         $data['order_date'] = strtotime($data['order_date']);
         $data['created'] = time();
         $data['order_source'] = EduOrder::SOURCE_MANUAL;
-
-        $exists = EduOrder::where('class_id', $data['class_id'])
-            ->where('month', $data['month'])
-            ->where('class_year', $data['class_year'])
-            ->where('user_id', $studentId)
-            ->exists();
-
-        if ($exists) {
-            return ['status' => false, 'message' => '續費已存在!'];
-        }
-
         $data['user_id'] = $studentId;
-        EduOrder::create($data);
 
-        $this->syncStudentIntoClassUser($data, $studentId);
+        // Two-layer protection against concurrent duplicate renewals:
+        //   1) Fast pre-check for friendly "already exists" message.
+        //   2) DB unique index on (user_id, class_id, month, class_year) is the
+        //      authoritative guard — catch the 23000 violation for the race
+        //      where two requests pass the pre-check simultaneously.
+        try {
+            return DB::transaction(function () use ($data, $studentId) {
+                $exists = EduOrder::where('class_id', $data['class_id'])
+                    ->where('month', $data['month'])
+                    ->where('class_year', $data['class_year'])
+                    ->where('user_id', $studentId)
+                    ->lockForUpdate()
+                    ->exists();
 
-        return ['status' => true, 'message' => 'Success'];
+                if ($exists) {
+                    return ['status' => false, 'message' => '續費已存在!'];
+                }
+
+                EduOrder::create($data);
+
+                $this->syncStudentIntoClassUser($data, $studentId);
+
+                return ['status' => true, 'message' => 'Success'];
+            });
+        } catch (\Illuminate\Database\QueryException $e) {
+            // SQLSTATE 23000 = integrity constraint violation (unique key).
+            if ($e->getCode() === '23000') {
+                return ['status' => false, 'message' => '續費已存在!'];
+            }
+
+            Log::error('orderAddForRenew failed', [
+                'user_id' => $studentId,
+                'data' => $data,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw $e;
+        }
     }
 
     public function getOrderById(int $orderId): ?array
@@ -291,9 +319,13 @@ class EduOrderService
 
         $data['refund_date'] = strtotime($data['refund_date']);
 
-        EduOrder::where('id', $orderId)->update($data);
+        // Atomic: refund fields + roster removal must commit together.
+        // Otherwise we can end up "refunded but still in class".
+        DB::transaction(function () use ($orderId, $data, $order) {
+            EduOrder::where('id', $orderId)->update($data);
 
-        $this->removeStudentFromClass($order);
+            $this->removeStudentFromClass($order);
+        });
 
         return ['status' => true, 'message' => 'Success'];
     }

@@ -282,7 +282,7 @@ class EduAttendanceController extends Controller
                 return response()->json(['data' => ['list' => $classUsers], 'message' => '成功']);
             }
 
-            return response()->json(['message' => 'Unknown handle', 'code' => 'INVALID_HANDLE'], 400);
+            return $this->error('Unknown handle', 'INVALID_HANDLE', 400);
         }
 
         // -------------------------------------------------------------------------

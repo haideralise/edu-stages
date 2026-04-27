@@ -13,6 +13,7 @@ use App\Models\EduClassUserDays;
 use App\Models\EduOrder;
 use App\Models\WpUser;
 use App\Services\AttendanceQueryService;
+use App\Services\JsonService;
 
 class ClassStudentListService
 {
@@ -147,9 +148,9 @@ class ClassStudentListService
 
         $all_student_ids = [];
         foreach ($current_classes as $row) {
-            $students = json_decode($row['student'] ?? '[]', true);
-            $transfers = json_decode($row['student_transfer'] ?? '[]', true);
-            $makeup = json_decode($row['student_makeup'] ?? '[]', true);
+            $students = JsonService::decode_json($row['student'] ?? '[]', true);
+            $transfers = JsonService::decode_json($row['student_transfer'] ?? '[]', true);
+            $makeup = JsonService::decode_json($row['student_makeup'] ?? '[]', true);
             foreach (array_merge(
                 is_array($students) ? $students : [],
                 is_array($transfers) ? $transfers : [],
@@ -203,8 +204,8 @@ class ClassStudentListService
 
     private function classUserRowToLegacyArray(EduClassUser $cu): array
     {
-        $enc = fn ($v) => json_encode(
-            is_array($v) ? $v : (json_decode((string) $v, true) ?: []),
+        $enc = fn ($v) => JsonService::encode_json(
+            is_array($v) ? $v : (JsonService::decode_json((string) $v, true) ?: []),
             JSON_UNESCAPED_UNICODE
         );
 
@@ -367,9 +368,9 @@ class ClassStudentListService
             $class_year = (int) $class_row['class_year'];
 
             $students_in_class = array_merge(
-                json_decode($class_row['student'] ?? '[]', true) ?: [],
-                json_decode($class_row['student_transfer'] ?? '[]', true) ?: [],
-                json_decode($class_row['student_makeup'] ?? '[]', true) ?: []
+                JsonService::decode_json($class_row['student'] ?? '[]', true) ?: [],
+                JsonService::decode_json($class_row['student_transfer'] ?? '[]', true) ?: [],
+                JsonService::decode_json($class_row['student_makeup'] ?? '[]', true) ?: []
             );
 
             foreach ($students_in_class as $sid) {
@@ -756,8 +757,8 @@ class ClassStudentListService
         if ($row === null) {
             return [];
         }
-        $students = is_array($row->student) ? $row->student : (json_decode((string) $row->getRawOriginal('student'), true) ?: []);
-        $transfers = is_array($row->student_transfer) ? $row->student_transfer : (json_decode((string) $row->getRawOriginal('student_transfer'), true) ?: []);
+        $students = is_array($row->student) ? $row->student : (JsonService::decode_json((string) $row->getRawOriginal('student'), true) ?: []);
+        $transfers = is_array($row->student_transfer) ? $row->student_transfer : (JsonService::decode_json((string) $row->getRawOriginal('student_transfer'), true) ?: []);
         $ids = [];
         foreach (array_merge($students, $transfers) as $sid) {
             if (! empty($sid) && is_numeric($sid)) {
@@ -818,8 +819,8 @@ class ClassStudentListService
                 if (! $this->storedMonthMatchesPeriodClause($stored, $spec['month'])) {
                     continue;
                 }
-                $students = is_array($row->student) ? $row->student : (json_decode((string) $row->getRawOriginal('student'), true) ?: []);
-                $transfers = is_array($row->student_transfer) ? $row->student_transfer : (json_decode((string) $row->getRawOriginal('student_transfer'), true) ?: []);
+                $students = is_array($row->student) ? $row->student : (JsonService::decode_json((string) $row->getRawOriginal('student'), true) ?: []);
+                $transfers = is_array($row->student_transfer) ? $row->student_transfer : (JsonService::decode_json((string) $row->getRawOriginal('student_transfer'), true) ?: []);
                 $ids = [];
                 foreach (array_merge($students, $transfers) as $sid) {
                     if (! empty($sid) && is_numeric($sid)) {
@@ -856,8 +857,8 @@ class ClassStudentListService
         $student_ids = [];
         $transfer_ids = [];
         foreach ($rows as $row) {
-            $students = is_array($row->student) ? $row->student : (json_decode((string) $row->getRawOriginal('student'), true) ?: []);
-            $transfers = is_array($row->student_transfer) ? $row->student_transfer : (json_decode((string) $row->getRawOriginal('student_transfer'), true) ?: []);
+            $students = is_array($row->student) ? $row->student : (JsonService::decode_json((string) $row->getRawOriginal('student'), true) ?: []);
+            $transfers = is_array($row->student_transfer) ? $row->student_transfer : (JsonService::decode_json((string) $row->getRawOriginal('student_transfer'), true) ?: []);
             foreach ($students as $sid) {
                 if (! empty($sid) && is_numeric($sid)) {
                     $student_ids[] = (int) $sid;
@@ -1088,9 +1089,9 @@ class ClassStudentListService
                 : [];
 
             $students_in_class = array_merge(
-                json_decode($class_row['student'] ?? '[]', true) ?: [],
-                json_decode($class_row['student_transfer'] ?? '[]', true) ?: [],
-                json_decode($class_row['student_makeup'] ?? '[]', true) ?: []
+                JsonService::decode_json($class_row['student'] ?? '[]', true) ?: [],
+                JsonService::decode_json($class_row['student_transfer'] ?? '[]', true) ?: [],
+                JsonService::decode_json($class_row['student_makeup'] ?? '[]', true) ?: []
             );
 
             foreach ($students_in_class as $sid) {
@@ -1186,9 +1187,9 @@ class ClassStudentListService
             $period_key = $prev_period ? ($prev_period['month'] . '_' . ($prev_period['year'] ?? 0)) : '';
             $coach_prev = $coach_prev_cache[$period_key] ?? ['student' => [], 'transfer' => []];
 
-            $students = json_decode($class_row['student'] ?? '[]', true) ?: [];
-            $transfers = json_decode($class_row['student_transfer'] ?? '[]', true) ?: [];
-            $makeup_ids = array_filter(array_map('intval', json_decode($class_row['student_makeup'] ?? '[]', true) ?: []), fn ($id) => $id > 0);
+            $students = JsonService::decode_json($class_row['student'] ?? '[]', true) ?: [];
+            $transfers = JsonService::decode_json($class_row['student_transfer'] ?? '[]', true) ?: [];
+            $makeup_ids = array_filter(array_map('intval', JsonService::decode_json($class_row['student_makeup'] ?? '[]', true) ?: []), fn ($id) => $id > 0);
             $normal_ids = array_filter(array_map('intval', $students), fn ($id) => $id > 0);
             $transfer_ids = array_filter(array_map('intval', $transfers), fn ($id) => $id > 0);
 
@@ -1240,8 +1241,8 @@ class ClassStudentListService
             $period_key = $prev_period ? ($prev_period['month'] . '_' . ($prev_period['year'] ?? 0)) : '';
             $coach_prev = $coach_prev_cache[$period_key] ?? ['student' => [], 'transfer' => []];
 
-            $students = json_decode($class_row['student'] ?? '[]', true) ?: [];
-            $transfers = json_decode($class_row['student_transfer'] ?? '[]', true) ?: [];
+            $students = JsonService::decode_json($class_row['student'] ?? '[]', true) ?: [];
+            $transfers = JsonService::decode_json($class_row['student_transfer'] ?? '[]', true) ?: [];
             $normal_ids = array_filter(array_map('intval', $students), fn ($id) => $id > 0);
             $transfer_ids = array_filter(array_map('intval', $transfers), fn ($id) => $id > 0);
 
@@ -1318,8 +1319,8 @@ class ClassStudentListService
         $in_current_student = false;
         $in_current_transfer = false;
         if ($row !== null) {
-            $students = is_array($row->student) ? $row->student : (json_decode((string) $row->getRawOriginal('student'), true) ?: []);
-            $transfers = is_array($row->student_transfer) ? $row->student_transfer : (json_decode((string) $row->getRawOriginal('student_transfer'), true) ?: []);
+            $students = is_array($row->student) ? $row->student : (JsonService::decode_json((string) $row->getRawOriginal('student'), true) ?: []);
+            $transfers = is_array($row->student_transfer) ? $row->student_transfer : (JsonService::decode_json((string) $row->getRawOriginal('student_transfer'), true) ?: []);
             $in_current_student = in_array($student_id, array_filter(array_map('intval', $students), fn ($id) => $id > 0), true);
             $in_current_transfer = in_array($student_id, array_filter(array_map('intval', $transfers), fn ($id) => $id > 0), true);
         }

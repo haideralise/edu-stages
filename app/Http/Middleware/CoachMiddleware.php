@@ -18,7 +18,7 @@ class CoachMiddleware
                 ], 401);
             }
             return redirect(
-                app()->environment('local') ? route('login') : config('wp.login_url', '/wp-login.php')
+                app()->environment('local') ? route('login') : config('services.wp.login_url', '/wp-login.php')
             );
         }
         return $next($request);

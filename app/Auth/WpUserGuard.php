@@ -75,32 +75,15 @@ public function viaRemember(): bool
             return 'admin';
         }
 
-        // Priority 2: usermeta wp_capabilities contains 'administrator' → admin
-        $capabilities = $user->meta()
-            ->where('meta_key', 'wp_3x_capabilities')
-            ->value('meta_value');
-
-        if ($capabilities && str_contains($capabilities, 'administrator')) {
-            return 'admin';
-        }
-
-        // Priority 3: edu_class_user.teacher JSON contains this user_id → coach
-        $isCoach = EduClassUser::whereRaw('JSON_VALID(teacher)')
-            ->whereJsonContains('teacher', (string) $user->ID)
-            ->exists();
-
-        if ($isCoach) {
-            return 'coach';
-        }
-
-        // Priority 4: everyone else → student
-        return 'student';
+        // Delegate to the model's cached resolveRole() to avoid
+        // duplicate wp_3x_capabilities queries per request.
+        return $user->resolveRole();
     }
 
     protected function getCookieName(): ?string
     {
         // First try LOGGED_IN_COOKIE from .env
-        $name = config('wp.logged_in_cookie');
+        $name = config('services.wp.logged_in_cookie');
         if ($name && isset($_COOKIE[$name])) {
             return $name;
         }
@@ -178,14 +161,14 @@ public function viaRemember(): bool
     {
         switch ($scheme) {
             case 'auth':
-                return config('wp.auth_key') . config('wp.auth_salt');
+                return config('services.wp.auth_key') . config('services.wp.auth_salt');
 
             case 'secure_auth':
-                return config('wp.secure_auth_key') . config('wp.secure_auth_salt');
+                return config('services.wp.secure_auth_key') . config('services.wp.secure_auth_salt');
 
             case 'logged_in':
             default:
-                return config('wp.logged_in_key') . config('wp.logged_in_salt');
+                return config('services.wp.logged_in_key') . config('services.wp.logged_in_salt');
         }
     }
 

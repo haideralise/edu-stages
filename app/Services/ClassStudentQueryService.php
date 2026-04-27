@@ -322,7 +322,7 @@ class ClassStudentQueryService
 
         $students = [];
 
-        $normal_students = json_decode($next_class['student'] ?? '[]', true);
+        $normal_students = JsonService::decode_json($next_class['student'] ?? '[]', true);
         if (is_array($normal_students)) {
             foreach ($normal_students as $sid) {
                 if (! empty($sid) && is_numeric($sid)) {
@@ -331,7 +331,7 @@ class ClassStudentQueryService
             }
         }
 
-        $transfer_students = json_decode($next_class['student_transfer'] ?? '[]', true);
+        $transfer_students = JsonService::decode_json($next_class['student_transfer'] ?? '[]', true);
         if (is_array($transfer_students)) {
             foreach ($transfer_students as $sid) {
                 if (! empty($sid) && is_numeric($sid)) {
@@ -451,7 +451,7 @@ class ClassStudentQueryService
                     $row = $temp[$class_id];
                     $students = [];
 
-                    $normal = json_decode($row['student'] ?? '[]', true);
+                    $normal = JsonService::decode_json($row['student'] ?? '[]', true);
                     if (is_array($normal)) {
                         foreach ($normal as $sid) {
                             if (! empty($sid) && is_numeric($sid)) {
@@ -460,7 +460,7 @@ class ClassStudentQueryService
                         }
                     }
 
-                    $transfer = json_decode($row['student_transfer'] ?? '[]', true);
+                    $transfer = JsonService::decode_json($row['student_transfer'] ?? '[]', true);
                     if (is_array($transfer)) {
                         foreach ($transfer as $sid) {
                             if (! empty($sid) && is_numeric($sid)) {

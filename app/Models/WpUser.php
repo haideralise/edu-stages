@@ -87,6 +87,8 @@ class WpUser extends Authenticatable
         return $this->meta()->where('meta_key', $key)->value('meta_value');
     }
 
+    private ?string $cachedRole = null;
+
     /**
      * Resolve role per doc 08 §2.3:
      *  - admin  → wp_capabilities contains 'administrator' or 'mssc'
@@ -95,15 +97,19 @@ class WpUser extends Authenticatable
      */
     public function resolveRole(): string
     {
+        if ($this->cachedRole !== null) {
+            return $this->cachedRole;
+        }
+
         $caps = $this->getMetaValue('wp_3x_capabilities');
         if ($caps) {
             $parsed = @unserialize($caps);
             if (is_array($parsed) && (isset($parsed['administrator']) || isset($parsed['mssc']))) {
-                return 'admin';
+                return $this->cachedRole = 'admin';
             }
         }
 
-        return EduClassUser::forCoach($this->ID)->exists() ? 'coach' : 'student';
+        return $this->cachedRole = (EduClassUser::forCoach($this->ID)->exists() ? 'coach' : 'student');
     }
 
     // ── from P1 ─────────────────────────────────────────────────

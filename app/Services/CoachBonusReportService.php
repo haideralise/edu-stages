@@ -9,6 +9,7 @@ namespace App\Services;
 
 use App\Services\AttendanceQueryService;
 use App\Services\CoachBonusCalculationService;
+use App\Services\JsonService;
 
 class CoachBonusReportService
 {
@@ -53,7 +54,7 @@ class CoachBonusReportService
             $class_month = $class_row['class_month'] ?? '';
             $class_days_str = $class_row['class_days'] ?? '';
             $normal_ids = array_filter(
-                array_map('intval', json_decode($class_row['student'] ?? '[]', true) ?: []),
+                array_map('intval', JsonService::decode_json($class_row['student'] ?? '[]', true) ?: []),
                 fn ($id) => $id > 0
             );
 
@@ -184,7 +185,7 @@ class CoachBonusReportService
         $class_month = $class_row['class_month'] ?? '';
         $class_days_str = $class_row['class_days'] ?? '';
         $normal_ids = array_filter(
-            array_map('intval', json_decode($class_row['student'] ?? '[]', true) ?: []),
+            array_map('intval', JsonService::decode_json($class_row['student'] ?? '[]', true) ?: []),
             fn ($id) => $id > 0
         );
 
@@ -444,7 +445,7 @@ class CoachBonusReportService
                 continue;
             }
             $makeup_ids = array_filter(
-                array_map('intval', json_decode($class_row['student_makeup'] ?? '[]', true) ?: []),
+                array_map('intval', JsonService::decode_json($class_row['student_makeup'] ?? '[]', true) ?: []),
                 fn ($id) => $id > 0
             );
             if (! in_array($user_id, $makeup_ids, true)) {
@@ -509,7 +510,7 @@ class CoachBonusReportService
                 continue;
             }
             $makeup_ids = array_filter(
-                array_map('intval', json_decode($class_row['student_makeup'] ?? '[]', true) ?: []),
+                array_map('intval', JsonService::decode_json($class_row['student_makeup'] ?? '[]', true) ?: []),
                 fn ($id) => $id > 0
             );
             if (! in_array($user_id, $makeup_ids, true)) {
