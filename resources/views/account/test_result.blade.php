@@ -12,12 +12,12 @@
         <div class="mb-6">
             <h2 class="text-xl font-semibold mb-3">{{ $course->name }}</h2>
 
-            @if ($course->descendants && $course->descendants->count())
-                @foreach ($course->descendants as $level)
+            @if ($course->children && $course->children->count())
+                @foreach ($course->children as $level)
                     <div class="bg-white rounded shadow mb-4 p-4">
                         <h3 class="text-lg font-medium mb-2">{{ $level->name }}</h3>
 
-                        @if ($level->descendants && $level->descendants->count())
+                        @if ($level->children && $level->children->count())
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
@@ -28,7 +28,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200">
-                                    @foreach ($level->descendants as $item)
+                                    @foreach ($level->children as $item)
                                         @php $itemResults = $resultsByExamId->get($item->id, collect()); @endphp
                                         @if ($itemResults->count())
                                             @foreach ($itemResults as $result)
