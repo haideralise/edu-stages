@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\WpUser;
 use App\Services\ChartDataService;
+use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class StudentChartController extends Controller
 {
+    use ApiResponse;
+
     public function __construct(private readonly ChartDataService $chartService) {}
 
     public function index(Request $request): View
@@ -44,6 +47,6 @@ class StudentChartController extends Controller
             ? $this->chartService->getResultChartData($target)
             : $this->chartService->getBmiChartData($target, $type);
 
-        return response()->json(['data' => $data]);
+        return $this->success($data);
     }
 }

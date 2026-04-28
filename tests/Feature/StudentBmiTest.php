@@ -166,7 +166,7 @@ class StudentBmiTest extends TestCase
 
         $response->assertOk();
         $response->assertJsonFragment(['id' => $bmi->id]);
-        $response->assertJsonStructure(['id', 'height', 'weight', 'hc', 'date', 'date_formatted', 'bmi']);
+        $response->assertJsonStructure(['data' => ['id', 'height', 'weight', 'hc', 'date', 'date_formatted', 'bmi'], 'meta']);
     }
 
     // ── Edit / Update ────────────────────────────────────────────
@@ -246,7 +246,7 @@ class StudentBmiTest extends TestCase
             ->deleteJson("/edu/account/bmi/{$bmi->id}");
 
         $response->assertOk();
-        $response->assertJson(['message' => 'Deleted']);
+        $response->assertJson(['data' => ['message' => 'Deleted']]);
         $this->assertDatabaseMissing('edu_bmi', ['id' => $bmi->id]);
     }
 
