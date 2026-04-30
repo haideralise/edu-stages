@@ -36,7 +36,7 @@
                         <td class="px-4 py-2 text-sm">{{ $className }}</td>
                         <td class="px-4 py-2 text-sm">{{ $paMonth }}</td>
                         <td class="px-4 py-2 text-sm">${{ number_format((float) $amount, 2) }}</td>
-                        <td class="px-4 py-2 text-sm">{{ $date ? date('Y-m-d', strtotime($date)) : '' }}</td>
+                        <td class="px-4 py-2 text-sm">{{ $date ? (is_numeric($date) ? date('Y-m-d', (int) $date) : date('Y-m-d', strtotime($date))) : '' }}</td>
                         <td class="px-4 py-2 text-sm">{{ $source }}</td>
                         <td class="px-4 py-2 text-sm">
                             @if ($renewText)

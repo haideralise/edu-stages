@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\EduClass;
 use App\Services\StudentPaymentServiceCommon;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -38,8 +39,14 @@ class OrderController extends Controller
             $order_list, $order_all, $userId, []
         );
 
+        $classIds = array_unique(array_filter(array_column($whatsapp_orders, 'class_id')));
+        $classes = $classIds !== []
+            ? EduClass::whereIn('class_id', $classIds)->get()
+                ->keyBy('class_id')->map(fn ($m) => $m->getAttributes())->all()
+            : [];
+
         $waOrders = $paymentService->prepareWhatappOrders(
-            $whatsapp_orders, $order_all, $userId, [], []
+            $whatsapp_orders, $order_all, $userId, $classes, []
         );
 
         $allOrders = array_merge($displayOrders, $waOrders);
