@@ -70,8 +70,23 @@ class EduLevel extends Model
     }
 
     // P3: build full level tree from root nodes — used by StudentResultController
+    // Single query: loads all rows and builds the tree in memory.
     public static function getTree(): Collection
     {
-        return self::where('pid', 0)->with('descendants')->get();
+        $all = self::all();
+        $grouped = $all->groupBy('pid');
+
+        $attach = function (Collection $nodes) use ($grouped, &$attach) {
+            foreach ($nodes as $node) {
+                $children = $grouped->get($node->id, collect());
+                $attach($children);
+                $node->setRelation('children', $children);
+            }
+        };
+
+        $roots = $grouped->get(0, collect());
+        $attach($roots);
+
+        return $roots;
     }
 }

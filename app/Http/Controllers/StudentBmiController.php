@@ -6,9 +6,8 @@ use App\Http\Requests\StoreBmiRequest;
 use App\Http\Requests\UpdateBmiRequest;
 use App\Http\Resources\BmiResource;
 use App\Models\EduBmi;
-use App\Models\EduClassUser;
-use App\Models\WpUser;
-use App\Models\WpUserMeta;
+use App\Services\BmiQueryService;
+use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,7 +15,9 @@ use Illuminate\View\View;
 
 class StudentBmiController extends Controller
 {
-    public function index(Request $request): View
+    use ApiResponse;
+
+    public function index(Request $request, BmiQueryService $queryService): View
     {
         $this->authorize('viewAny', EduBmi::class);
 
@@ -24,28 +25,10 @@ class StudentBmiController extends Controller
         $isAdmin = $user->resolveRole() === 'admin';
 
         if ($isAdmin) {
-            $records = EduBmi::with('user.meta')
-                ->orderByDesc('date')
-                ->get()
-                ->each(fn (EduBmi $bmi) => $bmi->setAttribute('student_name', $bmi->user?->display_name ?? "Student #{$bmi->user_id}"));
-
-            $coachIds = EduClassUser::allTeacherIds();
-
-            $adminIds = WpUserMeta::where('meta_key', 'wp_3x_capabilities')
-                ->where('meta_value', 'like', '%administrator%')
-                ->pluck('user_id');
-
-            $excludeIds = $coachIds->merge($adminIds)->unique()->values()->all();
-
-            $students = WpUser::whereNotIn('ID', $excludeIds)
-                ->orderBy('display_name')
-                ->get();
+            $records = $queryService->getAllRecords();
+            $students = $queryService->getStudentList();
         } else {
-            $records = EduBmi::with('user.meta')
-                ->forUser($user->ID)
-                ->orderByDesc('date')
-                ->get();
-
+            $records = $queryService->getRecordsForUser($user->ID);
             $students = collect();
         }
 
@@ -56,7 +39,7 @@ class StudentBmiController extends Controller
     {
         $this->authorize('view', $bmi);
 
-        return response()->json(new BmiResource($bmi));
+        return $this->success(new BmiResource($bmi));
     }
 
     public function store(StoreBmiRequest $request): JsonResponse|RedirectResponse
@@ -80,9 +63,7 @@ class StudentBmiController extends Controller
         ]);
 
         if ($request->expectsJson()) {
-            return (new BmiResource($bmi))
-                ->response()
-                ->setStatusCode(201);
+            return $this->success(new BmiResource($bmi))->setStatusCode(201);
         }
 
         return redirect()->route('account.mybmi')->with('success', 'BMI record added.');
@@ -101,7 +82,7 @@ class StudentBmiController extends Controller
         ]);
 
         if ($request->expectsJson()) {
-            return (new BmiResource($bmi))->response();
+            return $this->success(new BmiResource($bmi));
         }
 
         return redirect()->route('account.mybmi')->with('success', 'BMI record updated.');
@@ -114,7 +95,7 @@ class StudentBmiController extends Controller
         $bmi->delete();
 
         if ($request->expectsJson()) {
-            return response()->json(['message' => 'Deleted']);
+            return $this->success(['message' => 'Deleted']);
         }
 
         return redirect()->route('account.mybmi')->with('success', 'BMI record deleted.');
